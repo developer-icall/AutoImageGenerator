@@ -1,0 +1,148 @@
+{
+    "Base Positive Prompt": {
+        "prompts": [
+            "(8k, RAW photo, best quality, masterpiece:1.2), ultra detailed, ultra high res, (realistic, photo realistic:1.4), high detail RAW color photo, professional photograph"
+        ],
+        "use max prompts": 1,
+        "use min prompts": 1
+    },
+    "Women Type": {
+        "prompts": [
+            "cute girl, famous japanese idol",
+            "kawaii"
+        ],
+        "use max prompts": 1,
+        "use min prompts": 0
+    },
+    "Body Type": {
+        "prompts": [
+            "Breasts: 1.2",
+            "slender body",
+            "slender abs :1.1",
+            "Perfect Body Beauty: 1.4"
+        ],
+        "use max prompts": 1,
+        "use min prompts": 0
+    },
+    "Face": {
+        "prompts": [
+            "smile",
+            "Double Eyelids",
+            "cute face",
+            "baby face"
+        ],
+        "use max prompts": 1,
+        "use min prompts": 1
+    },
+    "age": {
+        "prompts": [
+            "teenage",
+            "(18 years old:1.2)",
+            "(20 years old:1.2)",
+            "(25 years old:1.2)"
+        ],
+        "use max prompts": 1,
+        "use min prompts": 0
+    },
+    "Cloth": {
+        "prompts": [
+            "blouse",
+            "Wearing oversized off-shoulder knit over lingerie",
+            "T-shirt",
+            "wearing floral onepiece",
+            "Bandeau Dress",
+            "knit blouse, skirt",
+            "casual dress",
+            "hoodie",
+            "loose necktie, socks, shoes, school uniform, plaid skirt, shirt, loafers, knee highs, pleated skirt",
+            "(lingerie:1.3), pants",
+            "(wedding dress:1.7)",
+            "black t shirt, blue pants",
+            "(Wearing a Swimsuit)",
+            "Henry shirt with ripped shorts",
+            "(Dress: 1.1)",
+            "Teleportion",
+            "White Autumn Wear",
+            "White Winter Wear"
+        ],
+        "use max prompts": 1,
+        "use min prompts": 1
+    },
+    "Hair Type": {
+        "prompts": [
+            "Layered Haircut",
+            "long straight hair",
+            "((Delicate Long Hair))"
+        ],
+        "use max prompts": 1,
+        "use min prompts": 0
+    },
+    "Hair Color": {
+        "prompts": [
+            "Dark brown hair",
+            "brown hair",
+            "black hair",
+            "blonde hair"
+        ],
+        "use max prompts": 1,
+        "use min prompts": 0
+    },
+    "Accesarry": {
+        "prompts": [
+            "necklace",
+            "earrings",
+            "a pendant",
+            "wearing a necklace"
+        ],
+        "use max prompts": 1,
+        "use min prompts": 0
+    },
+    "Camera Settings": {
+        "prompts": [
+            "(depth of field, blurry:1.4)",
+            "35mm lens, f/ 1. 8",
+            "Focus: 1.2"
+        ],
+        "use max prompts": 1,
+        "use min prompts": 0
+    },
+    "Place": {
+        "prompts": [
+            "street",
+            "room",
+            "bed room",
+            "grass field",
+            "at luxury hotel",
+            "Urban Area: 1.2",
+            "Park"
+        ],
+        "use max prompts": 1,
+        "use min prompts": 0
+    },
+    "lighting": {
+        "prompts": [
+            "accent lighting",
+            "Professional Lighting",
+            "Photon Mapping"
+        ],
+        "use max prompts": 1,
+        "use min prompts": 0
+    },
+    "pose": {
+        "prompts": [
+            "(kneeling on the floor, open legs :1.2)",
+            "stretching",
+            "a women sitting on bed"
+        ],
+        "use max prompts": 1,
+        "use min prompts": 0
+    },
+    "others": {
+        "prompts": [
+            "Whitening Skin",
+            "Highly Detailed Face and Skin Texture"
+        ],
+        "use max prompts": 1,
+        "use min prompts": 0
+    }
+}
