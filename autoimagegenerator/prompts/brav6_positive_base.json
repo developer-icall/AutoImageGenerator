@@ -1,0 +1,150 @@
+{
+    "Base Positive Prompt": {
+        "prompts": [
+            "(8k, RAW photo, best quality, masterpiece:1.2), 1girl, (looking at viewer:1.4), ultra detailed, ultra high res, (realistic, photo realistic:1.4), high detail RAW color photo"
+        ],
+        "use max prompts": 1,
+        "use min prompts": 1
+    },
+    "Women Type": {
+        "prompts": [
+            "cute girl, famous japanese idol",
+            "kawaii",
+            "cool beauty"
+        ],
+        "use max prompts": 1,
+        "use min prompts": 0
+    },
+    "Body Type": {
+        "prompts": [
+            "Breasts: 1.2",
+            "slender body",
+            "slender abs :1.1",
+            "Perfect Body Beauty: 1.4",
+            "smaller bust",
+            "Toned Abs",
+            "Wet Body"
+        ],
+        "use max prompts": 1,
+        "use min prompts": 0
+    },
+    "Face": {
+        "prompts": [
+            "smile",
+            "embarrassed smile",
+            "Double Eyelids",
+            "cute face"
+        ],
+        "use max prompts": 1,
+        "use min prompts": 0
+    },
+    "age": {
+        "prompts": [
+            "(18 years old:1.2)",
+            "(20 years old:1.2)",
+            "(23 years old:1.2)",
+            "(25 years old:1.2)",
+            "(28 years old:1.2)"
+        ],
+        "use max prompts": 1,
+        "use min prompts": 0
+    },
+    "Hair Type": {
+        "prompts": [
+            "Layered Haircut",
+            "long straight hair",
+            "((Delicate Long Hair))",
+            "A-line haircut",
+            "very long hair",
+            "medium hair",
+            "short hair",
+            "one-length haircut",
+            "ducktail",
+            "low ponytail",
+            "curly hair",
+            "perm hair",
+            "twintails",
+            "ponytail",
+            "side ponytail",
+            "bob cut",
+            "fluffy bob cut",
+            "braid",
+            "wavy hair",
+            "hime cut",
+            "half updo",
+            "flipped hair",
+            "shiny hair",
+            "messy hair",
+            "spiked hair",
+            "straight hair",
+            "twin braids",
+            "drill hair",
+            "natural wave",
+            "sauvage",
+            "low twintails",
+            "french braid",
+            "hair bun",
+            "half twin tail",
+            "shaggy hair",
+            "while tying my hair"
+        ],
+        "use max prompts": 1,
+        "use min prompts": 0
+    },
+    "Hair Length Type": {
+        "prompts": [
+            "long hair",
+            "very long hair",
+            "medium hair",
+            "short hair"
+        ],
+        "use max prompts": 1,
+        "use min prompts": 0
+    },
+    "Hair Front Type": {
+        "prompts": [
+            "hair between eyes",
+            "see-through bang",
+            "forehead hair",
+            "blunt bangs",
+            "short bangs",
+            "braided bangs",
+            "bangs pinned back"
+        ],
+        "use max prompts": 1,
+        "use min prompts": 0
+    },
+    "Hair Color": {
+        "prompts": [
+            "Dark brown hair",
+            "Dark brown hair",
+            "Dark brown hair",
+            "Dark brown hair",
+            "Dark brown hair",
+            "Dark brown hair",
+            "brown hair",
+            "brown hair",
+            "brown hair",
+            "brown hair",
+            "brown hair",
+            "brown hair",
+            "brown hair",
+            "black hair",
+            "black hair",
+            "black hair",
+            "black hair",
+            "blonde hair",
+            "jet black hair",
+            "jet black hair",
+            "jet black hair",
+            "ash hair",
+            "two-tone hair",
+            "colored inner hair",
+            "light orange hair",
+            "copper hair",
+            "pink hair"
+        ],
+        "use max prompts": 1,
+        "use min prompts": 1
+    }
+}
