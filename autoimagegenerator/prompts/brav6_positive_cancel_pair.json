@@ -1,0 +1,109 @@
+{
+    "bikini": [
+        "room",
+        "street",
+        "at luxury hotel",
+        "Park",
+        "(woman with left hand in pockets:1.4)",
+        "accent lighting",
+        "sit against the wall",
+        "a women sitting on bed",
+        "sit in a chair",
+        "(lie face down:1.2)"
+    ],
+    "dress": [
+        "(woman with left hand in pockets:1.4)",
+        "hair ribbon"
+    ],
+    "onepiece": [
+        "(woman with left hand in pockets:1.4)"
+    ],
+    "camisole": [
+        "(woman with left hand in pockets:1.4)"
+    ],
+    "lingerie": [
+        "(woman with left hand in pockets:1.4)"
+    ],
+    "T-shirt": [
+        "(woman with left hand in pockets:1.4)"
+    ],
+    "v-neck sweater": [
+        "(woman with left hand in pockets:1.4)"
+    ],
+    "(woman with left hand in pockets:1.4)": [
+        "white summer wear",
+        "skirt",
+        "blouse",
+        "room"
+    ],
+    "Emphasize the cleavage": [
+        "Down jacket",
+        "White Autumn Wear",
+        "White Winter Wear",
+        "Denim jacket",
+        "Down vest",
+        "Tailored jacket",
+        "trench coat",
+        "Pea coat",
+        "Fleece jacket",
+        "Overcoat",
+        "hoodie jacket",
+        "quilted jacket",
+        "Winter coat",
+        "Performance jacket",
+        "Wool coat",
+        "Cape jacket",
+        "sweater",
+        "turtleneck",
+        "polo shirt",
+        "sweatshirt",
+        "poncho"
+    ],
+    "Showcasing cleavage": [
+        "Down jacket",
+        "White Autumn Wear",
+        "White Winter Wear",
+        "Denim jacket",
+        "Down vest",
+        "Tailored jacket",
+        "trench coat",
+        "Pea coat",
+        "Fleece jacket",
+        "Overcoat",
+        "hoodie jacket",
+        "quilted jacket",
+        "Winter coat",
+        "Performance jacket",
+        "Wool coat",
+        "Cape jacket",
+        "sweater",
+        "turtleneck",
+        "polo shirt",
+        "sweatshirt",
+        "poncho"
+    ],
+    "a women sitting on bed": [
+        "(wearing a frill bikini, at luxury pool, upper body)",
+        "(Wearing micro bikini, at beach, Upper body)",
+        "bikini, (at beach:1.3)",
+        "Wearing cross halter bikini, at beach, Upper body",
+        "henry shirt with ripped shorts"
+    ],
+    "from above": [
+        "Spread legs"
+    ],
+    "sit in a chair": [
+        "Sunlight",
+        "Dappled-sunlight",
+        "Moonlight"
+    ],
+    "Dress": [
+        "room"
+    ],
+    "sitting": [
+        "room"
+    ],
+    "(lie face down:1.2)": [
+        "Moonlight"
+    ]
+}

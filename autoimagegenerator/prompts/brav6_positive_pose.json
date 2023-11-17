@@ -1,0 +1,49 @@
+{
+    "pose": {
+        "prompts": [
+            "a women sitting on bed",
+            "looking up, smile",
+            "leaning forward",
+            "arched back",
+            "dynamic pose",
+            "(look back:1.3)",
+            "arched back",
+            "sit in a chair",
+            "girl sitting",
+            "sit against the wall, hand between legs",
+            "(lie face down:1.2)",
+            "selfie",
+            "Hands on Hips",
+            "left hand on hips",
+            "(woman with left hand in pockets:1.4)",
+            "fashion model posing",
+            "(Looking Over Shoulder:1.3)",
+            "tilting head",
+            "Spread legs",
+            "Arching the back",
+            "Swayback stance",
+            "Seductive pose"
+        ],
+        "use max prompts": 1,
+        "use min prompts": 1
+    },
+    "Face": {
+        "prompts": [
+            "smile",
+            "smile",
+            "smile",
+            "smile",
+            "smile",
+            "Half-smile",
+            "Half-smile",
+            "Half-smile",
+            "wink",
+            "wink",
+            "Smirk",
+            "Smirk",
+            "Mournful"
+        ],
+        "use max prompts": 1,
+        "use min prompts": 0
+    }
+}
