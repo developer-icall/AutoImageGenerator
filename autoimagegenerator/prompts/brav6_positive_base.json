@@ -1,7 +1,7 @@
 {
     "Base Positive Prompt": {
         "prompts": [
-            "(8k, RAW photo, best quality, masterpiece:1.2), 1girl, (looking at viewer:1.4), ultra detailed, ultra high res, (realistic, photo realistic:1.4), high detail RAW color photo"
+            "(8k, RAW photo, best quality, masterpiece:1.2), (1girl:1.3), (looking at viewer:1.4), ultra detailed, ultra high res, (realistic, photo realistic:1.4), high detail RAW color photo"
         ],
         "use max prompts": 1,
         "use min prompts": 1
@@ -9,12 +9,12 @@
     "Women Type": {
         "prompts": [
             "cute girl, famous japanese idol",
-            "kawaii",
-            "cool beauty",
-            "As a fashion model"
+            "japanese kawaii",
+            "japanese cool beauty",
+            "japanese fashion model"
         ],
         "use max prompts": 1,
-        "use min prompts": 0
+        "use min prompts": 1
     },
     "Body Type": {
         "prompts": [
@@ -65,7 +65,6 @@
             "messy hair",
             "spiked hair",
             "straight hair",
-            "twin braids",
             "drill hair",
             "natural wave",
             "sauvage",
@@ -82,7 +81,7 @@
             "Pixie Cut"
         ],
         "use max prompts": 1,
-        "use min prompts": 0
+        "use min prompts": 1
     },
     "Hair Color": {
         "prompts": [
@@ -138,17 +137,12 @@
             "light brown hair",
             "black hair",
             "black hair",
-            "black hair",
-            "black hair",
-            "black hair",
-            "black hair",
-            "black hair",
-            "black hair",
-            "black hair",
-            "black hair",
-            "jet black hair",
-            "jet black hair",
-            "jet black hair",
+            "black hair, cloth color is white or gray",
+            "black hair, cloth color is white or gray or black",
+            "black hair, cloth color is white or gray or black",
+            "jet black hair, cloth color is white or gray",
+            "jet black hair, cloth color is white or gray or black",
+            "jet black hair, cloth color is white or gray or black",
             "jet black hair",
             "colored inner hair",
             "colored inner hair",

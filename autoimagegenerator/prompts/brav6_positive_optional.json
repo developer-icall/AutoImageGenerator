@@ -36,7 +36,7 @@
             "poncho",
             "quilted jacket",
             "ruffle dress",
-            "short sleeves, shorts",
+            "short sleeves",
             "skirt",
             "sleeveless top",
             "smock blouse",
@@ -51,7 +51,6 @@
             "v-neck sweater",
             "wearing floral onepiece",
             "white autumn wear",
-            "white spring wear",
             "white summer wear",
             "white winter wear",
             "winter coat",
@@ -108,10 +107,7 @@
     },
     "lighting": {
         "prompts": [
-            "Professional Lighting",
-            "Photon Mapping",
-            "Sunlight",
-            "Dappled-sunlight"
+            "Sunlight"
         ],
         "use max prompts": 1,
         "use min prompts": 0
