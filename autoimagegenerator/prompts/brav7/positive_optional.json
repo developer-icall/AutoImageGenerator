@@ -1,0 +1,112 @@
+{
+  "Cloth": {
+    "prompts": [
+      "(wearing a frill bikini, at luxury pool, upper body)",
+      "(Wearing micro bikini, at beach, Upper body)",
+      "bikini, (at beach:1.3)",
+      "Wearing cross halter bikini, at beach, Upper body",
+      "bandeau dress",
+      "bell sleeve",
+      "blouse",
+      "button-up shirt",
+      "cape knit",
+      "casual dress",
+      "chiffon blouse",
+      "cold shoulder top",
+      "denim jacket",
+      "down jacket",
+      "fleece jacket",
+      "henley shirt",
+      "high slit dress",
+      "hoodie",
+      "hoodie jacket",
+      "knit blouse, skirt",
+      "lace tops",
+      "maxi dress",
+      "mini dress",
+      "mock neck top",
+      "off-the-shoulder top",
+      "overcoat",
+      "party dress",
+      "pea coat",
+      "performance jacket",
+      "polo shirt",
+      "poncho",
+      "quilted jacket",
+      "ruffle dress",
+      "short sleeves",
+      "skirt",
+      "sleeveless top",
+      "smock blouse",
+      "sweater",
+      "sweatshirt",
+      "tailored jacket",
+      "trench coat",
+      "Plain T-shirt",
+      "tunic blouse",
+      "turtleneck",
+      "v-neck sweater",
+      "wearing floral onepiece",
+      "autumn wear",
+      "white summer wear",
+      "white winter wear",
+      "winter coat",
+      "wool coat"
+    ],
+    "use max prompts": 1,
+    "use min prompts": 1
+  },
+  "Accesarry": {
+    "prompts": [
+      "necklace",
+      "necklace",
+      "necklace",
+      "necklace",
+      "earrings",
+      "earrings",
+      "earrings",
+      "earrings",
+      "earrings",
+      "a pendant",
+      "a pendant",
+      "a pendant",
+      "wearing a necklace",
+      "wearing a necklace",
+      "hair accessory",
+      "hair ribbon",
+      "piercing",
+      "piercing",
+      "piercing"
+    ],
+    "use max prompts": 1,
+    "use min prompts": 0
+  },
+  "Camera Settings": {
+    "prompts": ["(depth of field, blurry:1.4)", "f/ 1. 8"],
+    "use max prompts": 1,
+    "use min prompts": 0
+  },
+  "Place": {
+    "prompts": ["room", "street", "at luxury hotel", "Park"],
+    "use max prompts": 1,
+    "use min prompts": 0
+  },
+  "lighting": {
+    "prompts": ["Sunlight"],
+    "use max prompts": 1,
+    "use min prompts": 0
+  },
+  "composition": {
+    "prompts": [
+      "face focus",
+      "portrait",
+      "upper body",
+      "close-up shot",
+      "middle shot",
+      "from above",
+      "Three-Quarter Length shot"
+    ],
+    "use max prompts": 1,
+    "use min prompts": 0
+  }
+}
