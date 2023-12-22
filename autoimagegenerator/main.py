@@ -1,5 +1,23 @@
 from auto_image_generator import AutoImageGenerator
+import sys
 import time
+
+# 定数定義
+SD_MODEL_CHECKPOINTS = {
+    "brav6": "Brav6.safetensors",
+    "brav7": "beautifulRealistic_v7.safetensors"
+}
+
+arg_sd_model = "brav6"
+
+# コマンドライン引数から指定されたモデルチェックポイントの値を取得
+if len(sys.argv) > 1:
+    arg_sd_model = sys.argv[1].lower()  # 引数を小文字に変換して比較
+    sd_model_checkpoint = SD_MODEL_CHECKPOINTS.get(arg_sd_model)
+else:
+    sd_model_checkpoint = "Brav6.safetensors"  # デフォルト値
+
+print(f"sd_model_checkpoint: {sd_model_checkpoint}")
 
 # 処理の開始時間を記録
 start_time = time.time()
@@ -11,8 +29,9 @@ auto_image_generator = AutoImageGenerator(
     input_folder="../images/input",
     output_folder="../images/output",
     prompts_folder="./prompts",
-    url="http://localhost:7860",
-    sd_model_checkpoint="Brav6.safetensors",
+    url="http://192.168.1.130:7860",
+    sd_model_checkpoint=sd_model_checkpoint,
+    sd_model_prefix=arg_sd_model,
     enable_hr=True
 )
 

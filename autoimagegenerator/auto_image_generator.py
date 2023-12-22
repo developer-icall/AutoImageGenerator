@@ -13,15 +13,17 @@ class AutoImageGenerator:
 
     def __init__(
         self,
-        image_generate_batch_execute_count=10,
+        image_generate_batch_execute_count=1,
         another_version_generate_count=11,
         input_folder="./autoimagegenerator/images/input",
         output_folder="./autoimagegenerator/images/output",
         prompts_folder="./prompts",
         url="http://localhost:7860",
         sd_model_checkpoint="Brav6.safetensors",
+        sd_model_prefix="brav6",
         enable_hr=False,
     ):
+        # パラメータから受け取った値をプロパティへセット
         # 画像生成バッチの実行回数を指定
         self.IMAGE_GENERATE_BATCH_EXECUTE_COUNT = image_generate_batch_execute_count
 
@@ -32,25 +34,31 @@ class AutoImageGenerator:
         self.INPUT_FOLDER = input_folder
         # 生成された画像の保存先フォルダのルートパス
         self.OUTPUT_FOLDER = output_folder
-        # ハイレゾ画像で生成するかどうか
-        self.ENABLE_HR = enable_hr
 
         # プロンプトの保存先フォルダ
-        self.PROMPT_PATH = prompts_folder
-        self.POSITIVE_PROMPT_BASE_FILENAME = 'brav6_positive_base.json'
-        self.POSITIVE_PROMPT_POSE_FILENAME = 'brav6_positive_pose.json'
-        self.POSITIVE_PROMPT_OPTIONAL_FILENAME = 'brav6_positive_optional.json'
-        self.NEGATIVE_PROMPT_FILENAME = 'brav6_negative.json'
-        self.CANCEL_SEEDS_FILENAME = 'brav6_cancel_seeds.json'
-
-        # 同時に使用できないプロンプトの組み合わせを保存したファイル
-        self.POSITIVE_PROMPT_CANCEL_PAIR_FILENAME = 'brav6_positive_cancel_pair.json'
+        self.PROMPT_PATH = prompts_folder + "/" + sd_model_prefix
 
         # StableDiffusionのAPI URL
         self.URL = url
+        
+        # 使用するモデルチェックポイント
+        self.SD_MODEL_CHECKPOINT = sd_model_checkpoint
+        
+        # 使用するモデルのプリフィックス
+        self.SD_MODEL_PREFIX = sd_model_prefix
 
-        # 生成された画像の別バージョン(同じSeed値でオプションのプロンプトを変更)を作成する回数を指定
-        self.ANOTHER_VERSION_GENERATE_COUNT = 11
+        # ハイレゾ画像で生成するかどうか
+        self.ENABLE_HR = enable_hr
+
+        # 定数定義
+        self.POSITIVE_PROMPT_BASE_FILENAME = "positive_base.json"
+        self.POSITIVE_PROMPT_POSE_FILENAME = "positive_pose.json"
+        self.POSITIVE_PROMPT_OPTIONAL_FILENAME = "positive_optional.json"
+        self.NEGATIVE_PROMPT_FILENAME = "negative.json"
+        self.CANCEL_SEEDS_FILENAME = "cancel_seeds.json"
+
+        # 同時に使用できないプロンプトの組み合わせを保存したファイル
+        self.POSITIVE_PROMPT_CANCEL_PAIR_FILENAME = "positive_cancel_pair.json"
 
         # サムネイル用画像の保存先フォルダのパス
         self.thumbnail_FOLDER = "/thumbnail"
@@ -70,7 +78,7 @@ class AutoImageGenerator:
 
         # text2imgのベースとなるpayload
         self.TXT2IMG_BASE_PAYLOAD = {
-            "steps": 40,
+            "steps": 60,
             "seed": -1,
             "width": 512,
             "height": 768,
@@ -78,7 +86,7 @@ class AutoImageGenerator:
             "batch_size": 1,
             "batch_count": 1,
             "sampler_name": "DPM++ 2M Karras",
-            "sd_model_checkpoint": sd_model_checkpoint,
+            "sd_model_checkpoint": self.SD_MODEL_CHECKPOINT,
             "enable_hr": enable_hr,
             "hr_scale": 2,
             "hr_upscaler": "4x-UltraSharp",
@@ -87,14 +95,14 @@ class AutoImageGenerator:
 
         # 生成された画像の別バージョン作成時のtext2imgのベースとなるpayload
         self.ANOTHER_VERSION_TXT2IMG_BASE_PAYLOAD = {
-            "steps": 40,
+            "steps": 60,
             "width": 512,
             "height": 768,
             "cfg_scale": 7,
             "batch_size": 1,
             "batch_count": 1,
             "sampler_name": "DPM++ 2M Karras",
-            "sd_model_checkpoint": sd_model_checkpoint,
+            "sd_model_checkpoint": self.SD_MODEL_CHECKPOINT,
             "enable_hr": enable_hr,
             "hr_scale": 2,
             "hr_upscaler": "4x-UltraSharp",
@@ -154,7 +162,7 @@ class AutoImageGenerator:
         prompt = positive_pose_prompts + ", " + positive_base_prompts + ", " + positive_optional_prompts
 
         # 結合したプロンプト文字列内にキー文字列が含まれている場合は、キーに対応する cancel prompts 内にキャンセル対象の文字列がないかを検索
-        cancel_prompts = {}
+        cancel_prompts = []
         for key, value in self.DATA_POSITIVE_CANCEL_PAIR.items():
             # キー文字列がプロンプト文字列内に含まれているかを検索
             if key in prompt:
@@ -201,9 +209,10 @@ class AutoImageGenerator:
                 folder_path = os.path.join(self.OUTPUT_FOLDER, folder_name).replace("\\", "/")
 
             if len(cancel_prompts) > 0:
-                print(f"folder_name: {folder_name} のプロンプト文字列内のキャンセル対象文字列のペア)")
-                for key, value in cancel_prompts.items():
-                    print(f" {key}: {value}")
+                print(f"folder_name: {folder_name} のプロンプト文字列内のキャンセル対象文字列のペア")
+                for item in cancel_prompts:
+                    for key, value in item.items():
+                        print(f"{key}: {value}")
 
             for seed in self.DATA_CANCEL_SEEDS["Seeds"]:
                 if seed_value == seed:
@@ -288,7 +297,7 @@ class AutoImageGenerator:
 
     # 使用されたプロンプトをテキストファイルに保存
     def save_prompts_to_json(self, positive_base_prompt_dict, positive_optional_pose_dict, positive_optional_prompt_dict, negative_prompt_dict, folder_path, filename, cancel_prompts):
-        merged_dict = {**positive_optional_pose_dict, **positive_base_prompt_dict, **positive_optional_prompt_dict, **negative_prompt_dict}
+        merged_dict = {"sd_model": self.SD_MODEL_PREFIX, **positive_optional_pose_dict, **positive_base_prompt_dict, **positive_optional_prompt_dict, **negative_prompt_dict}
         if len(cancel_prompts) > 0:
             merged_dict["cancel_prompts"] = cancel_prompts
         # プロンプトをJSONファイルに保存
