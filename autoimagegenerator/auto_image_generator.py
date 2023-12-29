@@ -317,6 +317,111 @@ class AutoImageGenerator:
 
         return result_image
 
+    def create_image_collage(self, input_folder, output_path, rows, cols, recreate_collage=True):
+
+        # フォルダ内のファイル一覧を取得
+        files = os.listdir(output_path)
+
+        # "collage" を含むファイルを削除
+        for file_name in files:
+            if "collage" in file_name:
+                if recreate_collage:
+                    file_path = os.path.join(input_folder, file_name)
+                    try:
+                        os.remove(file_path)
+                        print(f"ファイル {file_name} を削除しました。")
+                    except Exception as e:
+                        print(f"ファイル {file_name} の削除中にエラーが発生しました: {e}")
+                else:
+                    print(f"既にファイル {file_name} が存在したのでスキップしました。")
+                    return
+            
+        
+        # 入力フォルダから画像ファイルのパスを取得
+        image_files = [f for f in os.listdir(input_folder) if f.endswith(('.png'))]
+
+        if len(image_files) == 0:
+            print("指定されたフォルダに画像が存在しません。")
+            return
+
+        # 画像サイズを取得
+        image = Image.open(os.path.join(input_folder, image_files[0]))
+        image_width, image_height = image.size
+
+        # 出力画像のサイズを計算
+        collage_width = image_width * cols
+        collage_height = image_height * rows
+
+        # 出力用の画像を作成
+        collage = Image.new('RGB', (collage_width, collage_height))
+
+        # 画像を配置
+        for i, image_file in enumerate(image_files):
+            col = i % cols
+            row = i // cols
+            img = Image.open(os.path.join(input_folder, image_file))
+            collage.paste(img, (col * image_width, row * image_height))
+
+        folder_numbers = re.findall(r'\d+', input_folder)
+        collage_filename = f"{folder_numbers[0]}-{folder_numbers[1]}-{folder_numbers[2]}-thumbnail-collage"
+        collage_file_path = os.path.join(output_path, collage_filename + self.IMAGE_FILE_EXTENSION).replace("\\", "/")
+        # 画像を保存
+        collage.save(collage_file_path)
+        print(f"画像コラージュを作成しました: {collage_file_path}")
+
+    def create_image_sample(self, input_folder, delete_exists_sample=True):
+
+        if delete_exists_sample:
+            # フォルダ内のファイル一覧を取得
+            files = os.listdir(input_folder + self.WITH_SAMPLE_TEXT_FOLDER)
+
+            # ファイルを削除
+            for file_name in files:
+                file_path = os.path.join(input_folder + self.WITH_SAMPLE_TEXT_FOLDER, file_name)
+                try:
+                    os.remove(file_path)
+                    print(f"ファイル {file_name} を削除しました。")
+                except Exception as e:
+                    print(f"ファイル {file_name} の削除中にエラーが発生しました: {e}")
+        
+        # 入力フォルダから画像ファイルのパスを取得
+        image_files = [f for f in os.listdir(input_folder) if f.endswith(('.png'))]
+
+        if len(image_files) == 0:
+            print("指定されたフォルダに画像が存在しません。")
+            return
+
+        for i, image_file in enumerate(image_files):
+            file_name = os.path.basename(image_file).replace(self.IMAGE_FILE_EXTENSION, "")
+            base_image = Image.open(os.path.join(input_folder, image_file))
+
+            # 画像に「Sample」のテキストを追加して保存
+            sample_text_image = Image.open(self.INPUT_FOLDER + "/sample.png")
+            image_with_sample_text = self.merge_images(base_image, sample_text_image)
+            image_with_sample_text_file_path = os.path.join(input_folder + self.WITH_SAMPLE_TEXT_FOLDER,
+                                                            file_name + "-with-sample-text" + self.IMAGE_FILE_EXTENSION).replace("\\", "/")
+            print(f"image_with_sample_text_file_path: {image_with_sample_text_file_path}")
+            image_with_sample_text.save(image_with_sample_text_file_path)
+
+        # サムネイルフォルダから画像ファイルのパスを取得
+        thumbnail_image_files = [f for f in os.listdir(input_folder + self.THUMBNAIL_FOLDER) if f.endswith(('.png'))]
+
+        if len(thumbnail_image_files) == 0:
+            print("指定されたフォルダに画像が存在しません。")
+            return
+
+        for i, image_file in enumerate(thumbnail_image_files):
+            file_name = os.path.basename(image_file).replace(self.IMAGE_FILE_EXTENSION, "")
+            base_image = Image.open(os.path.join(input_folder + self.THUMBNAIL_FOLDER, image_file))
+
+            # 画像に「Sample」のテキストを追加して保存
+            sample_text_image = Image.open(self.INPUT_FOLDER + "/sample.png")
+            image_with_sample_text = self.merge_images(base_image, sample_text_image)
+            image_with_sample_text_file_path = os.path.join(input_folder + self.WITH_SAMPLE_THUMBNAIL_FOLDER,
+                                                            file_name + "-with-sample-text" + self.IMAGE_FILE_EXTENSION).replace("\\", "/")
+            print(f"image_with_sample_text_file_path: {image_with_sample_text_file_path}")
+            image_with_sample_text.save(image_with_sample_text_file_path)
+
 
     def run(self):
         for _ in tqdm(range(self.IMAGE_GENERATE_BATCH_EXECUTE_COUNT)):
