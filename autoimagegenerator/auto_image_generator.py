@@ -61,7 +61,7 @@ class AutoImageGenerator:
         self.POSITIVE_PROMPT_CANCEL_PAIR_FILENAME = "positive_cancel_pair.json"
 
         # サムネイル用画像の保存先フォルダのパス
-        self.thumbnail_FOLDER = "/thumbnail"
+        self.THUMBNAIL_FOLDER = "/thumbnail"
 
         # 解像度を半分にした画像の保存先フォルダのパス
         self.HALF_RESOLUTION_FOLDER = "/half-resolution"
@@ -70,7 +70,7 @@ class AutoImageGenerator:
         self.WITH_SAMPLE_TEXT_FOLDER = "/sample"
 
         # Sample文字が入っている解像度を半分にした画像(サムネイル用)の保存先フォルダのパス
-        self.WITH_SAMPLE_thumbnail_FOLDER = "/sample-thumbnail"
+        self.WITH_SAMPLE_THUMBNAIL_FOLDER = "/sample-thumbnail"
 
         self.IMAGE_FILE_EXTENSION = ".png"
         self.TEXT2IMG_URL = f'{self.URL}/sdapi/v1/txt2img'
@@ -267,19 +267,19 @@ class AutoImageGenerator:
             thumbnail_ratio = 4
         thumbnail_image = base_image.resize((base_image.width // thumbnail_ratio, base_image.height // thumbnail_ratio))
         thumbnail_filename = f"{filename}-thumbnail"
-        thumbnail_file_path = os.path.join(folder_path + self.thumbnail_FOLDER,
+        thumbnail_file_path = os.path.join(folder_path + self.THUMBNAIL_FOLDER,
                                                  thumbnail_filename + self.IMAGE_FILE_EXTENSION).replace("\\", "/")
-        if not os.path.exists(folder_path + self.thumbnail_FOLDER):
-            os.makedirs(folder_path + self.thumbnail_FOLDER)
+        if not os.path.exists(folder_path + self.THUMBNAIL_FOLDER):
+            os.makedirs(folder_path + self.THUMBNAIL_FOLDER)
         thumbnail_image.save(thumbnail_file_path)
 
         # 画像に「Sample」のテキストを追加して保存
         image_with_sample_text = self.merge_images(thumbnail_image, sample_text_image)
-        image_with_sample_text_file_path = os.path.join(folder_path + self.WITH_SAMPLE_thumbnail_FOLDER,
+        image_with_sample_text_file_path = os.path.join(folder_path + self.WITH_SAMPLE_THUMBNAIL_FOLDER,
                                                          thumbnail_filename + "-with-sample-text" + self.IMAGE_FILE_EXTENSION).replace(
             "\\", "/")
-        if not os.path.exists(folder_path + self.WITH_SAMPLE_thumbnail_FOLDER):
-            os.makedirs(folder_path + self.WITH_SAMPLE_thumbnail_FOLDER)
+        if not os.path.exists(folder_path + self.WITH_SAMPLE_THUMBNAIL_FOLDER):
+            os.makedirs(folder_path + self.WITH_SAMPLE_THUMBNAIL_FOLDER)
         image_with_sample_text.save(image_with_sample_text_file_path)
 
         if self.ENABLE_HR == True:
