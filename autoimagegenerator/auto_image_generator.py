@@ -22,6 +22,8 @@ class AutoImageGenerator:
         sd_model_checkpoint="Brav6.safetensors",
         sd_model_prefix="brav6",
         enable_hr=False,
+        output_folder_prefix="",
+        is_transparent_background=False
     ):
         # パラメータから受け取った値をプロパティへセット
         # 画像生成バッチの実行回数を指定
@@ -34,6 +36,8 @@ class AutoImageGenerator:
         self.INPUT_FOLDER = input_folder
         # 生成された画像の保存先フォルダのルートパス
         self.OUTPUT_FOLDER = output_folder
+        
+        self.OUTPUT_FOLDER_PREFIX = output_folder_prefix
 
         # プロンプトの保存先フォルダ
         self.PROMPT_PATH = prompts_folder + "/" + sd_model_prefix
@@ -46,9 +50,12 @@ class AutoImageGenerator:
         
         # 使用するモデルのプリフィックス
         self.SD_MODEL_PREFIX = sd_model_prefix
-
+        
         # ハイレゾ画像で生成するかどうか
         self.ENABLE_HR = enable_hr
+        
+        # 背景透過画像で生成するかどうか
+        self.IS_TRANPARENT_BACKGROUND = is_transparent_background
 
         # 定数定義
         self.POSITIVE_PROMPT_BASE_FILENAME = "positive_base.json"
@@ -108,6 +115,12 @@ class AutoImageGenerator:
             "hr_upscaler": "4x-UltraSharp",
             "denoising_strength": 0.3
         }
+
+        # 透過画像として出力する際に追加する payload
+        self.TRANPARENT_PAYLOAD = {
+            "script_name": "ABG Remover",
+            "script_args": []
+        }
         self.DATA_POSITIVE_BASE = None
         self.DATA_POSITIVE_OPTIONAL = None
         self.DATA_NEGATIVE = None
@@ -126,6 +139,9 @@ class AutoImageGenerator:
             self.DATA_POSITIVE_CANCEL_PAIR = json.load(file)
         with open(self.PROMPT_PATH + '/' + self.CANCEL_SEEDS_FILENAME, 'r') as file:
             self.DATA_CANCEL_SEEDS = json.load(file)
+        
+        # Seed の桁数が少ない場合生成される画像の質が低い可能性が高いため、生成をキャンセルする閾値として設定
+        self.CANCEL_MIN_SEED_VALUE = 999999999
 
     # ランダムなプロンプトを生成
     def generate_random_prompts(self, data):
@@ -151,6 +167,11 @@ class AutoImageGenerator:
     # 画像を生成
     def generate_images(self, positive_base_prompts, negative_prompts, payload, image_number, folder_path=None):
         result_images = {}
+
+        if self.IS_TRANPARENT_BACKGROUND:
+            payload = {**payload, **self.TRANPARENT_PAYLOAD}
+            positive_base_prompts = "(no background: 1.3, white background: 1.3), " + positive_base_prompts
+            
 
         # ポーズ用のランダムなプロンプトを生成
         positive_pose_prompts, positive_pose_prompt_dict = self.generate_random_prompts(self.DATA_POSITIVE_POSE)
@@ -180,31 +201,44 @@ class AutoImageGenerator:
         response = requests.post(url=self.TEXT2IMG_URL, json=txt2img_payload)
 
         r = response.json()
+        images_processed_count = 0
+        seed_value = 0
+        paramteters = ""
 
         for i in r['images']:
-            seed_value = 0
+            images_processed_count = images_processed_count + 1
             image = Image.open(io.BytesIO(base64.b64decode(i.split(",", 1)[0])))
-            png_payload = {
-                "image": "data:image/png;base64," + i
-            }
-            response2 = requests.post(url=self.PNGINFO_URL, json=png_payload)
+            
+            # 透過画像生成時は最初の１つ目の r['images'] にのみ PNG 画像情報があるので、そこから各種値を取得
+            if seed_value == 0:
+                png_payload = {
+                    "image": "data:image/png;base64," + i
+                }
+                response2 = requests.post(url=self.PNGINFO_URL, json=png_payload)
 
-            # 正規表現を使用してSeedの値を抽出
-            match = re.search(r"Seed:\s*(\d+)", response2.json().get("info"))
+                # 正規表現を使用してSeedの値を抽出
+                match = re.search(r"Seed:\s*(\d+)", response2.json().get("info"))
 
-            if match:
-                seed_value = int(match.group(1))
-                # print(f"Seedの値は: {seed_value}")
-            else:
-                print("Seedが見つかりませんでした。")
+                if match:
+                    seed_value = int(match.group(1))
+                    # print(f"Seedの値は: {seed_value}")
+                else:
+                    print("Seedが見つかりませんでした。")
+
+                if paramteters == "":
+                    paramteters = response2.json().get("info")
+
+            # 透過画像生成時は３つ目の画像のみを保存するため、１つ目と２つ目はスキップ
+            if self.IS_TRANPARENT_BACKGROUND and images_processed_count != 3:
+                continue
 
             pnginfo = PngImagePlugin.PngInfo()
-            pnginfo.add_text("parameters", response2.json().get("info"))
+            pnginfo.add_text("parameters", paramteters)
 
             # 日付とSeedを取得してフォルダパスを生成
             today = datetime.today()
             folder_name = today.strftime("%Y%m%d-%H")
-            folder_name = f"{folder_name}-{seed_value}"
+            folder_name = f"{folder_name}-{seed_value}{self.OUTPUT_FOLDER_PREFIX}"
             if folder_path is None:
                 folder_path = os.path.join(self.OUTPUT_FOLDER, folder_name).replace("\\", "/")
 
@@ -217,7 +251,12 @@ class AutoImageGenerator:
             for seed in self.DATA_CANCEL_SEEDS["Seeds"]:
                 if seed_value == seed:
                     print(f"folder_name: {folder_name} のSeed値はキャンセル対象です。")
-                    continue    
+                    continue
+
+            # Seed値が閾値よりも小さい場合、再起呼び出しで再実行
+            if seed_value <= self.CANCEL_MIN_SEED_VALUE:
+                print(f"folder_name: {folder_name} のSeed値は閾値よりも小さいのでキャンセル対象です。")
+                continue
 
             # フォルダが存在しない場合は作成
             if not os.path.exists(folder_path):
@@ -429,12 +468,15 @@ class AutoImageGenerator:
             positive_base_prompts, positive_base_prompt_dict = self.generate_random_prompts(self.DATA_POSITIVE_BASE)
             negative_prompts, negative_prompt_dict = self.generate_random_prompts(self.DATA_NEGATIVE)
 
-            # 関数から生成された画像の辞書を取得
-            generated_images = self.generate_images(positive_base_prompts, negative_prompts, self.TXT2IMG_BASE_PAYLOAD, 0)
+            # 画像が生成されるまで繰り返す
+            while True:
+                # 関数から生成された画像の辞書を取得
+                generated_images = self.generate_images(positive_base_prompts, negative_prompts, self.TXT2IMG_BASE_PAYLOAD, 0)
 
-            if len(generated_images) == 0:
-                print("キャンセル対象の Seed値だったため、画像の生成をスキップしました。")
-                continue
+                if len(generated_images) == 0:
+                    print("キャンセル対象の Seed 値だったため、画像の生成を再試行しました。")
+                else:
+                    break  # 画像が生成された場合、ループを終了
 
             # 関連画像および同じSeed値(同一人物)の別バリエーション画像を作成(画像生成時のbatch_size, batch_countを現状1固定のため、ループは1回のみだが将来的に変更される可能性があるためループで処理)
             for folder_path, image_data in generated_images.items():

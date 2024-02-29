@@ -1,7 +1,18 @@
 {
   "Base Positive Prompt": {
     "prompts": [
-      "(8k, RAW photo, best quality, masterpiece:1.2), (1girl:1.3), (looking at viewer:1.4), ultra detailed, ultra high res, (realistic, photo realistic:1.4), high detail RAW color photo"
+      "(8k, RAW photo, best quality, masterpiece:1.2), (looking at viewer:1.4), ultra detailed, ultra high res, (realistic, photo realistic:1.4), high detail RAW color photo"
+    ],
+    "use max prompts": 1,
+    "use min prompts": 1
+  },
+  "How meny people": {
+    "prompts": [
+      "",
+      "japanese cute girl, (24 years old:1.2)",
+      "japanese kawaii",
+      "japanese cool beauty",
+      "japanese fashion model"
     ],
     "use max prompts": 1,
     "use min prompts": 1

@@ -5,10 +5,22 @@ import time
 # 定数定義
 SD_MODEL_CHECKPOINTS = {
     "brav6": "Brav6.safetensors",
-    "brav7": "beautifulRealistic_v7.safetensors"
+    "brav7": "  ",
+    "brav7_men": "beautifulRealistic_v7.safetensors"
 }
 
+SD_MODEL_SCRITPS = {
+    
+}
+
+OUTPUT_FOLDER_MEN_PREFIX = "-men"
+
+OUTPUT_FOLDER_TRANSPARENT_BACKGROUND_PREFIX = "-transparent"
+
 arg_sd_model = "brav6"
+
+output_folder_prefix = ""
+is_transparent_background = False
 
 # コマンドライン引数から指定されたモデルチェックポイントの値を取得
 if len(sys.argv) > 1:
@@ -17,6 +29,17 @@ if len(sys.argv) > 1:
 else:
     sd_model_checkpoint = "Brav6.safetensors"  # デフォルト値
 
+if len(sys.argv) > 2:
+    if sys.argv[2].lower() == "true":  # 引数を小文字に変換して比較
+        is_transparent_background = True
+
+
+if arg_sd_model == "brav7_men":
+    output_folder_prefix = OUTPUT_FOLDER_MEN_PREFIX
+
+if is_transparent_background:
+    output_folder_prefix = output_folder_prefix + OUTPUT_FOLDER_TRANSPARENT_BACKGROUND_PREFIX
+
 print(f"sd_model_checkpoint: {sd_model_checkpoint}")
 
 # 処理の開始時間を記録
@@ -24,7 +47,7 @@ start_time = time.time()
 
 # AutoImageGenerator インスタンスを作成
 auto_image_generator = AutoImageGenerator(
-    image_generate_batch_execute_count=100,
+    image_generate_batch_execute_count=30,
     another_version_generate_count=11,
     input_folder="../images/input",
     output_folder="../images/output",
@@ -32,7 +55,9 @@ auto_image_generator = AutoImageGenerator(
     url="http://192.168.1.130:7860",
     sd_model_checkpoint=sd_model_checkpoint,
     sd_model_prefix=arg_sd_model,
-    enable_hr=True
+    enable_hr=True,
+    output_folder_prefix=output_folder_prefix,
+    is_transparent_background=is_transparent_background
 )
 
 # sd_model_checkpoint="beautifulRealistic_v7.safetensors"
