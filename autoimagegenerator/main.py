@@ -17,10 +17,13 @@ OUTPUT_FOLDER_MEN_PREFIX = "-men"
 
 OUTPUT_FOLDER_TRANSPARENT_BACKGROUND_PREFIX = "-transparent"
 
+OUTPUT_FOLDER_SELFIE_PREFIX = "-selfie"
+
 arg_sd_model = "brav6"
 
 output_folder_prefix = ""
 is_transparent_background = False
+is_selfie = False
 
 # コマンドライン引数から指定されたモデルチェックポイントの値を取得
 if len(sys.argv) > 1:
@@ -33,12 +36,18 @@ if len(sys.argv) > 2:
     if sys.argv[2].lower() == "true":  # 引数を小文字に変換して比較
         is_transparent_background = True
 
+if len(sys.argv) > 3:
+    if sys.argv[3].lower() == "true":  # 引数を小文字に変換して比較
+        is_selfie = True
 
 if arg_sd_model == "brav7_men":
     output_folder_prefix = OUTPUT_FOLDER_MEN_PREFIX
 
 if is_transparent_background:
     output_folder_prefix = output_folder_prefix + OUTPUT_FOLDER_TRANSPARENT_BACKGROUND_PREFIX
+
+if is_selfie:
+    output_folder_prefix = output_folder_prefix + OUTPUT_FOLDER_SELFIE_PREFIX
 
 print(f"sd_model_checkpoint: {sd_model_checkpoint}")
 
@@ -47,7 +56,7 @@ start_time = time.time()
 
 # AutoImageGenerator インスタンスを作成
 auto_image_generator = AutoImageGenerator(
-    image_generate_batch_execute_count=30,
+    image_generate_batch_execute_count=50,
     another_version_generate_count=11,
     input_folder="../images/input",
     output_folder="../images/output",
@@ -57,7 +66,8 @@ auto_image_generator = AutoImageGenerator(
     sd_model_prefix=arg_sd_model,
     enable_hr=True,
     output_folder_prefix=output_folder_prefix,
-    is_transparent_background=is_transparent_background
+    is_transparent_background=is_transparent_background,
+    is_selfie=is_selfie
 )
 
 # sd_model_checkpoint="beautifulRealistic_v7.safetensors"

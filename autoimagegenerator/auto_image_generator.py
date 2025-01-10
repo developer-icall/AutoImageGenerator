@@ -23,7 +23,8 @@ class AutoImageGenerator:
         sd_model_prefix="brav6",
         enable_hr=False,
         output_folder_prefix="",
-        is_transparent_background=False
+        is_transparent_background=False,
+        is_selfie=False
     ):
         # パラメータから受け取った値をプロパティへセット
         # 画像生成バッチの実行回数を指定
@@ -57,10 +58,14 @@ class AutoImageGenerator:
         # 背景透過画像で生成するかどうか
         self.IS_TRANPARENT_BACKGROUND = is_transparent_background
 
+        # 地鶏画像で生成するかどうか
+        self.IS_SELFIE = is_selfie
+
         # 定数定義
         self.POSITIVE_PROMPT_BASE_FILENAME = "positive_base.json"
         self.POSITIVE_PROMPT_POSE_FILENAME = "positive_pose.json"
         self.POSITIVE_PROMPT_OPTIONAL_FILENAME = "positive_optional.json"
+        self.POSITIVE_PROMPT_SELFIE_FILENAME = "positive_selfie.json"
         self.NEGATIVE_PROMPT_FILENAME = "negative.json"
         self.CANCEL_SEEDS_FILENAME = "cancel_seeds.json"
 
@@ -123,6 +128,7 @@ class AutoImageGenerator:
         }
         self.DATA_POSITIVE_BASE = None
         self.DATA_POSITIVE_OPTIONAL = None
+        self.DATA_POSITIVE_SELFIE = None
         self.DATA_NEGATIVE = None
         self.DATA_CANCEL_SEEDS = None
 
@@ -133,6 +139,8 @@ class AutoImageGenerator:
             self.DATA_POSITIVE_POSE = json.load(file)
         with open(self.PROMPT_PATH + '/' + self.POSITIVE_PROMPT_OPTIONAL_FILENAME, 'r') as file:
             self.DATA_POSITIVE_OPTIONAL = json.load(file)
+        with open(self.PROMPT_PATH + '/' + self.POSITIVE_PROMPT_SELFIE_FILENAME, 'r') as file:
+            self.DATA_POSITIVE_SELFIE = json.load(file)
         with open(self.PROMPT_PATH + '/' + self.NEGATIVE_PROMPT_FILENAME, 'r') as file:
             self.DATA_NEGATIVE = json.load(file)
         with open(self.PROMPT_PATH + '/' + self.POSITIVE_PROMPT_CANCEL_PAIR_FILENAME, 'r') as file:
@@ -171,10 +179,12 @@ class AutoImageGenerator:
         if self.IS_TRANPARENT_BACKGROUND:
             payload = {**payload, **self.TRANPARENT_PAYLOAD}
             positive_base_prompts = "(no background: 1.3, white background: 1.3), " + positive_base_prompts
-            
 
-        # ポーズ用のランダムなプロンプトを生成
-        positive_pose_prompts, positive_pose_prompt_dict = self.generate_random_prompts(self.DATA_POSITIVE_POSE)
+        if self.IS_SELFIE:
+            positive_pose_prompts, positive_pose_prompt_dict = self.generate_random_prompts(self.DATA_POSITIVE_SELFIE)
+        else :
+            # ポーズ用のランダムなプロンプトを生成
+            positive_pose_prompts, positive_pose_prompt_dict = self.generate_random_prompts(self.DATA_POSITIVE_POSE)
 
         # オプション用のランダムなプロンプトを生成
         positive_optional_prompts, positive_optional_prompt_dict = self.generate_random_prompts(self.DATA_POSITIVE_OPTIONAL)
