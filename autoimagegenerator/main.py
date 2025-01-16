@@ -5,7 +5,7 @@ import time
 # 定数定義
 SD_MODEL_CHECKPOINTS = {
     "brav6": "Brav6.safetensors",
-    "brav7": "  ",
+    "brav7": "beautifulRealistic_v7.safetensors",
     "brav7_men": "beautifulRealistic_v7.safetensors"
 }
 
