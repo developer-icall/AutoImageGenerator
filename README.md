@@ -22,6 +22,12 @@
 
 ## インストール手順
 
+### Cursor or VSCode で使用する拡張機能をインストール
+
+```
+cat extensions.txt | xargs -n 1 code --install-extension
+```
+
 ### 本プロジェクト実行に必要なインストール手順
 
 1. Pythonをインストールする
