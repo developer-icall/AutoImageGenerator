@@ -25,7 +25,7 @@
 ### Cursor or VSCode で使用する拡張機能をインストール
 
 ```
-cat extensions.txt | xargs -n 1 code --install-extension
+Get-Content extensions.txt | ForEach-Object { code --install-extension $_ }
 ```
 
 ### 本プロジェクト実行に必要なインストール手順
