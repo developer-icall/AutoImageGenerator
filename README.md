@@ -24,9 +24,13 @@
 
 ### Cursor or VSCode で使用する拡張機能をインストール
 
+- VSCode の場合
 ```
 Get-Content extensions.txt | ForEach-Object { code --install-extension $_ }
 ```
+
+- Cursor の場合
+    - extensions.txt を参考に手動でインストールしてください
 
 ### 本プロジェクト実行に必要なインストール手順
 
