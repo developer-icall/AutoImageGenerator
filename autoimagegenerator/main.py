@@ -4,7 +4,7 @@ import time
 
 # 定数定義
 SD_MODEL_CHECKPOINTS = {
-    "brav6": "Brav6.safetensors",
+    "brav6": "beautifulRealistic_v60.safetensors",
     "brav7": "beautifulRealistic_v7.safetensors",
     "brav7_men": "beautifulRealistic_v7.safetensors"
 }
@@ -56,8 +56,8 @@ start_time = time.time()
 
 # AutoImageGenerator インスタンスを作成
 auto_image_generator = AutoImageGenerator(
-    image_generate_batch_execute_count=50,
-    another_version_generate_count=11,
+    image_generate_batch_execute_count=2,
+    another_version_generate_count=2,
     input_folder="../images/input",
     output_folder="../images/output",
     prompts_folder="./prompts",

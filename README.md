@@ -101,5 +101,5 @@ Get-Content extensions.txt | ForEach-Object { code --install-extension $_ }
     - [Beautiful Realistic Asians - v7 | Stable Diffusion Checkpoint | Civitai](https://civitai.com/models/25494/brabeautiful-realistic-asians-v2)
 2. Stable Diffusion Web UI Docker のインストールフォルダ以下にある `data\models\Stable-diffusion` フォルダ内にダウンロードしたモデルファイルを配置
     - 例: `C:\Users\k.hongou\Dev\stable-diffusion-webui-docker\data\models\Stable-diffusion`
-        - Brav6.safetensors
+        - beautifulRealistic_v60.safetensors
         - beautifulRealistic_v7.safetensors
