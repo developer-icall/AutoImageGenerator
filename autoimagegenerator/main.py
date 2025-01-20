@@ -30,7 +30,7 @@ if len(sys.argv) > 1:
     arg_sd_model = sys.argv[1].lower()  # 引数を小文字に変換して比較
     sd_model_checkpoint = SD_MODEL_CHECKPOINTS.get(arg_sd_model)
 else:
-    sd_model_checkpoint = "Brav6.safetensors"  # デフォルト値
+    sd_model_checkpoint = "beautifulRealistic_v60.safetensors"  # デフォルト値
 
 if len(sys.argv) > 2:
     if sys.argv[2].lower() == "true":  # 引数を小文字に変換して比較
@@ -61,7 +61,7 @@ auto_image_generator = AutoImageGenerator(
     input_folder="../images/input",
     output_folder="../images/output",
     prompts_folder="./prompts",
-    url="http://192.168.1.130:7860",
+    url="http://localhost:7860",
     sd_model_checkpoint=sd_model_checkpoint,
     sd_model_prefix=arg_sd_model,
     enable_hr=True,
