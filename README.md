@@ -149,3 +149,9 @@ Get-Content extensions.txt | ForEach-Object { code --install-extension $_ }
     - 例: `C:\Users\k.hongou\Dev\stable-diffusion-webui-docker\data\models\Stable-diffusion`
         - beautifulRealistic_v60.safetensors
         - beautifulRealistic_v7.safetensors
+
+## トラブルシューティング
+
+### stable diffusion API へのアクセスでエラーが出た場合の対策
+
+- https://www.perplexity.ai/search/rokarupcnili-teta-stable-diffu-hZOzmrOKQTaxnE..nr35eA#1
