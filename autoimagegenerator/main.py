@@ -64,8 +64,8 @@ start_time = time.time()
 
 # AutoImageGenerator インスタンスを作成
 auto_image_generator = AutoImageGenerator(
-    image_generate_batch_execute_count=2,
-    another_version_generate_count=12,
+    image_generate_batch_execute_count=image_generate_batch_execute_count,
+    another_version_generate_count=another_version_generate_count,
     input_folder="../images/input",
     output_folder="../images/output",
     prompts_folder="./prompts",
