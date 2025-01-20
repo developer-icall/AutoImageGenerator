@@ -36,7 +36,37 @@ Get-Content extensions.txt | ForEach-Object { code --install-extension $_ }
 
 1. Pythonをインストールする
     - Python 3.10.6 で動作確認済み
-2. Python 仮想環境の作成
+2. Poetry をインストールする
+    - PoetryはPythonの依存関係管理ツールで、以下の手順でインストールできます。
+    1. **Poetryのインストールスクリプトを実行する**
+       Poetryの公式インストールスクリプトを使用してインストールします。以下のコマンドをPowerShellまたはコマンドプロンプトで実行してください。
+
+        ```powershell
+        (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | python -
+        ```
+
+    2. **環境変数の設定**
+
+       インストールが完了したら、Poetryのパスを環境変数に追加する必要があります。通常、Poetryはユーザーディレクトリの下にインストールされます。例えば、`C:\Users\<YourUsername>\AppData\Roaming\Python\Scripts`にインストールされることが多いです。
+
+       環境変数の設定は以下の手順で行います：
+
+        - 「システムのプロパティ」を開く
+        - 「環境変数」をクリック
+        - 「ユーザー環境変数」または「システム環境変数」で`Path`を選択し、「編集」をクリック
+        - Poetryのインストールパスを追加
+
+    3. **Poetryの動作確認**
+
+       コマンドプロンプトまたはPowerShellで以下のコマンドを実行し、Poetryが正しくインストールされているか確認します。
+
+        ```powershell
+        poetry --version
+        ```
+
+       正しくインストールされていれば、Poetryのバージョンが表示されます。
+
+3. Python 仮想環境の作成
     1. カレントディレクトリにて以下を実行
         ```
         python -m venv venv
@@ -48,7 +78,7 @@ Get-Content extensions.txt | ForEach-Object { code --install-extension $_ }
         (venv) PS C:\GitHub\AutoImageGenerator>
         ```
         - ※エラーが出るようであれば管理者権限で PowerShell を起動し、上記コマンドを実行することで解消される可能性があります
-3. 仮想環境にて以下のコマンドでライブラリをインストールする
+4. 仮想環境にて以下のコマンドでライブラリをインストールする
     ```
     # pip を最新版に更新
     python -m pip install --upgrade pip
