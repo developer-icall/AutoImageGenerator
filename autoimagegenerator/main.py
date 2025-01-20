@@ -1,6 +1,7 @@
 from auto_image_generator import AutoImageGenerator
 import sys
 import time
+import json
 
 # 定数定義
 SD_MODEL_CHECKPOINTS = {
@@ -18,6 +19,13 @@ OUTPUT_FOLDER_MEN_PREFIX = "-men"
 OUTPUT_FOLDER_TRANSPARENT_BACKGROUND_PREFIX = "-transparent"
 
 OUTPUT_FOLDER_SELFIE_PREFIX = "-selfie"
+
+# settings.json から設定を読み込む
+with open('settings.json', 'r') as f:
+    settings = json.load(f)
+
+image_generate_batch_execute_count = settings.get("image_generate_batch_execute_count", 2)
+another_version_generate_count = settings.get("another_version_generate_count", 12)
 
 arg_sd_model = "brav6"
 
@@ -57,7 +65,7 @@ start_time = time.time()
 # AutoImageGenerator インスタンスを作成
 auto_image_generator = AutoImageGenerator(
     image_generate_batch_execute_count=2,
-    another_version_generate_count=2,
+    another_version_generate_count=12,
     input_folder="../images/input",
     output_folder="../images/output",
     prompts_folder="./prompts",

@@ -133,6 +133,14 @@ Get-Content extensions.txt | ForEach-Object { code --install-extension $_ }
     (venv) PS C:\GitHub\AutoImageGenerator> poetry install
     ```
 
+### 設定
+
+#### settings.json
+
+- ./autoimagegenerator/sample.settings.json をコピーして settings.json を作成し以下を設定
+    - image_generate_batch_execute_count: 何件の人物について画像を一括作成するか指定
+    - another_version_generate_count: 同じ人物につき何件の画像を作成するか指定
+
 ### 本プロジェクトから呼び出す Stable Diffusion WEB UI 実行に必要なインストール手順
 
 - [Docker で Stable Diffusion web UI をセットアップする](https://zenn.dev/st_little/articles/setup-stable-diffusion-web-ui-in-docker)を参考にインストール
