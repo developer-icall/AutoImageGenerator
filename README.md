@@ -90,6 +90,8 @@ Get-Content extensions.txt | ForEach-Object { code --install-extension $_ }
 ### 本プロジェクトから呼び出す Stable Diffusion WEB UI 実行に必要なインストール手順
 
 - [Docker で Stable Diffusion web UI をセットアップする](https://zenn.dev/st_little/articles/setup-stable-diffusion-web-ui-in-docker)を参考にインストール
+    - `docker compose --profile auto up --build` 実行時に依存関係エラーが発生した場合は Dockerfile 54行目付近に以下を追加することで正常に完了できる可能性があります
+        - `RUN pip install --upgrade typing_extensions`
 - Docker Desktop がインストールされていない場合は先にインストールしてください
     - [Windows 11にDocker Desktopを入れる手順（令和5年最新版） #DockerDesktop - Qiita](https://qiita.com/zembutsu/items/a98f6f25ef47c04893b3)
 
