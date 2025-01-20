@@ -148,6 +148,7 @@ Get-Content extensions.txt | ForEach-Object { code --install-extension $_ }
 
 2. ファイルの配置:
    ダウンロードした「4x-UltraSharp.pth」ファイルを、Stable Diffusion WebUIのインストールディレクトリ内の「models/ESRGAN/」フォルダに配置
+    - フォルダがなければ作成して配置
 
 3. WebUIの再起動:
    Stable Diffusion WebUIを再起動して、新しいアップスケーラーを読み込ませます
