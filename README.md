@@ -20,6 +20,52 @@
 3. `poetry run python main.py` でファイルを実行する
 4. `./AutoImageGenerator/images/output` 以下に画像が生成されることを確認
 
+## main.py 起動オプション詳細
+
+`main.py` は以下のコマンドライン引数をサポートしています。これらの引数を使用することで、画像生成の動作をカスタマイズできます。
+
+1. **モデルチェックポイント**: 
+   - **引数**: `arg_sd_model`
+   - **説明**: 使用するモデルのチェックポイントを指定します。
+   - **オプション**:
+     - `brav6`: デフォルトのモデル。
+     - `brav7`: バージョン7のモデル。
+     - `brav7_men`: バージョン7の男性用モデル。
+
+   - **使用例**: 
+     ```bash
+     python main.py brav7
+     ```
+
+2. **透明背景**:
+   - **引数**: `is_transparent_background`
+   - **説明**: 生成される画像の背景を透明にするかどうかを指定します。
+   - **オプション**: `true` または `false`（デフォルト）
+   - **使用例**: 
+     ```bash
+     python main.py brav6 true
+     ```
+
+3. **セルフィー**:
+   - **引数**: `is_selfie`
+   - **説明**: セルフィー画像を生成するかどうかを指定します。
+   - **オプション**: `true` または `false`（デフォルト）
+   - **使用例**: 
+     ```bash
+     python main.py brav6 false true
+     ```
+
+### 使用例
+
+以下は、`brav7` モデルを使用し、透明背景でセルフィー画像を生成する例です。
+
+```bash
+python main.py brav7 true true
+```
+
+このコマンドは、`beautifulRealistic_v7.safetensors` モデルを使用し、透明な背景のセルフィー画像を生成します。
+
+
 ## インストール手順
 
 ### Cursor or VSCode で使用する拡張機能をインストール
