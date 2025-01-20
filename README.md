@@ -141,6 +141,18 @@ Get-Content extensions.txt | ForEach-Object { code --install-extension $_ }
 - Docker Desktop がインストールされていない場合は先にインストールしてください
     - [Windows 11にDocker Desktopを入れる手順（令和5年最新版） #DockerDesktop - Qiita](https://qiita.com/zembutsu/items/a98f6f25ef47c04893b3)
 
+#### 4x-UltraSharpのインストール
+
+1. ダウンロード:
+   Hugging Faceのウェブサイト (https://huggingface.co/lokCX/4x-Ultrasharp) にアクセスし、「Files and versions」をクリックします。「4x-UltraSharp.pth」ファイルをダウンロード
+
+2. ファイルの配置:
+   ダウンロードした「4x-UltraSharp.pth」ファイルを、Stable Diffusion WebUIのインストールディレクトリ内の「models/ESRGAN/」フォルダに配置
+
+3. WebUIの再起動:
+   Stable Diffusion WebUIを再起動して、新しいアップスケーラーを読み込ませます
+
+
 ### 必要な画像生成AIモデルのインストール手順
 
 1. 以下から Brav6 および Brav7 のモデルをダウンロード
