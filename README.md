@@ -171,6 +171,11 @@ Get-Content extensions.txt | ForEach-Object { code --install-extension $_ }
         - beautifulRealistic_v60.safetensors
         - beautifulRealistic_v7.safetensors
 
+### 背景透過写真を生成するために必要なモジュールのインストール
+
+- 以下を参考にインストールしてください
+    - https://www.perplexity.ai/search/stable-diffusion-web-ui-he-abg-bVWNoK55SCiEBdeBtUzk8w#0
+
 ## トラブルシューティング
 
 ### stable diffusion API へのアクセスでエラーが出た場合の対策
