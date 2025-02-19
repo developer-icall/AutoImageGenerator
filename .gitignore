@@ -4,9 +4,9 @@ images/output/
 autoimagegenerator/settings.json
 
 # Python関連
-__pycache__/
-*.py[cod]
-*$py.class
+**/__pycache__/
+**/*.py[cod]
+**/*$py.class
 *.so
 .Python
 build/
