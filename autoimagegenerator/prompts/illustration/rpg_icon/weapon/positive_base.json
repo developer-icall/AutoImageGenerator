@@ -1,0 +1,65 @@
+{
+  "Base Positive Prompt": {
+    "prompts": [
+      "game asset trending on artstation"
+    ],
+    "use max prompts": 1,
+    "use min prompts": 1
+  },
+  "Weapon Type": {
+    "prompts": [
+      "Awesome RPG icon of a mithril sword",
+      "Awesome RPG icon of an iron sword",
+      "Awesome RPG icon of a rusty iron sword",
+      "Awesome RPG icon of a katana",
+      "Awesome RPG icon of a long spear",
+      "Awesome RPG icon of a long sword",
+      "Awesome RPG icon of a short sword",
+      "Awesome RPG icon of an elegant elven bow",
+      "Awesome RPG icon of a sturdy kite shield",
+      "Awesome RPG icon of a double-headed battle axe",
+      "Awesome RPG icon of a steampunk-style revolver",
+      "Awesome RPG icon of a revolver",
+      "Awesome RPG icon of a precision crossbow",
+      "Awesome RPG icon of a mystical wizard's staff",
+      "Awesome RPG icon of a curved assassin's dagger",
+      "Awesome RPG icon of a massive war hammer",
+      "Awesome RPG icon of a halberd",
+      "Awesome RPG icon of a trident",
+      "Awesome RPG icon of a lightweight throwing axe",
+      "Awesome RPG icon of a heavy mace",
+      "Awesome RPG icon of a morning star",
+      "Awesome RPG icon of a flail",
+      "Awesome RPG icon of a enchanted boomerang",
+      "Awesome RPG icon of a elemental rod",
+      "Awesome RPG icon of a magic wand",
+      "Awesome RPG icon of a staff",
+      "Awesome RPG icon of a naginata",
+      "Awesome RPG icon of a spiked whip"
+    ],
+    "use max prompts": 1,
+    "use min prompts": 1
+  },
+  "Weapon Sub Type": {
+    "prompts": [
+      "legendary",
+      "ancient",
+      "cursed",
+      "unique",
+      "rare",
+      "epic"
+    ],
+    "use max prompts": 1,
+    "use min prompts": 0
+  },
+  "quality": {
+    "use max prompts": 3,
+    "use min prompts": 2,
+    "prompts": [
+      "high quality",
+      "highly detailed",
+      "best quality",
+      "masterpiece"
+    ]
+  }
+}

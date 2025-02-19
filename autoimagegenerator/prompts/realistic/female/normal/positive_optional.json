@@ -1,0 +1,42 @@
+{
+  "clothing": {
+    "prompts": [
+      "wearing casual clothes",
+      "wearing elegant dress",
+      "wearing business attire",
+      "wearing summer fashion"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  },
+  "makeup": {
+    "prompts": [
+      "natural makeup",
+      "professional makeup",
+      "minimal makeup",
+      "glamorous makeup"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  },
+  "setting": {
+    "prompts": [
+      "outdoor setting",
+      "indoor studio",
+      "urban background",
+      "nature background"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  },
+  "pose": {
+    "prompts": [
+      "side profile",
+      "looking at camera",
+      "candid pose",
+      "professional model pose"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  }
+}

@@ -8,6 +8,7 @@ import os
 from datetime import datetime
 import re
 from tqdm import tqdm
+import sys
 
 class AutoImageGenerator:
 
@@ -21,7 +22,7 @@ class AutoImageGenerator:
         url="http://localhost:7860",
         sd_model_checkpoint="Brav6.safetensors",
         sd_model_prefix="brav6",
-        enable_hr=False,
+        enable_hr=True,
         output_folder_prefix="",
         is_transparent_background=False,
         is_selfie=False
@@ -37,7 +38,7 @@ class AutoImageGenerator:
         self.INPUT_FOLDER = input_folder
         # 生成された画像の保存先フォルダのルートパス
         self.OUTPUT_FOLDER = output_folder
-        
+
         self.OUTPUT_FOLDER_PREFIX = output_folder_prefix
 
         # プロンプトの保存先フォルダ
@@ -45,16 +46,16 @@ class AutoImageGenerator:
 
         # StableDiffusionのAPI URL
         self.URL = url
-        
+
         # 使用するモデルチェックポイント
         self.SD_MODEL_CHECKPOINT = sd_model_checkpoint
-        
+
         # 使用するモデルのプリフィックス
         self.SD_MODEL_PREFIX = sd_model_prefix
-        
+
         # ハイレゾ画像で生成するかどうか
         self.ENABLE_HR = enable_hr
-        
+
         # 背景透過画像で生成するかどうか
         self.IS_TRANPARENT_BACKGROUND = is_transparent_background
 
@@ -93,7 +94,7 @@ class AutoImageGenerator:
             "steps": 60,
             "seed": -1,
             "width": 512,
-            "height": 768,
+            "height": 768,  # この値は後で条件分岐で上書きされます
             "cfg_scale": 7,
             "batch_size": 1,
             "batch_count": 1,
@@ -110,7 +111,7 @@ class AutoImageGenerator:
         self.ANOTHER_VERSION_TXT2IMG_BASE_PAYLOAD = {
             "steps": 60,
             "width": 512,
-            "height": 768,
+            "height": 768,  # この値は後で条件分岐で上書きされます
             "cfg_scale": 7,
             "batch_size": 1,
             "batch_count": 1,
@@ -123,6 +124,11 @@ class AutoImageGenerator:
             "denoising_strength": 0.3
         }
 
+        # RPGIcon用に画像サイズを設定
+        if sd_model_prefix == "rpgicon":
+            self.TXT2IMG_BASE_PAYLOAD["height"] = 512
+            self.ANOTHER_VERSION_TXT2IMG_BASE_PAYLOAD["height"] = 512
+
         # 透過画像として出力する際に追加する payload
         self.TRANPARENT_PAYLOAD = {
             "script_name": "ABG Remover",
@@ -134,24 +140,158 @@ class AutoImageGenerator:
         self.DATA_NEGATIVE = None
         self.DATA_CANCEL_SEEDS = None
 
+        # RPGIcon用の出力フォルダを設定
+        if sd_model_prefix == "rpgicon":
+            self.OUTPUT_FOLDER = os.path.join(output_folder, "RPGIcon").replace("\\", "/")
+        elif sd_model_prefix.startswith("brav"):  # bravシリーズの場合
+            self.OUTPUT_FOLDER = os.path.join(output_folder, "brav").replace("\\", "/")
+        else:
+            self.OUTPUT_FOLDER = output_folder
+
         # JSONファイルからデータを読み込む
-        with open(self.PROMPT_PATH + '/' + self.POSITIVE_PROMPT_BASE_FILENAME, 'r') as file:
-            self.DATA_POSITIVE_BASE = json.load(file)
-        with open(self.PROMPT_PATH + '/' + self.POSITIVE_PROMPT_POSE_FILENAME, 'r') as file:
-            self.DATA_POSITIVE_POSE = json.load(file)
-        with open(self.PROMPT_PATH + '/' + self.POSITIVE_PROMPT_OPTIONAL_FILENAME, 'r') as file:
-            self.DATA_POSITIVE_OPTIONAL = json.load(file)
-        with open(self.PROMPT_PATH + '/' + self.POSITIVE_PROMPT_SELFIE_FILENAME, 'r') as file:
-            self.DATA_POSITIVE_SELFIE = json.load(file)
-        with open(self.PROMPT_PATH + '/' + self.NEGATIVE_PROMPT_FILENAME, 'r') as file:
-            self.DATA_NEGATIVE = json.load(file)
-        with open(self.PROMPT_PATH + '/' + self.POSITIVE_PROMPT_CANCEL_PAIR_FILENAME, 'r') as file:
-            self.DATA_POSITIVE_CANCEL_PAIR = json.load(file)
-        with open(self.PROMPT_PATH + '/' + self.CANCEL_SEEDS_FILENAME, 'r') as file:
-            self.DATA_CANCEL_SEEDS = json.load(file)
-        
+        self.DATA_POSITIVE_BASE = {}
+        self.DATA_POSITIVE_POSE = {}
+        self.DATA_POSITIVE_OPTIONAL = {}
+        self.DATA_POSITIVE_SELFIE = {}
+        self.DATA_NEGATIVE = {}
+        self.DATA_POSITIVE_CANCEL_PAIR = {}
+        self.DATA_CANCEL_SEEDS = {}
+
+        # 必須のJSONファイルを読み込み
+        try:
+            with open(self.PROMPT_PATH + '/' + self.POSITIVE_PROMPT_BASE_FILENAME, 'r') as file:
+                self.DATA_POSITIVE_BASE = json.load(file)
+        except FileNotFoundError:
+            print(f"Error: Required file {self.POSITIVE_PROMPT_BASE_FILENAME} not found in {self.PROMPT_PATH}")
+            print("This file is required for image generation. Process will exit.")
+            sys.exit(1)
+
+        try:
+            with open(self.PROMPT_PATH + '/' + self.NEGATIVE_PROMPT_FILENAME, 'r') as file:
+                self.DATA_NEGATIVE = json.load(file)
+        except FileNotFoundError:
+            print(f"Error: Required file {self.NEGATIVE_PROMPT_FILENAME} not found in {self.PROMPT_PATH}")
+            print("This file is required for image generation. Process will exit.")
+            sys.exit(1)
+
+        # オプションのJSONファイルを読み込み
+        try:
+            with open(self.PROMPT_PATH + '/' + self.POSITIVE_PROMPT_POSE_FILENAME, 'r') as file:
+                self.DATA_POSITIVE_POSE = json.load(file)
+        except FileNotFoundError:
+            print(f"Warning: {self.POSITIVE_PROMPT_POSE_FILENAME} not found. Using empty dict.")
+
+        try:
+            with open(self.PROMPT_PATH + '/' + self.POSITIVE_PROMPT_OPTIONAL_FILENAME, 'r') as file:
+                self.DATA_POSITIVE_OPTIONAL = json.load(file)
+        except FileNotFoundError:
+            print(f"Warning: {self.POSITIVE_PROMPT_OPTIONAL_FILENAME} not found. Using empty dict.")
+
+        try:
+            with open(self.PROMPT_PATH + '/' + self.POSITIVE_PROMPT_SELFIE_FILENAME, 'r') as file:
+                self.DATA_POSITIVE_SELFIE = json.load(file)
+        except FileNotFoundError:
+            print(f"Warning: {self.POSITIVE_PROMPT_SELFIE_FILENAME} not found. Using empty dict.")
+
+        try:
+            with open(self.PROMPT_PATH + '/' + self.POSITIVE_PROMPT_CANCEL_PAIR_FILENAME, 'r') as file:
+                self.DATA_POSITIVE_CANCEL_PAIR = json.load(file)
+        except FileNotFoundError:
+            print(f"Warning: {self.POSITIVE_PROMPT_CANCEL_PAIR_FILENAME} not found. Using empty dict.")
+
+        try:
+            with open(self.PROMPT_PATH + '/' + self.CANCEL_SEEDS_FILENAME, 'r') as file:
+                self.DATA_CANCEL_SEEDS = json.load(file)
+        except FileNotFoundError:
+            print(f"Warning: {self.CANCEL_SEEDS_FILENAME} not found. Using empty dict.")
+            self.DATA_CANCEL_SEEDS = {"Seeds": []}  # Seedsキーは必要なので空の配列を設定
+
         # Seed の桁数が少ない場合生成される画像の質が低い可能性が高いため、生成をキャンセルする閾値として設定
         self.CANCEL_MIN_SEED_VALUE = 999999999
+
+        self.style = "realistic"  # デフォルト値
+        self.category = "female"  # デフォルト値
+        self.subcategory = "normal"  # デフォルト値
+
+    def get_prompts_path(self):
+        """スタイル、カテゴリーに応じたプロンプトファイルのパスを取得"""
+        return os.path.join(self.PROMPT_PATH, self.style, self.category)
+
+    def get_output_path(self):
+        """スタイル、カテゴリー、サブカテゴリーに応じた出力パスを取得"""
+        return os.path.join(
+            self.OUTPUT_FOLDER,
+            self.style,
+            self.category,
+            self.subcategory
+        )
+
+    def set_generation_params(self, style, category, subcategory):
+        """生成パラメータを設定"""
+        self.style = style
+        self.category = category
+        self.subcategory = subcategory
+
+    def load_prompts(self):
+        """プロンプトファイルを読み込む"""
+        prompts_path = self.get_prompts_path()
+
+        # 基本プロンプトの読み込み
+        with open(os.path.join(prompts_path, "positive_base.json"), "r", encoding="utf-8") as f:
+            self.DATA_POSITIVE_BASE = json.load(f)
+
+        # オプショナルプロンプトの読み込み
+        with open(os.path.join(prompts_path, "positive_optional.json"), "r", encoding="utf-8") as f:
+            self.DATA_POSITIVE_OPTIONAL = json.load(f)
+
+        # ネガティブプロンプトの読み込み
+        with open(os.path.join(prompts_path, "negative.json"), "r", encoding="utf-8") as f:
+            self.DATA_NEGATIVE = json.load(f)
+
+        # キャンセルシードの読み込み
+        try:
+            with open(os.path.join(prompts_path, "cancel_seeds.json"), "r", encoding="utf-8") as f:
+                self.DATA_CANCEL_SEEDS = json.load(f)
+        except FileNotFoundError:
+            self.DATA_CANCEL_SEEDS = {"seeds": []}
+
+    def generate_prompt(self):
+        """プロンプトを生成"""
+        prompt_parts = []
+
+        # 基本プロンプトの追加
+        for category, config in self.DATA_POSITIVE_BASE.items():
+            max_prompts = config.get("use max prompts", 1)
+            min_prompts = config.get("use min prompts", 0)
+            num_prompts = random.randint(min_prompts, max_prompts)
+            if num_prompts > 0:
+                selected = random.sample(config["prompts"], num_prompts)
+                prompt_parts.extend(selected)
+
+        # オプショナルプロンプトの追加
+        for category, config in self.DATA_POSITIVE_OPTIONAL.items():
+            max_prompts = config.get("use max prompts", 1)
+            min_prompts = config.get("use min prompts", 0)
+            num_prompts = random.randint(min_prompts, max_prompts)
+            if num_prompts > 0:
+                selected = random.sample(config["prompts"], num_prompts)
+                prompt_parts.extend(selected)
+
+        return ", ".join(prompt_parts)
+
+    def generate_negative_prompt(self):
+        """ネガティブプロンプトを生成"""
+        negative_parts = []
+
+        for category, config in self.DATA_NEGATIVE.items():
+            max_prompts = config.get("use max prompts", 1)
+            min_prompts = config.get("use min prompts", 0)
+            num_prompts = random.randint(min_prompts, max_prompts)
+            if num_prompts > 0:
+                selected = random.sample(config["prompts"], num_prompts)
+                negative_parts.extend(selected)
+
+        return ", ".join(negative_parts)
 
     # ランダムなプロンプトを生成
     def generate_random_prompts(self, data):
@@ -176,126 +316,41 @@ class AutoImageGenerator:
 
     # 画像を生成
     def generate_images(self, positive_base_prompts, negative_prompts, payload, image_number, folder_path=None):
-        result_images = {}
+        """画像を生成"""
+        generated_images = {}
 
-        if self.IS_TRANPARENT_BACKGROUND:
-            payload = {**payload, **self.TRANPARENT_PAYLOAD}
-            positive_base_prompts = "(no background: 1.3, white background: 1.3), " + positive_base_prompts
+        # APIリクエストを実行
+        response = requests.post(url=self.TXT2IMG_URL, json=payload)
 
-        if self.IS_SELFIE:
-            positive_pose_prompts, positive_pose_prompt_dict = self.generate_random_prompts(self.DATA_POSITIVE_SELFIE)
-        else :
-            # ポーズ用のランダムなプロンプトを生成
-            positive_pose_prompts, positive_pose_prompt_dict = self.generate_random_prompts(self.DATA_POSITIVE_POSE)
-
-        # オプション用のランダムなプロンプトを生成
-        positive_optional_prompts, positive_optional_prompt_dict = self.generate_random_prompts(self.DATA_POSITIVE_OPTIONAL)
-
-        # プロンプトを結合
-        prompt = positive_pose_prompts + ", " + positive_base_prompts + ", " + positive_optional_prompts
-
-        # 結合したプロンプト文字列内にキー文字列が含まれている場合は、キーに対応する cancel prompts 内にキャンセル対象の文字列がないかを検索
-        cancel_prompts = []
-        for key, value in self.DATA_POSITIVE_CANCEL_PAIR.items():
-            # キー文字列がプロンプト文字列内に含まれているかを検索
-            if key in prompt:
-                for cancel_prompt in value:
-                    # キャンセル対象の文字列がプロンプト文字列内に含まれているかを検索
-                    if cancel_prompt in prompt:
-                        # キャンセル対象の文字列が見つかった場合は、その文字列を削除
-                        prompt = prompt.replace(cancel_prompt + ", ", "").replace(", " + cancel_prompt, "").replace(cancel_prompt, "")
-                        cancel_prompts.append({key: cancel_prompt})
-
-        txt2img_payload = payload
-        txt2img_payload["prompt"] = prompt
-        txt2img_payload["negative_prompt"] = negative_prompts
-
-        response = requests.post(url=self.TEXT2IMG_URL, json=txt2img_payload)
-
-        r = response.json()
-        images_processed_count = 0
-        seed_value = 0
-        paramteters = ""
-
-        for i in r['images']:
-            images_processed_count = images_processed_count + 1
+        for i in response.json()['images']:
+            # 画像データをデコード
             image = Image.open(io.BytesIO(base64.b64decode(i.split(",", 1)[0])))
-            
-            # 透過画像生成時は最初の１つ目の r['images'] にのみ PNG 画像情報があるので、そこから各種値を取得
-            if seed_value == 0:
-                png_payload = {
-                    "image": "data:image/png;base64," + i
-                }
-                response2 = requests.post(url=self.PNGINFO_URL, json=png_payload)
 
-                # 正規表現を使用してSeedの値を抽出
-                match = re.search(r"Seed:\s*(\d+)", response2.json().get("info"))
-
-                if match:
-                    seed_value = int(match.group(1))
-                    # print(f"Seedの値は: {seed_value}")
-                else:
-                    print("Seedが見つかりませんでした。")
-
-                if paramteters == "":
-                    paramteters = response2.json().get("info")
-
-            # 透過画像生成時は３つ目の画像のみを保存するため、１つ目と２つ目はスキップ
-            if self.IS_TRANPARENT_BACKGROUND and images_processed_count != 3:
+            # シード値を取得
+            seed_value = self.get_seed_value(i)
+            if not seed_value:
                 continue
 
-            pnginfo = PngImagePlugin.PngInfo()
-            pnginfo.add_text("parameters", paramteters)
-
-            # 日付とSeedを取得してフォルダパスを生成
-            today = datetime.today()
-            folder_name = today.strftime("%Y%m%d-%H")
-            folder_name = f"{folder_name}-{seed_value}{self.OUTPUT_FOLDER_PREFIX}"
-            if folder_path is None:
-                folder_path = os.path.join(self.OUTPUT_FOLDER, folder_name).replace("\\", "/")
-
-            if len(cancel_prompts) > 0:
-                print(f"folder_name: {folder_name} のプロンプト文字列内のキャンセル対象文字列のペア")
-                for item in cancel_prompts:
-                    for key, value in item.items():
-                        print(f"{key}: {value}")
-
-            for seed in self.DATA_CANCEL_SEEDS["Seeds"]:
-                if seed_value == seed:
-                    print(f"folder_name: {folder_name} のSeed値はキャンセル対象です。")
-                    continue
-
-            # Seed値が閾値よりも小さい場合、再起呼び出しで再実行
-            if seed_value <= self.CANCEL_MIN_SEED_VALUE:
-                print(f"folder_name: {folder_name} のSeed値は閾値よりも小さいのでキャンセル対象です。")
+            # キャンセル条件をチェック
+            if self.should_cancel_generation(seed_value):
                 continue
 
-            # フォルダが存在しない場合は作成
-            if not os.path.exists(folder_path):
-                os.makedirs(folder_path)
+            # 保存パスを取得
+            save_path = folder_path or self.get_save_path(seed_value)
 
-            # 5桁ゼロ埋めの数字を生成
+            # 画像を保存
             filename = f"{str(image_number).zfill(5)}-{seed_value}"
+            self.save_image(image, save_path, filename)
 
-            # ファイルを保存
-            file_path = os.path.join(folder_path, filename + self.IMAGE_FILE_EXTENSION).replace("\\", "/")
-            image.save(file_path, pnginfo=pnginfo)
-
-            # 画像をJPG形式で保存（別ファイルとして）
-            jpg_file_path = os.path.join(folder_path, filename + ".jpg").replace("\\", "/")
-            image.convert("RGB").save(jpg_file_path, format="JPEG")            
-
-            result_images[folder_path] = {
+            generated_images[save_path] = {
                 'filename': filename,
                 'seed_value': seed_value,
                 'image': image,
-                'positive_pose_prompt_dict': positive_pose_prompt_dict,
-                'positive_optional_prompt_dict': positive_optional_prompt_dict,
-                'pnginfo': pnginfo,
-                'cancel_prompts': cancel_prompts
+                'pnginfo': self.get_pnginfo(i),
+                'cancel_prompts': []  # 必要に応じて設定
             }
 
-        return result_images
+        return generated_images
 
     # 必要な関連画像を作成
     def generate_related_images(self, base_image, folder_path, filename, pnginfo=None):
@@ -386,8 +441,8 @@ class AutoImageGenerator:
                 else:
                     print(f"既にファイル {file_name} が存在したのでスキップしました。")
                     return
-            
-        
+
+
         # 入力フォルダから画像ファイルのパスを取得
         image_files = [f for f in os.listdir(input_folder) if f.endswith(('.png'))]
 
@@ -434,7 +489,7 @@ class AutoImageGenerator:
                     print(f"ファイル {file_name} を削除しました。")
                 except Exception as e:
                     print(f"ファイル {file_name} の削除中にエラーが発生しました: {e}")
-        
+
         # 入力フォルダから画像ファイルのパスを取得
         image_files = [f for f in os.listdir(input_folder) if f.endswith(('.png'))]
 
@@ -473,36 +528,75 @@ class AutoImageGenerator:
             print(f"image_with_sample_text_file_path: {image_with_sample_text_file_path}")
             image_with_sample_text.save(image_with_sample_text_file_path)
 
+    def get_generation_payload(self):
+        """画像生成のペイロードを取得"""
+        payload = self.TXT2IMG_BASE_PAYLOAD.copy()
+
+        # スタイルとカテゴリーに応じたペイロード設定
+        if self.style == "illustration":
+            payload.update({
+                "steps": 30,
+                "cfg_scale": 8,
+                "width": 512,
+                "height": 512
+            })
+
+        # サブカテゴリーに応じた設定
+        if self.subcategory == "transparent":
+            payload["enable_hr"] = False
+
+        return payload
+
+    def get_save_path(self, seed_value):
+        """画像保存パスを生成"""
+        # 日付とシード値でフォルダ名を生成
+        today = datetime.today()
+        folder_name = today.strftime("%Y%m%d-%H")
+        folder_name = f"{folder_name}-{seed_value}{self.OUTPUT_FOLDER_PREFIX}"
+
+        # スタイル/カテゴリー/サブカテゴリーのパスを追加
+        base_path = os.path.join(
+            self.get_output_path(),
+            folder_name
+        ).replace("\\", "/")
+
+        return base_path
 
     def run(self):
-        for _ in tqdm(range(self.IMAGE_GENERATE_BATCH_EXECUTE_COUNT)):
-            # すべてのキーに対してランダムなプロンプトを生成
-            positive_base_prompts, positive_base_prompt_dict = self.generate_random_prompts(self.DATA_POSITIVE_BASE)
-            negative_prompts, negative_prompt_dict = self.generate_random_prompts(self.DATA_NEGATIVE)
+        """画像生成の実行"""
+        self.load_prompts()
+
+        for _ in range(self.IMAGE_GENERATE_BATCH_EXECUTE_COUNT):
+            # プロンプトの生成
+            prompt = self.generate_prompt()
+            negative_prompt = self.generate_negative_prompt()
+
+            # 画像生成のベースペイロードを設定
+            payload = self.get_generation_payload()
 
             # 画像が生成されるまで繰り返す
             while True:
-                # 関数から生成された画像の辞書を取得
-                generated_images = self.generate_images(positive_base_prompts, negative_prompts, self.TXT2IMG_BASE_PAYLOAD, 0)
+                generated_images = self.generate_images(
+                    prompt,
+                    negative_prompt,
+                    payload,
+                    0  # initial image number
+                )
 
-                if len(generated_images) == 0:
-                    print("キャンセル対象の Seed 値だったため、画像の生成を再試行しました。")
-                else:
-                    break  # 画像が生成された場合、ループを終了
+                if generated_images:  # 画像が生成された場合
+                    break
+                print("キャンセル対象のSeed値だったため、画像の生成を再試行します。")
 
             # 関連画像および同じSeed値(同一人物)の別バリエーション画像を作成(画像生成時のbatch_size, batch_countを現状1固定のため、ループは1回のみだが将来的に変更される可能性があるためループで処理)
             for folder_path, image_data in generated_images.items():
                 filename = image_data['filename']
                 seed_value = image_data['seed_value']
                 image = image_data['image']
-                positive_optional_prompt_dict = image_data['positive_optional_prompt_dict']
-                positive_pose_pose_dict = image_data['positive_pose_prompt_dict']
                 pnginfo = image_data['pnginfo']
-                cancel_prompts = image_data['cancel_prompts']
 
                 # 必要な関連画像を作成
                 self.generate_related_images(image, folder_path, filename, pnginfo)
-                self.save_prompts_to_json(positive_base_prompt_dict, positive_pose_pose_dict, positive_optional_prompt_dict, negative_prompt_dict, folder_path, filename, cancel_prompts)
+                self.save_prompts_to_json(self.DATA_POSITIVE_BASE, self.DATA_POSITIVE_POSE, self.DATA_POSITIVE_OPTIONAL, self.DATA_NEGATIVE, folder_path, filename, [])
 
                 # 生成された画像の別バージョン(同じSeed値でポーズとオプションのプロンプトを変更)を作成
                 image_number = 1
@@ -510,19 +604,17 @@ class AutoImageGenerator:
                     payload_another_version = self.ANOTHER_VERSION_TXT2IMG_BASE_PAYLOAD
                     payload_another_version["seed"] = seed_value
                     # 関数から生成された画像の辞書を取得
-                    generated_images = self.generate_images(positive_base_prompts, negative_prompts, payload_another_version, image_number, folder_path)
+                    generated_images = self.generate_images(prompt, negative_prompt, payload_another_version, image_number, folder_path)
 
                     # 生成された画像の辞書をループで処理
                     for folder_path, image_data in generated_images.items():
                         filename = image_data['filename']
                         seed_value = image_data['seed_value']
                         image = image_data['image']
-                        positive_optional_prompt_dict = image_data['positive_optional_prompt_dict']
-                        positive_pose_pose_dict = image_data['positive_pose_prompt_dict']
-                        cancel_prompts = image_data['cancel_prompts']
+                        pnginfo = image_data['pnginfo']
 
                         # 必要な関連画像を作成
                         self.generate_related_images(image, folder_path, str(image_number).zfill(5) + "-" + str(seed_value))
-                        self.save_prompts_to_json(positive_base_prompt_dict, positive_pose_pose_dict, positive_optional_prompt_dict, negative_prompt_dict, folder_path, filename, cancel_prompts)
+                        self.save_prompts_to_json(self.DATA_POSITIVE_BASE, self.DATA_POSITIVE_POSE, self.DATA_POSITIVE_OPTIONAL, self.DATA_NEGATIVE, folder_path, filename, [])
 
                     image_number += 1

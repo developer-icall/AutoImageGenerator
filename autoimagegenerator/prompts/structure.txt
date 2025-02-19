@@ -1,0 +1,55 @@
+prompts/
+├── realistic/
+│   ├── female/
+│   │   ├── cancel_seeds.json        # brav7から移行
+│   │   ├── negative.json            # brav7から移行
+│   │   ├── positive_base.json       # brav7から移行
+│   │   ├── positive_cancel_pair.json # brav7から移行
+│   │   ├── positive_optional.json   # brav7から移行
+│   │   ├── positive_pose.json       # brav7から移行
+│   │   └── positive_selfie.json     # brav7から移行
+│   ├── male/
+│   │   ├── cancel_seeds.json        # brav7_menから移行
+│   │   ├── negative.json            # brav7_menから移行
+│   │   ├── positive_base.json       # brav7_menから移行
+│   │   ├── positive_cancel_pair.json # brav7_menから移行
+│   │   ├── positive_optional.json   # brav7_menから移行
+│   │   ├── positive_pose.json       # brav7_menから移行
+│   │   └── positive_selfie.json     # brav7_menから移行
+│   └── animal/
+│       ├── dog/
+│       ├── cat/
+│       ├── bird/
+│       ├── fish/
+│       └── other/
+└── illustration/
+    ├── female/
+    ├── male/
+    ├── animal/
+    ├── background/
+    │   ├── nature/
+    │   ├── city/
+    │   ├── sea/
+    │   ├── sky/
+    │   └── other/
+    ├── rpg_icon/
+    │   ├── weapon/                  # RPGIconから移行・分割
+    │   │   ├── negative.json
+    │   │   ├── positive_base.json
+    │   │   ├── positive_optional.json
+    │   │   └── cancel_seeds.json
+    │   ├── monster/                 # RPGIconから移行・分割
+    │   │   ├── negative.json
+    │   │   ├── positive_base.json
+    │   │   ├── positive_optional.json
+    │   │   └── cancel_seeds.json
+    │   └── other/                   # RPGIconから移行・分割
+    │       ├── negative.json
+    │       ├── positive_base.json
+    │       ├── positive_optional.json
+    │       └── cancel_seeds.json
+    └── vehicle/
+        ├── car/
+        ├── ship/
+        ├── airplane/
+        └── other/

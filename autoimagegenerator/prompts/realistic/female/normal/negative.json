@@ -1,0 +1,12 @@
+{
+  "quality": {
+    "prompts": [
+      "deformed, distorted, disfigured, poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, disconnected limbs, mutation, mutated",
+      "blurry, bad art, poorly drawn, close up, cropped, out of frame",
+      "worst quality, low quality, jpeg artifacts, signature, watermark, username, blurry, artist name",
+      "amateur, poorly lit, overexposed, underexposed"
+    ],
+    "use_max_prompts": 4,
+    "use_min_prompts": 4
+  }
+}

@@ -1,0 +1,21 @@
+{
+    "Base Negative Prompt": {
+        "prompts": [
+            "3d,cartoon, bad drawing, watermark, blurry,simple background"
+        ],
+        "use max prompts": 1,
+        "use min prompts": 1
+    },
+    "quality": {
+        "use max prompts": 5,
+        "use min prompts": 3,
+        "prompts": [
+            "low quality",
+            "worst quality",
+            "normal quality",
+            "jpeg artifacts",
+            "blurry",
+            "watermark"
+        ]
+    }
+}

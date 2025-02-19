@@ -1,0 +1,12 @@
+{
+  "base": {
+    "prompts": [
+      "(fantasy item icon, game asset, RPG item:1.4)",
+      "(pixel perfect, clean lines:1.2)",
+      "(detailed illustration, game art style:1.3)",
+      "centered composition, professional game artwork"
+    ],
+    "use_max_prompts": 4,
+    "use_min_prompts": 4
+  }
+}

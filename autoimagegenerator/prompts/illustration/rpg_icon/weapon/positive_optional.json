@@ -1,0 +1,59 @@
+{
+  "Effect": {
+    "prompts": [
+      "glowing",
+      "sparkling",
+      "crackling with energy",
+      "crackling with lightning energy",
+      "surrounded by mist",
+      "surrounded by smoke",
+      "surrounded by fire",
+      "surrounded by ice",
+      "surrounded by lightning",
+      "surrounded by poison",
+      "surrounded by acid",
+      "surrounded by electricity"
+    ],
+    "use max prompts": 1,
+    "use min prompts": 0
+  },
+  "Color": {
+    "prompts": [
+      "gold",
+      "silver",
+      "silver",
+      "bronze",
+      "copper",
+      "iron",
+      "mithril",
+      "crimson",
+      "emerald",
+      "sapphire",
+      "ruby",
+      "diamond",
+      "amethyst",
+      "topaz",
+      "turquoise"
+    ],
+    "use max prompts": 1,
+    "use min prompts": 1
+  },
+  "background": {
+    "prompts": [
+      "forest",
+      "desert",
+      "mountain",
+      "cave",
+      "castle",
+      "dungeon",
+      "jungle"
+    ],
+    "use max prompts": 1,
+    "use min prompts": 0
+  },
+  "lighting": {
+    "prompts": ["Sunlight"],
+    "use max prompts": 1,
+    "use min prompts": 0
+  }
+}

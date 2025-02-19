@@ -1,0 +1,12 @@
+{
+  "base": {
+    "prompts": [
+      "(8k, RAW photo, best quality, masterpiece:1.2)",
+      "(beautiful woman, realistic, detailed skin texture:1.4)",
+      "(professional photography, sharp focus:1.1)",
+      "natural lighting, high resolution"
+    ],
+    "use_max_prompts": 4,
+    "use_min_prompts": 4
+  }
+}

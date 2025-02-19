@@ -1,0 +1,22 @@
+{
+  "item_type": {
+    "prompts": [
+      "magic potion",
+      "ancient scroll",
+      "mystical gem",
+      "enchanted ring"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  },
+  "attributes": {
+    "prompts": [
+      "glowing effect",
+      "magical aura",
+      "mysterious power",
+      "rare artifact"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  }
+} 

@@ -1,0 +1,22 @@
+{
+  "monster_type": {
+    "prompts": [
+      "fierce dragon",
+      "evil demon",
+      "giant slime",
+      "undead skeleton"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  },
+  "attributes": {
+    "prompts": [
+      "elemental power",
+      "magical aura",
+      "ancient beast",
+      "mythical creature"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  }
+}

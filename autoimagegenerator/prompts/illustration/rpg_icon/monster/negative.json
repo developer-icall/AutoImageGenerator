@@ -1,0 +1,12 @@
+{
+  "quality": {
+    "prompts": [
+      "photorealistic, photograph, real life, 3d render",
+      "blurry, bad art, poorly drawn, extra details, unnecessary details",
+      "worst quality, low quality, jpeg artifacts, signature, watermark",
+      "complex background, cluttered, busy composition"
+    ],
+    "use_max_prompts": 4,
+    "use_min_prompts": 4
+  }
+}
