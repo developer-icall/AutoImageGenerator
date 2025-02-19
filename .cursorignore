@@ -1,0 +1,21 @@
+# .env
+.env
+.env.*
+
+# .venv
+.venv
+
+# __pycache__
+__pycache__
+
+# sample
+sample
+
+# poetry
+poetry.lock
+
+# autoimagegenerator
+autoimagegenerator/images/input
+autoimagegenerator/images/output
+autoimagegenerator/images/output/sample
+autoimagegenerator/images/output/sample/sample.png
