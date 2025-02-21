@@ -58,3 +58,7 @@ ENV/
 # プロジェクト固有
 autoimagegenerator/images/output/
 autoimagegenerator/images/input/
+
+# ドキュメント関連
+docs/**/*.tmp
+docs/**/*.bak
