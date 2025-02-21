@@ -102,14 +102,26 @@
 /images/output/<style>/vehicle/airplane  # 飛行機
 /images/output/<style>/vehicle/other     # その他
 
+注意：<style>には 'realistic' または 'illustration' が入ります
+
+## 生成時に動的に作成されるフォルダ
+
+画像生成時には大項目・中項目・小項目に応じたフォルダの下に、作成日時と生成された画像の Seed 値を含むフォルダが作成されます。
+例) 20250221-12-2934224203
+
+既に実装されている機能なので、今回の修正においてこの機能が消えないよう注意してください。
+
+
 ## サムネイル・サンプル画像
-各フォルダ内に以下のサブフォルダを配置：
+
+生成時に動的に作成されるフォルダ内には以下のサブフォルダが作成され、それぞれの仕様に応じた画像が保存されます。
+既に実装されている機能なので、今回の修正においてこの機能が消えないよう注意してください。
+
 /thumbnail           # サムネイル画像
 /sample             # サンプル画像（透かし入り）
 /sample-thumbnail   # サンプルサムネイル画像（透かし入り）
 /half-resolution    # 半分の解像度の画像
 
-注意：<style>には 'realistic' または 'illustration' が入ります
 
 # 関連ファイル
 @main.py @auto_image_generator.py @settings.json
