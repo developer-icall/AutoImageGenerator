@@ -17,7 +17,7 @@ class AutoImageGenerator:
         another_version_generate_count=11,
         input_folder="./autoimagegenerator/images/input",
         output_folder="./autoimagegenerator/images/output",
-        prompts_folder="./prompts",
+        prompts_folder="./autoimagegenerator/prompts",
         url="http://localhost:7860",
         sd_model_checkpoint="Brav6.safetensors",
         sd_model_prefix="brav6",
@@ -40,8 +40,9 @@ class AutoImageGenerator:
 
         self.OUTPUT_FOLDER_PREFIX = output_folder_prefix
 
-        # プロンプトの保存先フォルダ
-        self.PROMPT_PATH = prompts_folder + "/" + sd_model_prefix
+        # プロンプトの保存先フォルダを画像タイプに応じて設定
+        style, category = output_folder_prefix.strip('/').split('/')[:2]
+        self.PROMPT_PATH = os.path.join(prompts_folder, style, category).replace('\\', '/')
 
         # StableDiffusionのAPI URL
         self.URL = url
@@ -135,20 +136,24 @@ class AutoImageGenerator:
         self.DATA_CANCEL_SEEDS = None
 
         # JSONファイルからデータを読み込む
-        with open(self.PROMPT_PATH + '/' + self.POSITIVE_PROMPT_BASE_FILENAME, 'r') as file:
-            self.DATA_POSITIVE_BASE = json.load(file)
-        with open(self.PROMPT_PATH + '/' + self.POSITIVE_PROMPT_POSE_FILENAME, 'r') as file:
-            self.DATA_POSITIVE_POSE = json.load(file)
-        with open(self.PROMPT_PATH + '/' + self.POSITIVE_PROMPT_OPTIONAL_FILENAME, 'r') as file:
-            self.DATA_POSITIVE_OPTIONAL = json.load(file)
-        with open(self.PROMPT_PATH + '/' + self.POSITIVE_PROMPT_SELFIE_FILENAME, 'r') as file:
-            self.DATA_POSITIVE_SELFIE = json.load(file)
-        with open(self.PROMPT_PATH + '/' + self.NEGATIVE_PROMPT_FILENAME, 'r') as file:
-            self.DATA_NEGATIVE = json.load(file)
-        with open(self.PROMPT_PATH + '/' + self.POSITIVE_PROMPT_CANCEL_PAIR_FILENAME, 'r') as file:
-            self.DATA_POSITIVE_CANCEL_PAIR = json.load(file)
-        with open(self.PROMPT_PATH + '/' + self.CANCEL_SEEDS_FILENAME, 'r') as file:
-            self.DATA_CANCEL_SEEDS = json.load(file)
+        try:
+            with open(os.path.join(self.PROMPT_PATH, self.POSITIVE_PROMPT_BASE_FILENAME), 'r') as file:
+                self.DATA_POSITIVE_BASE = json.load(file)
+            with open(os.path.join(self.PROMPT_PATH, self.POSITIVE_PROMPT_POSE_FILENAME), 'r') as file:
+                self.DATA_POSITIVE_POSE = json.load(file)
+            with open(os.path.join(self.PROMPT_PATH, self.POSITIVE_PROMPT_OPTIONAL_FILENAME), 'r') as file:
+                self.DATA_POSITIVE_OPTIONAL = json.load(file)
+            with open(os.path.join(self.PROMPT_PATH, self.POSITIVE_PROMPT_SELFIE_FILENAME), 'r') as file:
+                self.DATA_POSITIVE_SELFIE = json.load(file)
+            with open(os.path.join(self.PROMPT_PATH, self.NEGATIVE_PROMPT_FILENAME), 'r') as file:
+                self.DATA_NEGATIVE = json.load(file)
+            with open(os.path.join(self.PROMPT_PATH, self.POSITIVE_PROMPT_CANCEL_PAIR_FILENAME), 'r') as file:
+                self.DATA_POSITIVE_CANCEL_PAIR = json.load(file)
+            with open(os.path.join(self.PROMPT_PATH, self.CANCEL_SEEDS_FILENAME), 'r') as file:
+                self.DATA_CANCEL_SEEDS = json.load(file)
+        except FileNotFoundError as e:
+            print(f"エラー: プロンプトファイルが見つかりません: {e.filename}")
+            raise
 
         # Seed の桁数が少ない場合生成される画像の質が低い可能性が高いため、生成をキャンセルする閾値として設定
         self.CANCEL_MIN_SEED_VALUE = 999999999

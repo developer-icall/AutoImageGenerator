@@ -1,0 +1,33 @@
+{
+  "quality": {
+    "use max prompts": 3,
+    "use min prompts": 2,
+    "prompts": [
+      "masterpiece",
+      "best quality",
+      "high quality",
+      "highly detailed",
+      "ultra detailed"
+    ]
+  },
+  "style": {
+    "use max prompts": 2,
+    "use min prompts": 1,
+    "prompts": [
+      "photorealistic",
+      "realistic",
+      "photo",
+      "photography"
+    ]
+  },
+  "subject": {
+    "use max prompts": 1,
+    "use min prompts": 1,
+    "prompts": [
+      "1girl",
+      "woman",
+      "beautiful female",
+      "young woman"
+    ]
+  }
+}
