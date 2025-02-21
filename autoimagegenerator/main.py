@@ -2,16 +2,65 @@ from auto_image_generator import AutoImageGenerator
 import sys
 import time
 import json
+import argparse
 
 # 定数定義
+IMAGE_STYLES = {
+    "realistic": {
+        "female": {
+            "models": ["brav6", "brav7"],
+            "types": ["normal", "transparent", "selfie"]
+        },
+        "male": {
+            "models": ["brav6", "brav7"],
+            "types": ["normal", "transparent", "selfie"]
+        },
+        "animal": {
+            "types": ["dog", "cat", "bird", "fish", "other"],
+            "models": []  # 未確定
+        }
+    },
+    "illustration": {
+        "female": {
+            "models": [],  # 未確定
+            "types": ["normal", "transparent", "selfie"]
+        },
+        "male": {
+            "models": [],  # 未確定
+            "types": ["normal", "transparent", "selfie"]
+        },
+        "animal": {
+            "types": ["dog", "cat", "bird", "fish", "other"],
+            "models": []  # 未確定
+        },
+        "background": {
+            "types": ["nature", "city", "sea", "sky", "other"],
+            "models": []  # 未確定
+        },
+        "rpg_icon": {
+            "types": ["weapon", "monster", "other"],
+            "models": ["RPGIcon"]
+        },
+        "vehicle": {
+            "types": ["car", "ship", "airplane", "other"],
+            "models": []  # 未確定
+        },
+        "other": {
+            "types": [],
+            "models": []  # 未確定
+        }
+    }
+}
+
 SD_MODEL_CHECKPOINTS = {
     "brav6": "beautifulRealistic_v60.safetensors",
     "brav7": "beautifulRealistic_v7.safetensors",
-    "brav7_men": "beautifulRealistic_v7.safetensors"
+    "brav7_men": "beautifulRealistic_v7.safetensors",
+    "rpg_icon": "RPGIcon.safetensors"  # RPGIcon用のモデル
 }
 
 SD_MODEL_SCRITPS = {
-    
+
 }
 
 OUTPUT_FOLDER_MEN_PREFIX = "-men"
@@ -24,70 +73,106 @@ OUTPUT_FOLDER_SELFIE_PREFIX = "-selfie"
 with open('settings.json', 'r') as f:
     settings = json.load(f)
 
-image_generate_batch_execute_count = settings.get("image_generate_batch_execute_count", 2)
-another_version_generate_count = settings.get("another_version_generate_count", 12)
+def validate_image_type(style, category, subcategory):
+    """画像タイプの組み合わせが有効かチェック"""
+    if style not in IMAGE_STYLES:
+        return False
 
-arg_sd_model = "brav6"
+    if category not in IMAGE_STYLES[style]:
+        return False
 
-output_folder_prefix = ""
-is_transparent_background = False
-is_selfie = False
+    if subcategory:
+        if "types" not in IMAGE_STYLES[style][category]:
+            return False
+        if subcategory not in IMAGE_STYLES[style][category]["types"]:
+            return False
 
-# コマンドライン引数から指定されたモデルチェックポイントの値を取得
-if len(sys.argv) > 1:
-    arg_sd_model = sys.argv[1].lower()  # 引数を小文字に変換して比較
-    sd_model_checkpoint = SD_MODEL_CHECKPOINTS.get(arg_sd_model)
-else:
-    sd_model_checkpoint = "beautifulRealistic_v60.safetensors"  # デフォルト値
+    return True
 
-if len(sys.argv) > 2:
-    if sys.argv[2].lower() == "true":  # 引数を小文字に変換して比較
-        is_transparent_background = True
+def get_output_folder_prefix(args):
+    """出力フォルダのプレフィックスを生成"""
+    prefix = f"/{args.style}/{args.category}"
+    if args.subcategory:
+        prefix += f"/{args.subcategory}"
+    return prefix
 
-if len(sys.argv) > 3:
-    if sys.argv[3].lower() == "true":  # 引数を小文字に変換して比較
-        is_selfie = True
+def main():
+    parser = argparse.ArgumentParser(description='画像生成プログラム')
 
-if arg_sd_model == "brav7_men":
-    output_folder_prefix = OUTPUT_FOLDER_MEN_PREFIX
+    # 必須の引数
+    parser.add_argument('--style', required=True, choices=['realistic', 'illustration'],
+                        help='画像スタイル (realistic/illustration)')
+    parser.add_argument('--category', required=True,
+                        help='カテゴリー (female/male/animal/background/rpg_icon/vehicle/other)')
 
-if is_transparent_background:
-    output_folder_prefix = output_folder_prefix + OUTPUT_FOLDER_TRANSPARENT_BACKGROUND_PREFIX
+    # オプションの引数
+    parser.add_argument('--subcategory',
+                        help='サブカテゴリー (normal/transparent/selfie/dog/cat etc...)')
+    parser.add_argument('--model',
+                        help='使用するモデル (デフォルトはカテゴリーに応じて自動選択)')
+    parser.add_argument('--enable-hr', type=str, choices=['true', 'false'], default='true',
+                        help='ハイレゾ画像生成の有効/無効 (true/false, デフォルト: true)')
 
-if is_selfie:
-    output_folder_prefix = output_folder_prefix + OUTPUT_FOLDER_SELFIE_PREFIX
+    args = parser.parse_args()
 
-print(f"sd_model_checkpoint: {sd_model_checkpoint}")
+    # 画像タイプの組み合わせをバリデーション
+    if not validate_image_type(args.style, args.category, args.subcategory):
+        print("エラー: 無効な画像タイプの組み合わせです")
+        sys.exit(1)
 
-# 処理の開始時間を記録
-start_time = time.time()
+    # モデルの選択
+    if not args.model:
+        # カテゴリーに応じてデフォルトモデルを選択
+        if args.category == "rpg_icon":
+            model = "rpg_icon"
+        else:
+            model = "brav6"  # デフォルトモデル
+    else:
+        model = args.model
 
-# AutoImageGenerator インスタンスを作成
-auto_image_generator = AutoImageGenerator(
-    image_generate_batch_execute_count=image_generate_batch_execute_count,
-    another_version_generate_count=another_version_generate_count,
-    input_folder="../images/input",
-    output_folder="../images/output",
-    prompts_folder="./prompts",
-    url="http://localhost:7860",
-    sd_model_checkpoint=sd_model_checkpoint,
-    sd_model_prefix=arg_sd_model,
-    enable_hr=True,
-    output_folder_prefix=output_folder_prefix,
-    is_transparent_background=is_transparent_background,
-    is_selfie=is_selfie
-)
+    # モデルの存在確認
+    if model not in SD_MODEL_CHECKPOINTS:
+        print(f"エラー: 指定されたモデル '{model}' は存在しません")
+        sys.exit(1)
 
-# sd_model_checkpoint="beautifulRealistic_v7.safetensors"
+    # 透過背景の判定
+    is_transparent = args.subcategory == "transparent"
 
-# AutoImageGenerator の run メソッドを呼び出して処理を実行
-auto_image_generator.run()
+    # セルフィーの判定
+    is_selfie = args.subcategory == "selfie"
 
-# 処理の終了時間を記録
-end_time = time.time()
+    # 出力フォルダのプレフィックスを生成
+    output_folder_prefix = get_output_folder_prefix(args)
 
-# 経過時間を計算
-elapsed_time = end_time - start_time
+    # 処理の開始時間を記録
+    start_time = time.time()
 
-# 経過時間を表示
-print(f"処理にかかった時間: {elapsed_time}秒")
+    # enable_hrの判定（文字列をブール値に変換）
+    enable_hr = args.enable_hr.lower() == 'true'
+
+    # AutoImageGenerator インスタンスを作成
+    auto_image_generator = AutoImageGenerator(
+        image_generate_batch_execute_count=settings.get("image_generate_batch_execute_count", 2),
+        another_version_generate_count=settings.get("another_version_generate_count", 12),
+        input_folder="../images/input",
+        output_folder="../images/output",
+        prompts_folder="./prompts",
+        url="http://localhost:7860",
+        sd_model_checkpoint=SD_MODEL_CHECKPOINTS[model],
+        sd_model_prefix=model,
+        enable_hr=enable_hr,
+        output_folder_prefix=output_folder_prefix,
+        is_transparent_background=is_transparent,
+        is_selfie=is_selfie
+    )
+
+    # 画像生成の実行
+    auto_image_generator.run()
+
+    # 処理の終了時間を記録と表示
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"処理にかかった時間: {elapsed_time}秒")
+
+if __name__ == "__main__":
+    main()

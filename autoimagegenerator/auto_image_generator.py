@@ -37,7 +37,7 @@ class AutoImageGenerator:
         self.INPUT_FOLDER = input_folder
         # 生成された画像の保存先フォルダのルートパス
         self.OUTPUT_FOLDER = output_folder
-        
+
         self.OUTPUT_FOLDER_PREFIX = output_folder_prefix
 
         # プロンプトの保存先フォルダ
@@ -45,16 +45,16 @@ class AutoImageGenerator:
 
         # StableDiffusionのAPI URL
         self.URL = url
-        
+
         # 使用するモデルチェックポイント
         self.SD_MODEL_CHECKPOINT = sd_model_checkpoint
-        
+
         # 使用するモデルのプリフィックス
         self.SD_MODEL_PREFIX = sd_model_prefix
-        
+
         # ハイレゾ画像で生成するかどうか
         self.ENABLE_HR = enable_hr
-        
+
         # 背景透過画像で生成するかどうか
         self.IS_TRANPARENT_BACKGROUND = is_transparent_background
 
@@ -149,7 +149,7 @@ class AutoImageGenerator:
             self.DATA_POSITIVE_CANCEL_PAIR = json.load(file)
         with open(self.PROMPT_PATH + '/' + self.CANCEL_SEEDS_FILENAME, 'r') as file:
             self.DATA_CANCEL_SEEDS = json.load(file)
-        
+
         # Seed の桁数が少ない場合生成される画像の質が低い可能性が高いため、生成をキャンセルする閾値として設定
         self.CANCEL_MIN_SEED_VALUE = 999999999
 
@@ -220,7 +220,7 @@ class AutoImageGenerator:
         for i in r['images']:
             images_processed_count = images_processed_count + 1
             image = Image.open(io.BytesIO(base64.b64decode(i.split(",", 1)[0])))
-            
+
             # 透過画像生成時は最初の１つ目の r['images'] にのみ PNG 画像情報があるので、そこから各種値を取得
             if seed_value == 0:
                 png_payload = {
@@ -283,7 +283,7 @@ class AutoImageGenerator:
 
             # 画像をJPG形式で保存（別ファイルとして）
             jpg_file_path = os.path.join(folder_path, filename + ".jpg").replace("\\", "/")
-            image.convert("RGB").save(jpg_file_path, format="JPEG")            
+            image.convert("RGB").save(jpg_file_path, format="JPEG")
 
             result_images[folder_path] = {
                 'filename': filename,
@@ -386,8 +386,8 @@ class AutoImageGenerator:
                 else:
                     print(f"既にファイル {file_name} が存在したのでスキップしました。")
                     return
-            
-        
+
+
         # 入力フォルダから画像ファイルのパスを取得
         image_files = [f for f in os.listdir(input_folder) if f.endswith(('.png'))]
 
@@ -434,7 +434,7 @@ class AutoImageGenerator:
                     print(f"ファイル {file_name} を削除しました。")
                 except Exception as e:
                     print(f"ファイル {file_name} の削除中にエラーが発生しました: {e}")
-        
+
         # 入力フォルダから画像ファイルのパスを取得
         image_files = [f for f in os.listdir(input_folder) if f.endswith(('.png'))]
 
