@@ -22,49 +22,56 @@
 
 ## main.py 起動オプション詳細
 
-`main.py` は以下のコマンドライン引数をサポートしています。これらの引数を使用することで、画像生成の動作をカスタマイズできます。
+`main.py` は以下のコマンドライン引数をサポートしています。これらの引数を使用することで、画像生成の動作をカスタマイズできます：
 
-1. **モデルチェックポイント**: 
-   - **引数**: `arg_sd_model`
-   - **説明**: 使用するモデルのチェックポイントを指定します。
-   - **オプション**:
-     - `brav6`: デフォルトのモデル。
-     - `brav7`: バージョン7のモデル。
-     - `brav7_men`: バージョン7の男性用モデル。
+1. **必須の引数**:
+   - **--style**: 画像スタイル
+     - `realistic`: リアルテイスト画像
+     - `illustration`: イラストテイスト画像
+   - **--category**: カテゴリー
+     - `female`: 女性
+     - `male`: 男性
+     - `animal`: 動物
+     - `background`: 背景（illustrationのみ）
+     - `rpg_icon`: RPGアイコン（illustrationのみ）
+     - `vehicle`: 乗り物（illustrationのみ）
+     - `other`: その他（illustrationのみ）
 
-   - **使用例**: 
-     ```bash
-     python main.py brav7
-     ```
-
-2. **透明背景**:
-   - **引数**: `is_transparent_background`
-   - **説明**: 生成される画像の背景を透明にするかどうかを指定します。
-   - **オプション**: `true` または `false`（デフォルト）
-   - **使用例**: 
-     ```bash
-     python main.py brav6 true
-     ```
-
-3. **セルフィー**:
-   - **引数**: `is_selfie`
-   - **説明**: セルフィー画像を生成するかどうかを指定します。
-   - **オプション**: `true` または `false`（デフォルト）
-   - **使用例**: 
-     ```bash
-     python main.py brav6 false true
-     ```
+2. **オプションの引数**:
+   - **--subcategory**: サブカテゴリー
+     - 人物（female/male）の場合:
+       - `normal`: 通常画像
+       - `transparent`: 透過背景画像
+       - `selfie`: セルフィー画像
+     - 動物の場合:
+       - `dog`: 犬
+       - `cat`: 猫
+       - `bird`: 鳥
+       - `fish`: 魚
+       - `other`: その他
+     - その他のカテゴリーについては仕様書を参照
+   - **--model**: 使用するモデル（デフォルトはカテゴリーに応じて自動選択）
+     - `brav6`: Beautiful Realistic Asians v6
+     - `brav7`: Beautiful Realistic Asians v7
+     - `rpg_icon`: RPGアイコン用モデル
+   - **--enable-hr**: ハイレゾ画像生成の有効/無効
+     - `true`: 有効（デフォルト）
+     - `false`: 無効
 
 ### 使用例
 
-以下は、`brav7` モデルを使用し、透明背景でセルフィー画像を生成する例です。
+以下は、いくつかの使用例です：
 
 ```bash
-python main.py brav7 true true
+# リアルテイストの女性の通常画像を生成（brav7モデルを指定）
+python main.py --style realistic --category female --subcategory normal --model brav7
+
+# リアルテイストの女性の透過背景画像を生成（ハイレゾ無効）
+python main.py --style realistic --category female --subcategory transparent --enable-hr false
+
+# イラストテイストのRPGアイコン（武器）を生成
+python main.py --style illustration --category rpg_icon --subcategory weapon
 ```
-
-このコマンドは、`beautifulRealistic_v7.safetensors` モデルを使用し、透明な背景のセルフィー画像を生成します。
-
 
 ## インストール手順
 

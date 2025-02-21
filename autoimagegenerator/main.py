@@ -96,6 +96,15 @@ def get_output_folder_prefix(args):
         prefix += f"/{args.subcategory}"
     return prefix
 
+def get_default_model(category):
+    """カテゴリーに基づいてデフォルトのモデルを返す"""
+    if category == "male":
+        return "brav7_men"
+    elif category == "rpg_icon":
+        return "rpg_icon"
+    else:
+        return "brav6"
+
 def main():
     parser = argparse.ArgumentParser(description='画像生成プログラム')
 
@@ -123,10 +132,7 @@ def main():
     # モデルの選択
     if not args.model:
         # カテゴリーに応じてデフォルトモデルを選択
-        if args.category == "rpg_icon":
-            model = "rpg_icon"
-        else:
-            model = "brav6"  # デフォルトモデル
+        model = get_default_model(args.category)
     else:
         model = args.model
 
@@ -147,9 +153,6 @@ def main():
     # 処理の開始時間を記録
     start_time = time.time()
 
-    # enable_hrの判定（文字列をブール値に変換）
-    enable_hr = args.enable_hr.lower() == 'true'
-
     # AutoImageGenerator インスタンスを作成
     auto_image_generator = AutoImageGenerator(
         image_generate_batch_execute_count=settings.get("image_generate_batch_execute_count", 2),
@@ -160,7 +163,7 @@ def main():
         url="http://localhost:7860",
         sd_model_checkpoint=SD_MODEL_CHECKPOINTS[model],
         sd_model_prefix=model,
-        enable_hr=enable_hr,
+        enable_hr=args.enable_hr.lower() == 'true',
         output_folder_prefix=output_folder_prefix,
         is_transparent_background=is_transparent,
         is_selfie=is_selfie

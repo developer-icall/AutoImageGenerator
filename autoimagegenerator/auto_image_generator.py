@@ -8,6 +8,7 @@ import os
 from datetime import datetime
 import re
 from tqdm import tqdm
+import time
 
 class AutoImageGenerator:
 
@@ -158,6 +159,28 @@ class AutoImageGenerator:
         # Seed の桁数が少ない場合生成される画像の質が低い可能性が高いため、生成をキャンセルする閾値として設定
         self.CANCEL_MIN_SEED_VALUE = 999999999
 
+        # APIのエンドポイントを追加
+        self.OPTIONS_URL = f'{self.URL}/sdapi/v1/options'
+
+    def set_model(self, model_name):
+        """モデルを切り替えるためのリクエストを送信"""
+        option_payload = {
+            "sd_model_checkpoint": model_name
+        }
+
+        try:
+            response = requests.post(url=self.OPTIONS_URL, json=option_payload)
+            response.raise_for_status()
+
+            # モデルの切り替えが完了するまで少し待機
+            time.sleep(10)
+
+            print(f"モデルを {model_name} に切り替えました")
+            return True
+        except requests.exceptions.RequestException as e:
+            print(f"モデルの切り替え中にエラーが発生しました: {e}")
+            return False
+
     # ランダムなプロンプトを生成
     def generate_random_prompts(self, data):
         combined_prompt = []
@@ -214,6 +237,16 @@ class AutoImageGenerator:
         txt2img_payload = payload
         txt2img_payload["prompt"] = prompt
         txt2img_payload["negative_prompt"] = negative_prompts
+
+        # text2imgリクエストを送信する前にモデルが正しく設定されていることを確認
+        response = requests.get(self.OPTIONS_URL)
+        current_model = response.json().get("sd_model_checkpoint")
+
+        if current_model != self.SD_MODEL_CHECKPOINT:
+            print(f"警告: 現在のモデル({current_model})が指定されたモデル({self.SD_MODEL_CHECKPOINT})と異なります")
+            if not self.set_model(self.SD_MODEL_CHECKPOINT):
+                print("モデルの再設定に失敗しました")
+            return {}
 
         response = requests.post(url=self.TEXT2IMG_URL, json=txt2img_payload)
 
@@ -480,6 +513,12 @@ class AutoImageGenerator:
 
 
     def run(self):
+        """画像生成の実行"""
+        # 最初にモデルを切り替え
+        if not self.set_model(self.SD_MODEL_CHECKPOINT):
+            print("モデルの切り替えに失敗したため、処理を中止します")
+            return
+
         for _ in tqdm(range(self.IMAGE_GENERATE_BATCH_EXECUTE_COUNT)):
             # すべてのキーに対してランダムなプロンプトを生成
             positive_base_prompts, positive_base_prompt_dict = self.generate_random_prompts(self.DATA_POSITIVE_BASE)
