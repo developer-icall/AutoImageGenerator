@@ -169,14 +169,36 @@ class AutoImageGenerator:
         }
 
         try:
+            # 現在のモデルを確認
+            current_model_response = requests.get(self.OPTIONS_URL)
+            current_model = current_model_response.json().get("sd_model_checkpoint")
+
+            # 既に指定されたモデルが設定されている場合はスキップ
+            if current_model == model_name:
+                print(f"モデル {model_name} は既に設定されています")
+                return True
+            else:
+                print(f"モデル {model_name} への切り替えを行います")
+
+            # モデル切り替えリクエスト
             response = requests.post(url=self.OPTIONS_URL, json=option_payload)
             response.raise_for_status()
 
-            # モデルの切り替えが完了するまで少し待機
-            time.sleep(10)
+            # モデルの切り替えが完了するまで待機
+            max_retries = 20
+            retry_count = 0
+            while retry_count < max_retries:
+                time.sleep(5)
+                verify_response = requests.get(self.OPTIONS_URL)
+                current_model = verify_response.json().get("sd_model_checkpoint")
+                if current_model == model_name:
+                    print(f"モデルを {model_name} に切り替えました")
+                    return True
+                retry_count += 1
 
-            print(f"モデルを {model_name} に切り替えました")
-            return True
+            print(f"モデルの切り替えが確認できませんでした")
+            return False
+
         except requests.exceptions.RequestException as e:
             print(f"モデルの切り替え中にエラーが発生しました: {e}")
             return False
@@ -238,102 +260,109 @@ class AutoImageGenerator:
         txt2img_payload["prompt"] = prompt
         txt2img_payload["negative_prompt"] = negative_prompts
 
-        # text2imgリクエストを送信する前にモデルが正しく設定されていることを確認
-        response = requests.get(self.OPTIONS_URL)
-        current_model = response.json().get("sd_model_checkpoint")
+        try:
+            # text2imgリクエストを送信する前にモデルが正しく設定されていることを確認
+            response = requests.get(self.OPTIONS_URL)
+            current_model = response.json().get("sd_model_checkpoint")
 
-        if current_model != self.SD_MODEL_CHECKPOINT:
-            print(f"警告: 現在のモデル({current_model})が指定されたモデル({self.SD_MODEL_CHECKPOINT})と異なります")
-            if not self.set_model(self.SD_MODEL_CHECKPOINT):
-                print("モデルの再設定に失敗しました")
-            return {}
+            if current_model != self.SD_MODEL_CHECKPOINT:
+                print(f"警告: 現在のモデル({current_model})が指定されたモデル({self.SD_MODEL_CHECKPOINT})と異なります")
+                if not self.set_model(self.SD_MODEL_CHECKPOINT):
+                    print("モデルの再設定に失敗しました。処理を中止します")
+                    return {}
 
-        response = requests.post(url=self.TEXT2IMG_URL, json=txt2img_payload)
+            # text2imgリクエストの送信
+            response = requests.post(url=self.TEXT2IMG_URL, json=txt2img_payload)
+            response.raise_for_status()
 
-        r = response.json()
-        images_processed_count = 0
-        seed_value = 0
-        paramteters = ""
+            r = response.json()
+            images_processed_count = 0
+            seed_value = 0
+            paramteters = ""
 
-        for i in r['images']:
-            images_processed_count = images_processed_count + 1
-            image = Image.open(io.BytesIO(base64.b64decode(i.split(",", 1)[0])))
+            for i in r['images']:
+                images_processed_count = images_processed_count + 1
+                image = Image.open(io.BytesIO(base64.b64decode(i.split(",", 1)[0])))
 
-            # 透過画像生成時は最初の１つ目の r['images'] にのみ PNG 画像情報があるので、そこから各種値を取得
-            if seed_value == 0:
-                png_payload = {
-                    "image": "data:image/png;base64," + i
-                }
-                response2 = requests.post(url=self.PNGINFO_URL, json=png_payload)
+                # 透過画像生成時は最初の１つ目の r['images'] にのみ PNG 画像情報があるので、そこから各種値を取得
+                if seed_value == 0:
+                    png_payload = {
+                        "image": "data:image/png;base64," + i
+                    }
+                    response2 = requests.post(url=self.PNGINFO_URL, json=png_payload)
 
-                # 正規表現を使用してSeedの値を抽出
-                match = re.search(r"Seed:\s*(\d+)", response2.json().get("info"))
+                    # 正規表現を使用してSeedの値を抽出
+                    match = re.search(r"Seed:\s*(\d+)", response2.json().get("info"))
 
-                if match:
-                    seed_value = int(match.group(1))
-                    # print(f"Seedの値は: {seed_value}")
-                else:
-                    print("Seedが見つかりませんでした。")
+                    if match:
+                        seed_value = int(match.group(1))
+                        # print(f"Seedの値は: {seed_value}")
+                    else:
+                        print("Seedが見つかりませんでした。")
 
-                if paramteters == "":
-                    paramteters = response2.json().get("info")
+                    if paramteters == "":
+                        paramteters = response2.json().get("info")
 
-            # 透過画像生成時は３つ目の画像のみを保存するため、１つ目と２つ目はスキップ
-            if self.IS_TRANPARENT_BACKGROUND and images_processed_count != 3:
-                continue
-
-            pnginfo = PngImagePlugin.PngInfo()
-            pnginfo.add_text("parameters", paramteters)
-
-            # 日付とSeedを取得してフォルダパスを生成
-            today = datetime.today()
-            folder_name = today.strftime("%Y%m%d-%H")
-            folder_name = f"{folder_name}-{seed_value}{self.OUTPUT_FOLDER_PREFIX}"
-            if folder_path is None:
-                folder_path = os.path.join(self.OUTPUT_FOLDER, folder_name).replace("\\", "/")
-
-            if len(cancel_prompts) > 0:
-                print(f"folder_name: {folder_name} のプロンプト文字列内のキャンセル対象文字列のペア")
-                for item in cancel_prompts:
-                    for key, value in item.items():
-                        print(f"{key}: {value}")
-
-            for seed in self.DATA_CANCEL_SEEDS["Seeds"]:
-                if seed_value == seed:
-                    print(f"folder_name: {folder_name} のSeed値はキャンセル対象です。")
+                # 透過画像生成時は３つ目の画像のみを保存するため、１つ目と２つ目はスキップ
+                if self.IS_TRANPARENT_BACKGROUND and images_processed_count != 3:
                     continue
 
-            # Seed値が閾値よりも小さい場合、再起呼び出しで再実行
-            if seed_value <= self.CANCEL_MIN_SEED_VALUE:
-                print(f"folder_name: {folder_name} のSeed値は閾値よりも小さいのでキャンセル対象です。")
-                continue
+                pnginfo = PngImagePlugin.PngInfo()
+                pnginfo.add_text("parameters", paramteters)
 
-            # フォルダが存在しない場合は作成
-            if not os.path.exists(folder_path):
-                os.makedirs(folder_path)
+                # 日付とSeedを取得してフォルダパスを生成
+                today = datetime.today()
+                folder_name = today.strftime("%Y%m%d-%H")
+                folder_name = f"{folder_name}-{seed_value}{self.OUTPUT_FOLDER_PREFIX}"
+                if folder_path is None:
+                    folder_path = os.path.join(self.OUTPUT_FOLDER, folder_name).replace("\\", "/")
 
-            # 5桁ゼロ埋めの数字を生成
-            filename = f"{str(image_number).zfill(5)}-{seed_value}"
+                if len(cancel_prompts) > 0:
+                    print(f"folder_name: {folder_name} のプロンプト文字列内のキャンセル対象文字列のペア")
+                    for item in cancel_prompts:
+                        for key, value in item.items():
+                            print(f"{key}: {value}")
 
-            # ファイルを保存
-            file_path = os.path.join(folder_path, filename + self.IMAGE_FILE_EXTENSION).replace("\\", "/")
-            image.save(file_path, pnginfo=pnginfo)
+                for seed in self.DATA_CANCEL_SEEDS["Seeds"]:
+                    if seed_value == seed:
+                        print(f"folder_name: {folder_name} のSeed値はキャンセル対象です。")
+                        continue
 
-            # 画像をJPG形式で保存（別ファイルとして）
-            jpg_file_path = os.path.join(folder_path, filename + ".jpg").replace("\\", "/")
-            image.convert("RGB").save(jpg_file_path, format="JPEG")
+                # Seed値が閾値よりも小さい場合、再起呼び出しで再実行
+                if seed_value <= self.CANCEL_MIN_SEED_VALUE:
+                    print(f"folder_name: {folder_name} のSeed値は閾値よりも小さいのでキャンセル対象です。")
+                    continue
 
-            result_images[folder_path] = {
-                'filename': filename,
-                'seed_value': seed_value,
-                'image': image,
-                'positive_pose_prompt_dict': positive_pose_prompt_dict,
-                'positive_optional_prompt_dict': positive_optional_prompt_dict,
-                'pnginfo': pnginfo,
-                'cancel_prompts': cancel_prompts
-            }
+                # フォルダが存在しない場合は作成
+                if not os.path.exists(folder_path):
+                    os.makedirs(folder_path)
 
-        return result_images
+                # 5桁ゼロ埋めの数字を生成
+                filename = f"{str(image_number).zfill(5)}-{seed_value}"
+
+                # ファイルを保存
+                file_path = os.path.join(folder_path, filename + self.IMAGE_FILE_EXTENSION).replace("\\", "/")
+                image.save(file_path, pnginfo=pnginfo)
+
+                # 画像をJPG形式で保存（別ファイルとして）
+                jpg_file_path = os.path.join(folder_path, filename + ".jpg").replace("\\", "/")
+                image.convert("RGB").save(jpg_file_path, format="JPEG")
+
+                result_images[folder_path] = {
+                    'filename': filename,
+                    'seed_value': seed_value,
+                    'image': image,
+                    'positive_pose_prompt_dict': positive_pose_prompt_dict,
+                    'positive_optional_prompt_dict': positive_optional_prompt_dict,
+                    'pnginfo': pnginfo,
+                    'cancel_prompts': cancel_prompts
+                }
+
+            return result_images
+
+        except requests.exceptions.RequestException as e:
+            print(f"画像生成中にエラーが発生しました: {e}")
+            return {}
 
     # 必要な関連画像を作成
     def generate_related_images(self, base_image, folder_path, filename, pnginfo=None):

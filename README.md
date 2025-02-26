@@ -13,12 +13,16 @@
 
 ## 使用方法
 1. 下記 インストール手順 に従って諸々セットアップする
-2. 実行環境のパスへ移動
+2. venv を activate する
+    ```
+    .\venv\Scripts\activate
+    ```
+3. 実行環境のパスへ移動
     ```
     cd .\autoimagegenerator\
     ```
-3. `poetry run python main.py` でファイルを実行する
-4. `./AutoImageGenerator/images/output` 以下に画像が生成されることを確認
+4. `poetry run python main.py` でファイルを実行する
+5. `./AutoImageGenerator/images/output` 以下に画像が生成されることを確認
 
 ## main.py 起動オプション詳細
 
