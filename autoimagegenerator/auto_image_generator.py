@@ -9,6 +9,7 @@ from datetime import datetime
 import re
 from tqdm import tqdm
 import time
+import logging
 
 class AutoImageGenerator:
 
@@ -128,7 +129,7 @@ class AutoImageGenerator:
         # 透過画像として出力する際に追加する payload
         self.TRANPARENT_PAYLOAD = {
             "script_name": "ABG Remover",
-            "script_args": []
+            "script_args": [False, True, False, 0, False]   # 背景除去スクリプトの引数(背景透過画像のみ保存, 自動保存, カスタム背景色使用, 背景色, ランダム背景色使用)
         }
         self.DATA_POSITIVE_BASE = None
         self.DATA_POSITIVE_OPTIONAL = None
@@ -161,6 +162,94 @@ class AutoImageGenerator:
 
         # APIのエンドポイントを追加
         self.OPTIONS_URL = f'{self.URL}/sdapi/v1/options'
+
+        # ロガーの設定
+        self.logger = logging.getLogger(__name__)
+        self.logger.setLevel(logging.INFO)
+        if not self.logger.handlers:
+            handler = logging.StreamHandler()
+            formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+            handler.setFormatter(formatter)
+            self.logger.addHandler(handler)
+
+        # 画像タイプに応じたフォルダ構造を作成
+        self._create_output_directories()
+
+    def _create_output_directories(self):
+        """
+        画像タイプに応じた出力ディレクトリ構造を作成する
+        """
+        # スタイル（大項目）
+        styles = ["realistic", "illustration"]
+
+        # カテゴリー（中項目）
+        categories = {
+            "realistic": ["female", "male", "animal"],
+            "illustration": ["female", "male", "animal", "background", "rpg_icon", "vehicle", "other"]
+        }
+
+        # サブカテゴリー（小項目）
+        subcategories = {
+            "female": ["normal", "transparent", "selfie"],
+            "male": ["normal", "transparent", "selfie"],
+            "animal": ["dog", "cat", "bird", "fish", "other"],
+            "background": ["nature", "city", "sea", "sky", "other"],
+            "rpg_icon": ["weapon", "monster", "other"],
+            "vehicle": ["car", "ship", "airplane", "other"]
+        }
+
+        # ディレクトリ構造を作成
+        for style in styles:
+            style_path = os.path.join(self.OUTPUT_FOLDER, style)
+            os.makedirs(style_path, exist_ok=True)
+
+            for category in categories[style]:
+                category_path = os.path.join(style_path, category)
+                os.makedirs(category_path, exist_ok=True)
+
+                # カテゴリーに対応するサブカテゴリーがある場合
+                if category in subcategories:
+                    for subcategory in subcategories[category]:
+                        subcategory_path = os.path.join(category_path, subcategory)
+                        os.makedirs(subcategory_path, exist_ok=True)
+
+        self.logger.info("出力ディレクトリ構造を作成しました")
+
+    def _get_output_path(self, style, category, subcategory=None):
+        """
+        画像タイプに応じた出力パスを取得する
+
+        Args:
+            style (str): 画像スタイル（realistic/illustration）
+            category (str): 画像カテゴリー（female/male/animal等）
+            subcategory (str, optional): 画像サブカテゴリー
+
+        Returns:
+            str: 出力パス
+        """
+        # 基本パス
+        output_path = os.path.join(self.OUTPUT_FOLDER, style, category)
+
+        # サブカテゴリーがある場合は追加
+        if subcategory:
+            output_path = os.path.join(output_path, subcategory)
+
+        # 日時とシード値を含むフォルダ名を作成
+        now = datetime.now().strftime("%Y%m%d-%H")
+        seed = self.current_seed if hasattr(self, 'current_seed') else random.randint(1, 4294967295)
+        folder_name = f"{now}-{seed}"
+
+        # 最終的な出力パス
+        final_output_path = os.path.join(output_path, folder_name)
+        os.makedirs(final_output_path, exist_ok=True)
+
+        # サブフォルダも作成
+        os.makedirs(os.path.join(final_output_path, "thumbnail"), exist_ok=True)
+        os.makedirs(os.path.join(final_output_path, "sample"), exist_ok=True)
+        os.makedirs(os.path.join(final_output_path, "sample-thumbnail"), exist_ok=True)
+        os.makedirs(os.path.join(final_output_path, "half-resolution"), exist_ok=True)
+
+        return final_output_path
 
     def set_model(self, model_name):
         """モデルを切り替えるためのリクエストを送信"""
@@ -228,57 +317,115 @@ class AutoImageGenerator:
     def generate_images(self, positive_base_prompts, negative_prompts, payload, image_number, folder_path=None):
         result_images = {}
 
-        if self.IS_TRANPARENT_BACKGROUND:
-            payload = {**payload, **self.TRANPARENT_PAYLOAD}
-            positive_base_prompts = "(no background: 1.3, white background: 1.3), " + positive_base_prompts
-
-        if self.IS_SELFIE:
-            positive_pose_prompts, positive_pose_prompt_dict = self.generate_random_prompts(self.DATA_POSITIVE_SELFIE)
-        else :
-            # ポーズ用のランダムなプロンプトを生成
-            positive_pose_prompts, positive_pose_prompt_dict = self.generate_random_prompts(self.DATA_POSITIVE_POSE)
-
-        # オプション用のランダムなプロンプトを生成
-        positive_optional_prompts, positive_optional_prompt_dict = self.generate_random_prompts(self.DATA_POSITIVE_OPTIONAL)
-
-        # プロンプトを結合
-        prompt = positive_pose_prompts + ", " + positive_base_prompts + ", " + positive_optional_prompts
-
-        # 結合したプロンプト文字列内にキー文字列が含まれている場合は、キーに対応する cancel prompts 内にキャンセル対象の文字列がないかを検索
-        cancel_prompts = []
-        for key, value in self.DATA_POSITIVE_CANCEL_PAIR.items():
-            # キー文字列がプロンプト文字列内に含まれているかを検索
-            if key in prompt:
-                for cancel_prompt in value:
-                    # キャンセル対象の文字列がプロンプト文字列内に含まれているかを検索
-                    if cancel_prompt in prompt:
-                        # キャンセル対象の文字列が見つかった場合は、その文字列を削除
-                        prompt = prompt.replace(cancel_prompt + ", ", "").replace(", " + cancel_prompt, "").replace(cancel_prompt, "")
-                        cancel_prompts.append({key: cancel_prompt})
-
-        txt2img_payload = payload
-        txt2img_payload["prompt"] = prompt
-        txt2img_payload["negative_prompt"] = negative_prompts
-
         try:
-            # text2imgリクエストを送信する前にモデルが正しく設定されていることを確認
-            response = requests.get(self.OPTIONS_URL)
-            current_model = response.json().get("sd_model_checkpoint")
+            if self.IS_TRANPARENT_BACKGROUND:
+                try:
+                    payload = {**payload, **self.TRANPARENT_PAYLOAD}
+                    positive_base_prompts = "(no background: 1.3, white background: 1.3), " + positive_base_prompts
+                    print(f"透過画像生成モードを有効化しました。使用スクリプト: {self.TRANPARENT_PAYLOAD['script_name']}")
+                except Exception as e:
+                    print(f"透過画像設定中にエラーが発生しました: {e}")
+                    # エラーが発生しても処理を続行
 
-            if current_model != self.SD_MODEL_CHECKPOINT:
-                print(f"警告: 現在のモデル({current_model})が指定されたモデル({self.SD_MODEL_CHECKPOINT})と異なります")
-                if not self.set_model(self.SD_MODEL_CHECKPOINT):
-                    print("モデルの再設定に失敗しました。処理を中止します")
-                    return {}
+            if self.IS_SELFIE:
+                positive_pose_prompts, positive_pose_prompt_dict = self.generate_random_prompts(self.DATA_POSITIVE_SELFIE)
+            else:
+                # ポーズ用のランダムなプロンプトを生成
+                positive_pose_prompts, positive_pose_prompt_dict = self.generate_random_prompts(self.DATA_POSITIVE_POSE)
+
+            # オプション用のランダムなプロンプトを生成
+            positive_optional_prompts, positive_optional_prompt_dict = self.generate_random_prompts(self.DATA_POSITIVE_OPTIONAL)
+
+            # プロンプトを結合
+            prompt = positive_pose_prompts + ", " + positive_base_prompts + ", " + positive_optional_prompts
+
+            # 結合したプロンプト文字列内にキー文字列が含まれている場合は、キーに対応する cancel prompts 内にキャンセル対象の文字列がないかを検索
+            cancel_prompts = []
+            for key, value in self.DATA_POSITIVE_CANCEL_PAIR.items():
+                # キー文字列がプロンプト文字列内に含まれているかを検索
+                if key in prompt:
+                    for cancel_prompt in value:
+                        # キャンセル対象の文字列がプロンプト文字列内に含まれているかを検索
+                        if cancel_prompt in prompt:
+                            # キャンセル対象の文字列が見つかった場合は、その文字列を削除
+                            prompt = prompt.replace(cancel_prompt + ", ", "").replace(", " + cancel_prompt, "").replace(cancel_prompt, "")
+                            cancel_prompts.append({key: cancel_prompt})
+
+            txt2img_payload = payload
+            txt2img_payload["prompt"] = prompt
+            txt2img_payload["negative_prompt"] = negative_prompts
 
             # text2imgリクエストの送信
-            response = requests.post(url=self.TEXT2IMG_URL, json=txt2img_payload)
-            response.raise_for_status()
+            try:
+                response = requests.post(url=self.TEXT2IMG_URL, json=txt2img_payload)
+
+                # 500エラーの場合は即座に終了
+                if response.status_code == 500:
+                    print(f"サーバーエラー (500): APIサーバーで内部エラーが発生しました")
+                    print(f"透過画像生成に失敗した可能性があります。別のモードで試してください。")
+
+                    # Stable Diffusion Web UIのログを取得
+                    try:
+                        log_response = requests.get(f"{self.URL}/sdapi/v1/log")
+                        if log_response.status_code == 200:
+                            logs = log_response.json()
+                            print(f"Stable Diffusion Web UIのログ (最新10行):")
+                            log_lines = logs.get("lines", [])
+                            for line in log_lines[-10:]:
+                                print(f"  {line}")
+                    except Exception as log_error:
+                        print(f"ログ取得中にエラーが発生しました: {log_error}")
+
+                    # プログラムを終了
+                    import sys
+                    sys.exit(1)
+
+                response.raise_for_status()
+            except requests.exceptions.HTTPError as e:
+                # HTTPエラーの詳細情報を取得
+                print(f"HTTPエラー: {e}")
+                try:
+                    error_json = response.json()
+                    print(f"サーバーからのエラー詳細: {json.dumps(error_json, indent=2)}")
+                except:
+                    print(f"サーバーからのレスポンス: {response.text}")
+
+                # Stable Diffusion Web UIのログを取得
+                try:
+                    log_response = requests.get(f"{self.URL}/sdapi/v1/log")
+                    if log_response.status_code == 200:
+                        logs = log_response.json()
+                        print(f"Stable Diffusion Web UIのログ (最新10行):")
+                        log_lines = logs.get("lines", [])
+                        for line in log_lines[-10:]:
+                            print(f"  {line}")
+                    else:
+                        print(f"ログの取得に失敗しました: {log_response.status_code}")
+                except Exception as log_error:
+                    print(f"ログ取得中にエラーが発生しました: {log_error}")
+
+                # エラー発生時にも作成したフォルダを削除
+                if 'created_folder_path' in locals() and created_folder_path and os.path.exists(created_folder_path):
+                    import shutil
+                    try:
+                        shutil.rmtree(created_folder_path)
+                        print(f"エラー発生のため、フォルダを削除しました: {created_folder_path}")
+                    except Exception as e2:
+                        print(f"フォルダの削除中にエラーが発生しました: {e2}")
+
+                # 500エラーの場合はプログラムを終了
+                if response.status_code == 500:
+                    print(f"致命的なサーバーエラーのため、プログラムを終了します")
+                    import sys
+                    sys.exit(1)
+
+                return {}
 
             r = response.json()
             images_processed_count = 0
             seed_value = 0
             paramteters = ""
+            created_folder_path = None
 
             for i in r['images']:
                 images_processed_count = images_processed_count + 1
@@ -296,7 +443,8 @@ class AutoImageGenerator:
 
                     if match:
                         seed_value = int(match.group(1))
-                        # print(f"Seedの値は: {seed_value}")
+                        # 現在のシードを保存
+                        self.current_seed = seed_value
                     else:
                         print("Seedが見つかりませんでした。")
 
@@ -310,28 +458,49 @@ class AutoImageGenerator:
                 pnginfo = PngImagePlugin.PngInfo()
                 pnginfo.add_text("parameters", paramteters)
 
-                # 日付とSeedを取得してフォルダパスを生成
-                today = datetime.today()
-                folder_name = today.strftime("%Y%m%d-%H")
-                folder_name = f"{folder_name}-{seed_value}{self.OUTPUT_FOLDER_PREFIX}"
+                # 画像タイプに応じた出力パスを取得
                 if folder_path is None:
-                    folder_path = os.path.join(self.OUTPUT_FOLDER, folder_name).replace("\\", "/")
+                    # OUTPUT_FOLDER_PREFIXからスタイル、カテゴリー、サブカテゴリーを取得
+                    path_parts = self.OUTPUT_FOLDER_PREFIX.strip('/').split('/')
+                    style = path_parts[0]
+                    category = path_parts[1]
+                    subcategory = path_parts[2] if len(path_parts) > 2 else None
 
-                if len(cancel_prompts) > 0:
-                    print(f"folder_name: {folder_name} のプロンプト文字列内のキャンセル対象文字列のペア")
-                    for item in cancel_prompts:
-                        for key, value in item.items():
-                            print(f"{key}: {value}")
+                    # サブカテゴリーが指定されていない場合、デフォルト値を設定
+                    if subcategory is None:
+                        if self.IS_TRANPARENT_BACKGROUND:
+                            subcategory = "transparent"
+                        elif self.IS_SELFIE:
+                            subcategory = "selfie"
+                        else:
+                            subcategory = "normal"
 
+                    folder_path = self._get_output_path(style, category, subcategory)
+                    created_folder_path = folder_path
+
+                # キャンセル対象のSeed値かチェック
+                is_cancel_seed = False
                 for seed in self.DATA_CANCEL_SEEDS["Seeds"]:
                     if seed_value == seed:
-                        print(f"folder_name: {folder_name} のSeed値はキャンセル対象です。")
-                        continue
+                        print(f"folder_path: {folder_path} のSeed値はキャンセル対象です。")
+                        is_cancel_seed = True
+                        break
 
-                # Seed値が閾値よりも小さい場合、再起呼び出しで再実行
+                # Seed値が閾値よりも小さい場合もキャンセル
                 if seed_value <= self.CANCEL_MIN_SEED_VALUE:
-                    print(f"folder_name: {folder_name} のSeed値は閾値よりも小さいのでキャンセル対象です。")
-                    continue
+                    print(f"folder_path: {folder_path} のSeed値は閾値よりも小さいのでキャンセル対象です。")
+                    is_cancel_seed = True
+
+                # キャンセル対象の場合、作成したフォルダを削除して空の結果を返す
+                if is_cancel_seed:
+                    if created_folder_path and os.path.exists(created_folder_path):
+                        import shutil
+                        try:
+                            shutil.rmtree(created_folder_path)
+                            print(f"キャンセル対象のため、フォルダを削除しました: {created_folder_path}")
+                        except Exception as e:
+                            print(f"フォルダの削除中にエラーが発生しました: {e}")
+                    return {}
 
                 # フォルダが存在しない場合は作成
                 if not os.path.exists(folder_path):
@@ -362,6 +531,29 @@ class AutoImageGenerator:
 
         except requests.exceptions.RequestException as e:
             print(f"画像生成中にエラーが発生しました: {e}")
+
+            # Stable Diffusion Web UIのログを取得
+            try:
+                log_response = requests.get(f"{self.URL}/sdapi/v1/log")
+                if log_response.status_code == 200:
+                    logs = log_response.json()
+                    print(f"Stable Diffusion Web UIのログ (最新10行):")
+                    log_lines = logs.get("lines", [])
+                    for line in log_lines[-10:]:
+                        print(f"  {line}")
+                else:
+                    print(f"ログの取得に失敗しました: {log_response.status_code}")
+            except Exception as log_error:
+                print(f"ログ取得中にエラーが発生しました: {log_error}")
+
+            # エラー発生時にも作成したフォルダを削除
+            if 'created_folder_path' in locals() and created_folder_path and os.path.exists(created_folder_path):
+                import shutil
+                try:
+                    shutil.rmtree(created_folder_path)
+                    print(f"エラー発生のため、フォルダを削除しました: {created_folder_path}")
+                except Exception as e2:
+                    print(f"フォルダの削除中にエラーが発生しました: {e2}")
             return {}
 
     # 必要な関連画像を作成
