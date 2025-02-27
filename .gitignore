@@ -59,6 +59,11 @@ ENV/
 autoimagegenerator/images/output/
 autoimagegenerator/images/input/
 
+# テスト関連
+autoimagegenerator/tests/output/
+autoimagegenerator/tests/reports/
+autoimagegenerator/tests/temp_test_settings.json
+
 # ドキュメント関連
 docs/**/*.tmp
 docs/**/*.bak

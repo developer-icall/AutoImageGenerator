@@ -104,6 +104,31 @@
 
 注意：<style>には 'realistic' または 'illustration' が入ります
 
+# プロンプト保存フォルダ構造パターン
+
+## 大項目（スタイル）
+/promps/realistic      # リアルテイスト
+/promps/illustration   # イラストテイスト
+
+## 中項目（カテゴリー）
+/promps/<style>/female      # 女性
+/promps/<style>/male        # 男性
+/promps/<style>/animal      # 動物
+/promps/<style>/background  # 背景
+/promps/<style>/rpg_icon    # RPGアイコン
+/promps/<style>/vehicle     # 乗り物
+
+## 格納されている各ファイルの用途
+/promps/<style>/<category>/positive_base.json        # 必ず指定するプロンプト。同じ Seed の場合同じプロンプトが使用される
+/promps/<style>/<category>/positive_optional.json    # オプションとして指定するプロンプト。同じ Seed で複数の画像を生成する場合にランダムに選択される
+/promps/<style>/<category>/positive_pose.json        # ポーズを指定するプロンプト。同じ Seed で複数の画像を生成する場合にランダムに選択される
+/promps/<style>/<category>/negative.json             # 必ず指定するネガティブプロンプト
+/promps/<style>/<category>/cancel_seeds.json         # 生成された画像の Seed がこのファイルに指定されていたものの場合、別の Seed を使用して画像を再生成する
+/promps/<style>/<category>/positive_selfie.json      # サブカテゴリーでセルフィー画像を生成する場合に使用するプロンプト
+/promps/<style>/<category>/positive_cancel_pair.json # 特定のプロンプトの組み合わせが使用された場合、その組み合わせを使用しないプロンプトを指定する
+
+
+
 ## 生成時に動的に作成されるフォルダ
 
 画像生成時には大項目・中項目・小項目に応じたフォルダの下に、作成日時と生成された画像の Seed 値を含むフォルダが作成されます。
@@ -130,7 +155,7 @@
 @prompts
 
 ---
-以下のステップで進みたいですが、各ステップ毎に動作確認ができる状態で実装を進めてください
+以下のステップで進みたいですが、各ステップ毎に動作確認をするためのテストコードも合わせて作成しつつ実装を進めてください
 1. main.py の起動オプションを追加
 2. 生成する画像タイプに応じた prompts を追加
 3. 生成する画像タイプに応じた画像保存先フォルダを追加

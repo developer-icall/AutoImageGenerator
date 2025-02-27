@@ -1,0 +1,95 @@
+{
+    "image_generate_batch_execute_count": 1,
+    "another_version_generate_count": 1,
+    "url": "http://localhost:7860",
+    "test_patterns": [
+        {
+            "name": "realistic_female_normal",
+            "style": "realistic",
+            "category": "female",
+            "subcategory": "normal",
+            "model": "brav7",
+            "enable_hr": false
+        },
+        {
+            "name": "realistic_female_selfie",
+            "style": "realistic",
+            "category": "female",
+            "subcategory": "selfie",
+            "model": "brav6",
+            "enable_hr": false
+        },
+        {
+            "name": "realistic_female_transparent",
+            "style": "realistic",
+            "category": "female",
+            "subcategory": "transparent",
+            "model": "brav7",
+            "enable_hr": true
+        },
+        {
+            "name": "realistic_male_normal",
+            "style": "realistic",
+            "category": "male",
+            "subcategory": "normal",
+            "model": "brav7_men",
+            "enable_hr": false
+        },
+        {
+            "name": "realistic_male_selfie",
+            "style": "realistic",
+            "category": "male",
+            "subcategory": "selfie",
+            "model": "brav7_men",
+            "enable_hr": false
+        },
+        {
+            "name": "realistic_male_transparent",
+            "style": "realistic",
+            "category": "male",
+            "subcategory": "transparent",
+            "model": "brav7_men",
+            "enable_hr": false
+        },
+        {
+            "name": "illustration_rpg_icon_weapon",
+            "style": "illustration",
+            "category": "rpg_icon",
+            "subcategory": "weapon",
+            "model": "rpg_icon",
+            "enable_hr": false
+        },
+        {
+            "name": "illustration_rpg_icon_monster",
+            "style": "illustration",
+            "category": "rpg_icon",
+            "subcategory": "monster",
+            "model": "rpg_icon",
+            "enable_hr": false
+        },
+        {
+            "name": "realistic_animal_dog",
+            "style": "realistic",
+            "category": "animal",
+            "subcategory": "dog",
+            "model": "brav7",
+            "enable_hr": false
+        },
+        {
+            "name": "illustration_background_nature",
+            "style": "illustration",
+            "category": "background",
+            "subcategory": "nature",
+            "model": "brav7",
+            "enable_hr": false
+        },
+        {
+            "name": "illustration_vehicle_car",
+            "style": "illustration",
+            "category": "vehicle",
+            "subcategory": "car",
+            "model": "brav7",
+            "enable_hr": false
+        }
+    ]
+}
