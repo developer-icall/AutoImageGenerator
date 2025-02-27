@@ -100,10 +100,9 @@ class AutoImageGenerator:
         self.TEXT2IMG_URL = f'{self.URL}/sdapi/v1/txt2img'
         self.PNGINFO_URL = f'{self.URL}/sdapi/v1/png-info'
 
-        # text2imgのベースとなるpayload
-        self.TXT2IMG_BASE_PAYLOAD = {
+        # 共通のpayload設定を定義
+        self.COMMON_PAYLOAD_SETTINGS = {
             "steps": 60,
-            "seed": -1,
             "width": 512,
             "height": 768,
             "cfg_scale": 7,
@@ -115,24 +114,27 @@ class AutoImageGenerator:
             "enable_hr": enable_hr,
             "hr_scale": 2,
             "hr_upscaler": "4x-UltraSharp",
+            "hr_second_pass_steps": 20,
+            "hr_resize_x": 0,
+            "hr_resize_y": 0,
+            "hr_checkpoint_name": self.SD_MODEL_CHECKPOINT,
+            "hr_additional_modules": [],
+            "hr_sampler_name": "DPM++ 2M",
+            "hr_scheduler": "Karras",
+            "hr_cfg": 7,
+            "hr_distilled_cfg": 3.5,
             "denoising_strength": 0.3
+        }
+
+        # text2imgのベースとなるpayload
+        self.TXT2IMG_BASE_PAYLOAD = {
+            "seed": -1,
+            **self.COMMON_PAYLOAD_SETTINGS
         }
 
         # 生成された画像の別バージョン作成時のtext2imgのベースとなるpayload
         self.ANOTHER_VERSION_TXT2IMG_BASE_PAYLOAD = {
-            "steps": 60,
-            "width": 512,
-            "height": 768,
-            "cfg_scale": 7,
-            "batch_size": 1,
-            "batch_count": 1,
-            "sampler_name": "DPM++ 2M",
-            "Schedule type": "Karras",
-            "sd_model_checkpoint": self.SD_MODEL_CHECKPOINT,
-            "enable_hr": enable_hr,
-            "hr_scale": 2,
-            "hr_upscaler": "4x-UltraSharp",
-            "denoising_strength": 0.3
+            **self.COMMON_PAYLOAD_SETTINGS
         }
 
         # 透過画像として出力する際に追加する payload
@@ -396,20 +398,32 @@ class AutoImageGenerator:
             try:
                 response = requests.post(url=self.TEXT2IMG_URL, json=txt2img_payload)
 
-                # 500エラーの場合は即座に終了
+                # 500エラーの場合は詳細情報を取得して表示
                 if response.status_code == 500:
                     print(f"サーバーエラー (500): APIサーバーで内部エラーが発生しました")
                     print(f"透過画像生成に失敗した可能性があります。別のモードで試してください。")
+
+                    # レスポンスの内容を表示
+                    try:
+                        error_content = response.json()
+                        print(f"エラーの詳細情報: {json.dumps(error_content, indent=2, ensure_ascii=False)}")
+                    except json.JSONDecodeError:
+                        print(f"エラーレスポンス (テキスト形式): {response.text}")
+
+                    # リクエストの内容も表示
+                    print(f"送信したリクエスト: {json.dumps(txt2img_payload, indent=2, ensure_ascii=False)}")
 
                     # Stable Diffusion Web UIのログを取得
                     try:
                         log_response = requests.get(f"{self.URL}/sdapi/v1/log")
                         if log_response.status_code == 200:
                             logs = log_response.json()
-                            print(f"Stable Diffusion Web UIのログ (最新10行):")
+                            print(f"Stable Diffusion Web UIのログ (最新20行):")
                             log_lines = logs.get("lines", [])
-                            for line in log_lines[-10:]:
+                            for line in log_lines[-20:]:
                                 print(f"  {line}")
+                        else:
+                            print(f"ログの取得に失敗しました: {log_response.status_code}")
                     except Exception as log_error:
                         print(f"ログ取得中にエラーが発生しました: {log_error}")
 
@@ -423,18 +437,23 @@ class AutoImageGenerator:
                 print(f"HTTPエラー: {e}")
                 try:
                     error_json = response.json()
-                    print(f"サーバーからのエラー詳細: {json.dumps(error_json, indent=2)}")
-                except:
+                    print(f"サーバーからのエラー詳細: {json.dumps(error_json, indent=2, ensure_ascii=False)}")
+                except json.JSONDecodeError:
                     print(f"サーバーからのレスポンス: {response.text}")
+                except Exception as json_error:
+                    print(f"エラー情報の解析中に例外が発生しました: {json_error}")
+
+                # リクエストの内容も表示
+                print(f"送信したリクエスト: {json.dumps(txt2img_payload, indent=2, ensure_ascii=False)}")
 
                 # Stable Diffusion Web UIのログを取得
                 try:
                     log_response = requests.get(f"{self.URL}/sdapi/v1/log")
                     if log_response.status_code == 200:
                         logs = log_response.json()
-                        print(f"Stable Diffusion Web UIのログ (最新10行):")
+                        print(f"Stable Diffusion Web UIのログ (最新20行):")
                         log_lines = logs.get("lines", [])
-                        for line in log_lines[-10:]:
+                        for line in log_lines[-20:]:
                             print(f"  {line}")
                     else:
                         print(f"ログの取得に失敗しました: {log_response.status_code}")
@@ -569,14 +588,20 @@ class AutoImageGenerator:
         except requests.exceptions.RequestException as e:
             print(f"画像生成中にエラーが発生しました: {e}")
 
+            # リクエストの内容を表示
+            try:
+                print(f"送信したリクエスト: {json.dumps(payload, indent=2, ensure_ascii=False)}")
+            except Exception as req_error:
+                print(f"リクエスト情報の表示中にエラーが発生しました: {req_error}")
+
             # Stable Diffusion Web UIのログを取得
             try:
                 log_response = requests.get(f"{self.URL}/sdapi/v1/log")
                 if log_response.status_code == 200:
                     logs = log_response.json()
-                    print(f"Stable Diffusion Web UIのログ (最新10行):")
+                    print(f"Stable Diffusion Web UIのログ (最新20行):")
                     log_lines = logs.get("lines", [])
-                    for line in log_lines[-10:]:
+                    for line in log_lines[-20:]:
                         print(f"  {line}")
                 else:
                     print(f"ログの取得に失敗しました: {log_response.status_code}")
@@ -900,5 +925,6 @@ class AutoImageGenerator:
 
                         # 必要な関連画像を作成
                         self.generate_related_images(image, folder_path, str(image_number).zfill(5) + "-" + str(seed_value))
+                        self.save_prompts_to_json(positive_base_prompt_dict, positive_pose_pose_dict, positive_optional_prompt_dict, negative_prompt_dict, folder_path, filename, cancel_prompts)
 
                     image_number += 1
