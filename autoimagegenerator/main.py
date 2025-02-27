@@ -166,7 +166,10 @@ def main():
         enable_hr=args.enable_hr.lower() == 'true',
         output_folder_prefix=output_folder_prefix,
         is_transparent_background=is_transparent,
-        is_selfie=is_selfie
+        is_selfie=is_selfie,
+        style=args.style,
+        category=args.category,
+        subcategory=args.subcategory
     )
 
     # 画像生成の実行

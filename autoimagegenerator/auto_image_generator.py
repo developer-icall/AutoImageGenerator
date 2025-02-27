@@ -26,8 +26,16 @@ class AutoImageGenerator:
         enable_hr=False,
         output_folder_prefix="",
         is_transparent_background=False,
-        is_selfie=False
+        is_selfie=False,
+        style="realistic",
+        category="female",
+        subcategory="normal"
     ):
+        # 画像タイプの設定を追加
+        self.style = style
+        self.category = category
+        self.subcategory = subcategory
+
         # パラメータから受け取った値をプロパティへセット
         # 画像生成バッチの実行回数を指定
         self.IMAGE_GENERATE_BATCH_EXECUTE_COUNT = image_generate_batch_execute_count
@@ -35,16 +43,17 @@ class AutoImageGenerator:
         # 生成された画像の別バージョン(同じSeed値でオプションのプロンプトを変更)を作成する回数を指定
         self.ANOTHER_VERSION_GENERATE_COUNT = another_version_generate_count
 
-        # 生成時に利用する画像の保存先フォルダのルートパス
-        self.INPUT_FOLDER = input_folder
-        # 生成された画像の保存先フォルダのルートパス
-        self.OUTPUT_FOLDER = output_folder
+        # 絶対パスを取得するためのベースディレクトリ
+        self.BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+        # 生成時に利用する画像の保存先フォルダのルートパス（絶対パスに変換）
+        self.INPUT_FOLDER = os.path.abspath(input_folder)
+        # 生成された画像の保存先フォルダのルートパス（絶対パスに変換）
+        self.OUTPUT_FOLDER = os.path.abspath(output_folder)
+        # プロンプトフォルダのパス（絶対パスに変換）
+        self.PROMPTS_FOLDER = os.path.abspath(prompts_folder)
 
         self.OUTPUT_FOLDER_PREFIX = output_folder_prefix
-
-        # プロンプトの保存先フォルダを画像タイプに応じて設定
-        style, category = output_folder_prefix.strip('/').split('/')[:2]
-        self.PROMPT_PATH = os.path.join(prompts_folder, style, category).replace('\\', '/')
 
         # StableDiffusionのAPI URL
         self.URL = url
@@ -64,7 +73,7 @@ class AutoImageGenerator:
         # 地鶏画像で生成するかどうか
         self.IS_SELFIE = is_selfie
 
-        # 定数定義
+        # 定数定義 - _get_prompt_folder_pathより前に定義
         self.POSITIVE_PROMPT_BASE_FILENAME = "positive_base.json"
         self.POSITIVE_PROMPT_POSE_FILENAME = "positive_pose.json"
         self.POSITIVE_PROMPT_OPTIONAL_FILENAME = "positive_optional.json"
@@ -139,19 +148,42 @@ class AutoImageGenerator:
 
         # JSONファイルからデータを読み込む
         try:
-            with open(os.path.join(self.PROMPT_PATH, self.POSITIVE_PROMPT_BASE_FILENAME), 'r') as file:
+            # プロンプトの保存先フォルダを画像タイプに応じて設定
+            self.PROMPT_PATH = self._get_prompt_folder_path()
+
+            # 各ファイルのフルパスを取得
+            positive_base_path = os.path.join(self.PROMPT_PATH, self.POSITIVE_PROMPT_BASE_FILENAME)
+
+            # ファイルが存在しない場合は、既存のプロンプトファイルを探す
+            if not os.path.exists(positive_base_path):
+                # 既存のプロンプトファイルを探す
+                legacy_paths = [
+                    os.path.join("autoimagegenerator", "prompts", self.POSITIVE_PROMPT_BASE_FILENAME),
+                    os.path.join("autoimagegenerator", "prompts", "default", self.POSITIVE_PROMPT_BASE_FILENAME)
+                ]
+
+                for path in legacy_paths:
+                    if os.path.exists(path):
+                        positive_base_path = path
+                        self.PROMPT_PATH = os.path.dirname(path)
+                        break
+
+            # ファイルを読み込む
+            with open(positive_base_path, 'r', encoding='utf-8') as file:
                 self.DATA_POSITIVE_BASE = json.load(file)
-            with open(os.path.join(self.PROMPT_PATH, self.POSITIVE_PROMPT_POSE_FILENAME), 'r') as file:
+
+            # 以下同様に他のファイルも読み込む
+            with open(os.path.join(self.PROMPT_PATH, self.POSITIVE_PROMPT_POSE_FILENAME), 'r', encoding='utf-8') as file:
                 self.DATA_POSITIVE_POSE = json.load(file)
-            with open(os.path.join(self.PROMPT_PATH, self.POSITIVE_PROMPT_OPTIONAL_FILENAME), 'r') as file:
+            with open(os.path.join(self.PROMPT_PATH, self.POSITIVE_PROMPT_OPTIONAL_FILENAME), 'r', encoding='utf-8') as file:
                 self.DATA_POSITIVE_OPTIONAL = json.load(file)
-            with open(os.path.join(self.PROMPT_PATH, self.POSITIVE_PROMPT_SELFIE_FILENAME), 'r') as file:
+            with open(os.path.join(self.PROMPT_PATH, self.POSITIVE_PROMPT_SELFIE_FILENAME), 'r', encoding='utf-8') as file:
                 self.DATA_POSITIVE_SELFIE = json.load(file)
-            with open(os.path.join(self.PROMPT_PATH, self.NEGATIVE_PROMPT_FILENAME), 'r') as file:
+            with open(os.path.join(self.PROMPT_PATH, self.NEGATIVE_PROMPT_FILENAME), 'r', encoding='utf-8') as file:
                 self.DATA_NEGATIVE = json.load(file)
-            with open(os.path.join(self.PROMPT_PATH, self.POSITIVE_PROMPT_CANCEL_PAIR_FILENAME), 'r') as file:
+            with open(os.path.join(self.PROMPT_PATH, self.POSITIVE_PROMPT_CANCEL_PAIR_FILENAME), 'r', encoding='utf-8') as file:
                 self.DATA_POSITIVE_CANCEL_PAIR = json.load(file)
-            with open(os.path.join(self.PROMPT_PATH, self.CANCEL_SEEDS_FILENAME), 'r') as file:
+            with open(os.path.join(self.PROMPT_PATH, self.CANCEL_SEEDS_FILENAME), 'r', encoding='utf-8') as file:
                 self.DATA_CANCEL_SEEDS = json.load(file)
         except FileNotFoundError as e:
             print(f"エラー: プロンプトファイルが見つかりません: {e.filename}")
@@ -174,6 +206,10 @@ class AutoImageGenerator:
 
         # 画像タイプに応じたフォルダ構造を作成
         self._create_output_directories()
+
+        # モデル選択ロジックを拡張
+        self.model = self._select_model_by_image_type()
+
 
     def _create_output_directories(self):
         """
@@ -327,10 +363,11 @@ class AutoImageGenerator:
                     print(f"透過画像設定中にエラーが発生しました: {e}")
                     # エラーが発生しても処理を続行
 
-            if self.IS_SELFIE:
+            if self.subcategory == "selfie" or self.IS_SELFIE:
+                # selfieの場合は専用のプロンプトを使用
                 positive_pose_prompts, positive_pose_prompt_dict = self.generate_random_prompts(self.DATA_POSITIVE_SELFIE)
             else:
-                # ポーズ用のランダムなプロンプトを生成
+                # それ以外の場合は通常のポーズプロンプトを使用
                 positive_pose_prompts, positive_pose_prompt_dict = self.generate_random_prompts(self.DATA_POSITIVE_POSE)
 
             # オプション用のランダムなプロンプトを生成
@@ -732,6 +769,81 @@ class AutoImageGenerator:
             print(f"image_with_sample_text_file_path: {image_with_sample_text_file_path}")
             image_with_sample_text.save(image_with_sample_text_file_path)
 
+    def _select_model_by_image_type(self):
+        """画像タイプに基づいて適切なモデルを選択する"""
+        # リアルテイスト画像の場合
+        if self.style == "realistic":
+            if self.category in ["female", "male"]:
+                # 女性または男性の場合はbrav6またはbrav7を使用
+                return self.SD_MODEL_PREFIX
+            elif self.category == "animal":
+                # 動物の場合は将来的に追加予定のモデル
+                # 現時点では暫定的にbrav7を使用
+                return "brav7"  # 将来的には動物専用モデルに変更予定
+
+        # イラスト風画像の場合
+        elif self.style == "illustration":
+            if self.category in ["female", "male"]:
+                # イラスト系の人物モデル（将来的に追加予定）
+                return "anime_model"  # 仮のモデル名
+            elif self.category == "animal":
+                # イラスト系の動物モデル
+                return "anime_animal_model"  # 仮のモデル名
+            elif self.category == "background":
+                # 背景用モデル
+                return "background_model"  # 仮のモデル名
+            elif self.category == "rpg_icon":
+                # RPGアイコン用モデル
+                return "RPGIcon"
+            elif self.category == "vehicle":
+                # 乗り物用モデル
+                return "vehicle_model"  # 仮のモデル名
+
+        # デフォルトモデル
+        return self.SD_MODEL_PREFIX
+
+    def _get_prompt_folder_path(self):
+        """
+        画像タイプに基づいて適切なプロンプトフォルダのパスを返す
+
+        現在の実装では、サブカテゴリごとに異なるJSONファイルを使用している。
+        - selfie: positive_selfie.json
+        - normal/transparent: positive_pose.json
+
+        この実装を維持しながら、新しいフォルダ構造にも対応する。
+        """
+        # 基本となるプロンプトフォルダのパス（絶対パス）
+        base_prompt_folder = self.PROMPTS_FOLDER
+
+        # 既存の実装との互換性のため、まずプロンプトファイルが直接基本フォルダにあるか確認
+        if os.path.exists(os.path.join(base_prompt_folder, self.POSITIVE_PROMPT_BASE_FILENAME)):
+            return base_prompt_folder
+
+        # 新しいフォルダ構造を確認
+        # スタイルフォルダが存在するか
+        style_folder = os.path.join(base_prompt_folder, self.style)
+        if not os.path.exists(style_folder):
+            # スタイルフォルダが存在しない場合、デフォルトフォルダを使用
+            default_folder = os.path.join(base_prompt_folder, "default")
+            if os.path.exists(default_folder):
+                return default_folder
+            else:
+                return base_prompt_folder
+
+        # カテゴリフォルダが存在するか
+        category_folder = os.path.join(style_folder, self.category)
+        if not os.path.exists(category_folder):
+            # カテゴリフォルダが存在しない場合、スタイルフォルダを使用
+            return style_folder
+
+        # サブカテゴリフォルダが存在するか
+        if self.subcategory:
+            subcategory_folder = os.path.join(category_folder, self.subcategory)
+            if os.path.exists(subcategory_folder):
+                return subcategory_folder
+
+        # サブカテゴリフォルダが存在しない場合、カテゴリフォルダを使用
+        return category_folder
 
     def run(self):
         """画像生成の実行"""
@@ -788,6 +900,5 @@ class AutoImageGenerator:
 
                         # 必要な関連画像を作成
                         self.generate_related_images(image, folder_path, str(image_number).zfill(5) + "-" + str(seed_value))
-                        self.save_prompts_to_json(positive_base_prompt_dict, positive_pose_pose_dict, positive_optional_prompt_dict, negative_prompt_dict, folder_path, filename, cancel_prompts)
 
                     image_number += 1
