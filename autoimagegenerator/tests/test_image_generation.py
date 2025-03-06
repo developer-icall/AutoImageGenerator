@@ -190,7 +190,7 @@ class TestImageGeneration(unittest.TestCase):
                     model_checkpoint = model_checkpoints.get(pattern["model"], f"{pattern['model']}.safetensors")
 
                     # 設定から画像生成数とバージョン数を取得
-                    image_generate_batch_execute_count = self.settings["image_generate_batch_execute_count"]
+                    image_generate_batch_execute_count = pattern.get("image_generate_batch_execute_count", self.settings["image_generate_batch_execute_count"])
                     another_version_generate_count = self.settings["another_version_generate_count"]
 
                     logger.info(f"画像生成バッチ実行数: {image_generate_batch_execute_count}")

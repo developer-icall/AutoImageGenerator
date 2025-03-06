@@ -100,6 +100,35 @@ class AutoImageGenerator:
         self.TEXT2IMG_URL = f'{self.URL}/sdapi/v1/txt2img'
         self.PNGINFO_URL = f'{self.URL}/sdapi/v1/png-info'
 
+        # ロガーの設定
+        self.logger = logging.getLogger(__name__)
+        self.logger.setLevel(logging.INFO)
+        if not self.logger.handlers:
+            handler = logging.StreamHandler()
+            formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+            handler.setFormatter(formatter)
+            self.logger.addHandler(handler)
+
+        # 画像タイプに応じたフォルダ構造を作成
+        self._create_output_directories()
+
+        # 画像タイプに基づいて適切なモデルを選択
+        self.model = self._select_model_by_image_type()
+
+        # 選択されたモデルに基づいてSD_MODEL_CHECKPOINTを更新
+        if self.model != self.SD_MODEL_PREFIX:
+            try:
+                from main import SD_MODEL_CHECKPOINTS
+                if self.model in SD_MODEL_CHECKPOINTS:
+                    self.SD_MODEL_CHECKPOINT = SD_MODEL_CHECKPOINTS[self.model]
+                    self.logger.info(f"画像タイプに基づいて {self.model} モデル ({self.SD_MODEL_CHECKPOINT}) を使用します")
+                else:
+                    self.logger.warning(f"警告: モデルチェックポイントの取得中にエラーが発生しました: {e}")
+                    self.logger.info(f"デフォルトモデル {self.SD_MODEL_CHECKPOINT} を使用します")
+            except (ImportError, KeyError) as e:
+                self.logger.warning(f"警告: モデルチェックポイントの取得中にエラーが発生しました: {e}")
+                self.logger.info(f"デフォルトモデル {self.SD_MODEL_CHECKPOINT} を使用します")
+
         # 共通のpayload設定を定義
         self.COMMON_PAYLOAD_SETTINGS = {
             "steps": 60,
@@ -188,7 +217,7 @@ class AutoImageGenerator:
             with open(os.path.join(self.PROMPT_PATH, self.CANCEL_SEEDS_FILENAME), 'r', encoding='utf-8') as file:
                 self.DATA_CANCEL_SEEDS = json.load(file)
         except FileNotFoundError as e:
-            print(f"エラー: プロンプトファイルが見つかりません: {e.filename}")
+            self.logger.error(f"エラー: プロンプトファイルが見つかりません: {e.filename}")
             raise
 
         # Seed の桁数が少ない場合生成される画像の質が低い可能性が高いため、生成をキャンセルする閾値として設定
@@ -196,22 +225,6 @@ class AutoImageGenerator:
 
         # APIのエンドポイントを追加
         self.OPTIONS_URL = f'{self.URL}/sdapi/v1/options'
-
-        # ロガーの設定
-        self.logger = logging.getLogger(__name__)
-        self.logger.setLevel(logging.INFO)
-        if not self.logger.handlers:
-            handler = logging.StreamHandler()
-            formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-            handler.setFormatter(formatter)
-            self.logger.addHandler(handler)
-
-        # 画像タイプに応じたフォルダ構造を作成
-        self._create_output_directories()
-
-        # モデル選択ロジックを拡張
-        self.model = self._select_model_by_image_type()
-
 
     def _create_output_directories(self):
         """
@@ -400,32 +413,32 @@ class AutoImageGenerator:
 
                 # 500エラーの場合は詳細情報を取得して表示
                 if response.status_code == 500:
-                    print(f"サーバーエラー (500): APIサーバーで内部エラーが発生しました")
-                    print(f"透過画像生成に失敗した可能性があります。別のモードで試してください。")
+                    self.logger.info(f"サーバーエラー (500): APIサーバーで内部エラーが発生しました")
+                    self.logger.info(f"透過画像生成に失敗した可能性があります。別のモードで試してください。")
 
                     # レスポンスの内容を表示
                     try:
                         error_content = response.json()
-                        print(f"エラーの詳細情報: {json.dumps(error_content, indent=2, ensure_ascii=False)}")
+                        self.logger.info(f"エラーの詳細情報: {json.dumps(error_content, indent=2, ensure_ascii=False)}")
                     except json.JSONDecodeError:
-                        print(f"エラーレスポンス (テキスト形式): {response.text}")
+                        self.logger.info(f"エラーレスポンス (テキスト形式): {response.text}")
 
                     # リクエストの内容も表示
-                    print(f"送信したリクエスト: {json.dumps(txt2img_payload, indent=2, ensure_ascii=False)}")
+                    self.logger.info(f"送信したリクエスト: {json.dumps(txt2img_payload, indent=2, ensure_ascii=False)}")
 
                     # Stable Diffusion Web UIのログを取得
                     try:
                         log_response = requests.get(f"{self.URL}/sdapi/v1/log")
                         if log_response.status_code == 200:
                             logs = log_response.json()
-                            print(f"Stable Diffusion Web UIのログ (最新20行):")
+                            self.logger.info(f"Stable Diffusion Web UIのログ (最新20行):")
                             log_lines = logs.get("lines", [])
                             for line in log_lines[-20:]:
-                                print(f"  {line}")
+                                self.logger.info(f"  {line}")
                         else:
-                            print(f"ログの取得に失敗しました: {log_response.status_code}")
+                            self.logger.info(f"ログの取得に失敗しました: {log_response.status_code}")
                     except Exception as log_error:
-                        print(f"ログ取得中にエラーが発生しました: {log_error}")
+                        self.logger.info(f"ログ取得中にエラーが発生しました: {log_error}")
 
                     # プログラムを終了
                     import sys
@@ -434,31 +447,31 @@ class AutoImageGenerator:
                 response.raise_for_status()
             except requests.exceptions.HTTPError as e:
                 # HTTPエラーの詳細情報を取得
-                print(f"HTTPエラー: {e}")
+                self.logger.error(f"HTTPエラー: {e}")
                 try:
                     error_json = response.json()
-                    print(f"サーバーからのエラー詳細: {json.dumps(error_json, indent=2, ensure_ascii=False)}")
+                    self.logger.error(f"サーバーからのエラー詳細: {json.dumps(error_json, indent=2, ensure_ascii=False)}")
                 except json.JSONDecodeError:
-                    print(f"サーバーからのレスポンス: {response.text}")
+                    self.logger.error(f"サーバーからのレスポンス: {response.text}")
                 except Exception as json_error:
-                    print(f"エラー情報の解析中に例外が発生しました: {json_error}")
+                    self.logger.error(f"エラー情報の解析中に例外が発生しました: {json_error}")
 
                 # リクエストの内容も表示
-                print(f"送信したリクエスト: {json.dumps(txt2img_payload, indent=2, ensure_ascii=False)}")
+                self.logger.info(f"送信したリクエスト: {json.dumps(txt2img_payload, indent=2, ensure_ascii=False)}")
 
                 # Stable Diffusion Web UIのログを取得
                 try:
                     log_response = requests.get(f"{self.URL}/sdapi/v1/log")
                     if log_response.status_code == 200:
                         logs = log_response.json()
-                        print(f"Stable Diffusion Web UIのログ (最新20行):")
+                        self.logger.info(f"Stable Diffusion Web UIのログ (最新20行):")
                         log_lines = logs.get("lines", [])
                         for line in log_lines[-20:]:
-                            print(f"  {line}")
+                            self.logger.info(f"  {line}")
                     else:
-                        print(f"ログの取得に失敗しました: {log_response.status_code}")
+                        self.logger.info(f"ログの取得に失敗しました: {log_response.status_code}")
                 except Exception as log_error:
-                    print(f"ログ取得中にエラーが発生しました: {log_error}")
+                    self.logger.info(f"ログ取得中にエラーが発生しました: {log_error}")
 
                 # エラー発生時にも作成したフォルダを削除
                 if 'created_folder_path' in locals() and created_folder_path and os.path.exists(created_folder_path):
@@ -586,36 +599,36 @@ class AutoImageGenerator:
             return result_images
 
         except requests.exceptions.RequestException as e:
-            print(f"画像生成中にエラーが発生しました: {e}")
+            self.logger.error(f"画像生成中にエラーが発生しました: {e}")
 
             # リクエストの内容を表示
             try:
-                print(f"送信したリクエスト: {json.dumps(payload, indent=2, ensure_ascii=False)}")
+                self.logger.info(f"送信したリクエスト: {json.dumps(payload, indent=2, ensure_ascii=False)}")
             except Exception as req_error:
-                print(f"リクエスト情報の表示中にエラーが発生しました: {req_error}")
+                self.logger.error(f"リクエスト情報の表示中にエラーが発生しました: {req_error}")
 
             # Stable Diffusion Web UIのログを取得
             try:
                 log_response = requests.get(f"{self.URL}/sdapi/v1/log")
                 if log_response.status_code == 200:
                     logs = log_response.json()
-                    print(f"Stable Diffusion Web UIのログ (最新20行):")
+                    self.logger.info(f"Stable Diffusion Web UIのログ (最新20行):")
                     log_lines = logs.get("lines", [])
                     for line in log_lines[-20:]:
-                        print(f"  {line}")
+                        self.logger.info(f"  {line}")
                 else:
-                    print(f"ログの取得に失敗しました: {log_response.status_code}")
+                    self.logger.info(f"ログの取得に失敗しました: {log_response.status_code}")
             except Exception as log_error:
-                print(f"ログ取得中にエラーが発生しました: {log_error}")
+                self.logger.error(f"ログ取得中にエラーが発生しました: {log_error}")
 
             # エラー発生時にも作成したフォルダを削除
             if 'created_folder_path' in locals() and created_folder_path and os.path.exists(created_folder_path):
                 import shutil
                 try:
                     shutil.rmtree(created_folder_path)
-                    print(f"エラー発生のため、フォルダを削除しました: {created_folder_path}")
+                    self.logger.info(f"エラー発生のため、フォルダを削除しました: {created_folder_path}")
                 except Exception as e2:
-                    print(f"フォルダの削除中にエラーが発生しました: {e2}")
+                    self.logger.error(f"フォルダの削除中にエラーが発生しました: {e2}")
             return {}
 
     # 必要な関連画像を作成
@@ -798,9 +811,15 @@ class AutoImageGenerator:
         """画像タイプに基づいて適切なモデルを選択する"""
         # リアルテイスト画像の場合
         if self.style == "realistic":
-            if self.category in ["female", "male"]:
-                # 女性または男性の場合はbrav6またはbrav7を使用
+            if self.category == "female":
+                # 女性の場合はbrav6またはbrav7を使用
                 return self.SD_MODEL_PREFIX
+            elif self.category == "male":
+                # 男性の場合はbrav7_menを使用
+                if self.SD_MODEL_PREFIX == "brav7":
+                    return "brav7_men"
+                else:
+                    return self.SD_MODEL_PREFIX
             elif self.category == "animal":
                 # 動物の場合は将来的に追加予定のモデル
                 # 現時点では暫定的にbrav7を使用
@@ -808,21 +827,28 @@ class AutoImageGenerator:
 
         # イラスト風画像の場合
         elif self.style == "illustration":
-            if self.category in ["female", "male"]:
-                # イラスト系の人物モデル（将来的に追加予定）
-                return "anime_model"  # 仮のモデル名
-            elif self.category == "animal":
-                # イラスト系の動物モデル
-                return "anime_animal_model"  # 仮のモデル名
-            elif self.category == "background":
-                # 背景用モデル
-                return "background_model"  # 仮のモデル名
-            elif self.category == "rpg_icon":
+            if self.category == "rpg_icon":
                 # RPGアイコン用モデル
-                return "RPGIcon"
+                return "rpg_icon"
+            elif self.category in ["female", "male"]:
+                # イラスト系の人物モデル（将来的に追加予定）
+                # 現時点では暫定的にbrav7を使用
+                if self.category == "male":
+                    return "brav7_men"
+                else:
+                    return "brav7"
+            elif self.category == "animal":
+                # イラスト系の動物モデル（将来的に追加予定）
+                return "brav7"  # 仮のモデル名
+            elif self.category == "background":
+                # 背景用モデル（将来的に追加予定）
+                return "brav7"  # 仮のモデル名
             elif self.category == "vehicle":
-                # 乗り物用モデル
-                return "vehicle_model"  # 仮のモデル名
+                # 乗り物用モデル（将来的に追加予定）
+                return "brav7"  # 仮のモデル名
+            elif self.category == "other":
+                # その他のカテゴリ（将来的に追加予定）
+                return "brav7"  # 仮のモデル名
 
         # デフォルトモデル
         return self.SD_MODEL_PREFIX

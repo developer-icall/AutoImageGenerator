@@ -43,7 +43,7 @@ def clean_test_output_directory():
         logger.error(f"テスト出力ディレクトリのクリーンアップ中にエラーが発生しました: {e}")
         return False
 
-def run_tests(pattern=None, style=None, category=None, subcategory=None, model=None, generate_report=True, clean_output=True):
+def run_tests(pattern=None, style=None, category=None, subcategory=None, model=None, generate_report=True, clean_output=True, run_all=False, failfast=False, test_files=None):
     """
     テストを実行する関数
 
@@ -55,6 +55,9 @@ def run_tests(pattern=None, style=None, category=None, subcategory=None, model=N
         model (str, optional): 実行するテストのモデル（brav6/brav7等）
         generate_report (bool, optional): テスト結果のレポートを生成するかどうか
         clean_output (bool, optional): テスト実行前に以前のテスト出力を削除するかどうか
+        run_all (bool, optional): 全てのテストを実行するかどうか
+        failfast (bool, optional): テストが失敗した時点で実行を中止するかどうか
+        test_files (list, optional): 実行する特定のテストファイル名のリスト
 
     Returns:
         bool: テストが成功したかどうか
@@ -124,15 +127,50 @@ def run_tests(pattern=None, style=None, category=None, subcategory=None, model=N
     # テストディレクトリをPythonパスに追加
     sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
-    # テストを実行
-    from test_image_generation import TestImageGeneration
-
     # テストスイートを作成
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestImageGeneration))
+
+    if test_files:
+        # 特定のテストファイルのみを実行
+        logger.info(f"指定されたテストファイルのみを実行します: {test_files}")
+        test_loader = unittest.TestLoader()
+
+        for test_file in test_files:
+            # ファイル名からモジュール名を取得（拡張子を除去）
+            if test_file.endswith('.py'):
+                test_module = test_file[:-3]
+            else:
+                test_module = test_file
+
+            try:
+                # モジュールをインポート
+                module = __import__(test_module, fromlist=[''])
+                # モジュール内のテストを検出して追加
+                tests = test_loader.loadTestsFromModule(module)
+                suite.addTests(tests)
+                logger.info(f"テストモジュール {test_module} を追加しました")
+            except (ImportError, AttributeError) as e:
+                logger.warning(f"テストモジュール {test_module} の追加に失敗しました: {e}")
+    elif run_all:
+        # 全てのテストを実行
+        logger.info("全てのテストを実行します")
+
+        # テストディスカバリーを使用して全てのテストを検出
+        test_loader = unittest.TestLoader()
+        test_dir = os.path.dirname(__file__)
+        discovered_tests = test_loader.discover(test_dir, pattern="test_*.py")
+        suite.addTests(discovered_tests)
+
+        # 明示的に各テストファイルを追加する方法は使用しない（重複を避けるため）
+        # テストディスカバリーで十分にテストが検出されるはず
+        logger.info("テストディスカバリーを使用してテストを検出しました")
+    else:
+        # 特定のテストのみ実行
+        from test_image_generation import TestImageGeneration
+        suite.addTest(unittest.makeSuite(TestImageGeneration))
 
     # テストを実行
-    runner = unittest.TextTestRunner(verbosity=2)
+    runner = unittest.TextTestRunner(verbosity=2, failfast=failfast)
     result = runner.run(suite)
 
     # テスト結果を取得
@@ -144,8 +182,59 @@ def run_tests(pattern=None, style=None, category=None, subcategory=None, model=N
         logger.error("テストが失敗しました。")
 
     # テスト結果のレポートを生成
-    if generate_report and os.path.exists(os.path.join(os.path.dirname(__file__), 'output', 'test_results.json')):
-        generate_test_report()
+    if generate_report:
+        # テスト結果の詳細情報を収集
+        test_results = {
+            'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            'success': success,
+            'total_tests': result.testsRun,
+            'failures': len(result.failures),
+            'errors': len(result.errors),
+            'skipped': len(result.skipped) if hasattr(result, 'skipped') else 0,
+            'test_details': []
+        }
+
+        # 失敗したテストの詳細を追加
+        for test, traceback in result.failures:
+            test_results['test_details'].append({
+                'test_name': str(test),
+                'status': 'failure',
+                'traceback': traceback
+            })
+
+        # エラーが発生したテストの詳細を追加
+        for test, traceback in result.errors:
+            test_results['test_details'].append({
+                'test_name': str(test),
+                'status': 'error',
+                'traceback': traceback
+            })
+
+        # スキップされたテストの詳細を追加（存在する場合）
+        if hasattr(result, 'skipped'):
+            for test, reason in result.skipped:
+                test_results['test_details'].append({
+                    'test_name': str(test),
+                    'status': 'skipped',
+                    'reason': reason
+                })
+
+        # 成功したテストの詳細を追加
+        for test in result.successes if hasattr(result, 'successes') else []:
+            test_results['test_details'].append({
+                'test_name': str(test),
+                'status': 'success'
+            })
+
+        # テスト結果をJSONファイルに保存
+        output_dir = os.path.join(os.path.dirname(__file__), 'output')
+        os.makedirs(output_dir, exist_ok=True)
+
+        with open(os.path.join(output_dir, 'test_results_summary.json'), 'w', encoding='utf-8') as f:
+            json.dump(test_results, f, indent=4, ensure_ascii=False)
+
+        # 既存のテスト結果ファイルも使用してレポートを生成
+        generate_test_report(test_results)
 
     # 一時設定ファイルを削除
     try:
@@ -157,12 +246,41 @@ def run_tests(pattern=None, style=None, category=None, subcategory=None, model=N
 
     return success
 
-def generate_test_report():
-    """テスト結果のレポートを生成する関数"""
+def generate_test_report(test_results_summary=None):
+    """
+    テスト結果のレポートを生成する関数
+
+    Args:
+        test_results_summary (dict, optional): テスト実行の概要結果
+
+    Returns:
+        str: 生成されたレポートファイルのパス
+    """
     try:
-        # テスト結果を読み込む
-        with open(os.path.join(os.path.dirname(__file__), 'output', 'test_results.json'), 'r', encoding='utf-8') as f:
-            results = json.load(f)
+        # テスト結果の概要を取得
+        if test_results_summary is None:
+            try:
+                with open(os.path.join(os.path.dirname(__file__), 'output', 'test_results_summary.json'), 'r', encoding='utf-8') as f:
+                    test_results_summary = json.load(f)
+            except FileNotFoundError:
+                logger.warning("テスト結果の概要ファイルが見つかりません。")
+                test_results_summary = {
+                    'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    'success': False,
+                    'total_tests': 0,
+                    'failures': 0,
+                    'errors': 0,
+                    'skipped': 0,
+                    'test_details': []
+                }
+
+        # 詳細なテスト結果を取得（存在する場合）
+        detailed_results = []
+        try:
+            with open(os.path.join(os.path.dirname(__file__), 'output', 'test_results.json'), 'r', encoding='utf-8') as f:
+                detailed_results = json.load(f)
+        except FileNotFoundError:
+            logger.warning("詳細なテスト結果ファイルが見つかりません。")
 
         # レポートディレクトリを作成
         report_dir = Path(os.path.join(os.path.dirname(__file__), 'reports'))
@@ -181,11 +299,13 @@ def generate_test_report():
     <title>AutoImageGenerator テスト結果</title>
     <style>
         body {{ font-family: Arial, sans-serif; margin: 20px; }}
-        h1 {{ color: #333; }}
+        h1, h2, h3, h4 {{ color: #333; }}
         .summary {{ margin: 20px 0; padding: 10px; background-color: #f5f5f5; border-radius: 5px; }}
         .test-case {{ margin: 10px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }}
         .success {{ background-color: #dff0d8; }}
         .failure {{ background-color: #f2dede; }}
+        .error {{ background-color: #fcf8e3; }}
+        .skipped {{ background-color: #d9edf7; }}
         .details {{ margin-top: 10px; }}
         .validation-section {{ margin: 15px 0; padding: 10px; background-color: #f9f9f9; border-radius: 5px; }}
         .validation-item {{ margin: 5px 0; }}
@@ -200,6 +320,7 @@ def generate_test_report():
         .invalid {{ color: red; }}
         .toggle-button {{ cursor: pointer; padding: 5px; background-color: #f0f0f0; border-radius: 3px; display: inline-block; }}
         .hidden {{ display: none; }}
+        pre {{ background-color: #f8f8f8; padding: 10px; border-radius: 5px; overflow-x: auto; }}
     </style>
     <script>
         function toggleDetails(id) {{
@@ -215,51 +336,96 @@ def generate_test_report():
 <body>
     <h1>AutoImageGenerator テスト結果</h1>
     <div class="summary">
-        <p><strong>実行日時:</strong> {results['timestamp']}</p>
-        <p><strong>テスト数:</strong> {len(results['results'])}</p>
-        <p><strong>成功数:</strong> {sum(1 for r in results['results'] if r['success'])}</p>
-        <p><strong>失敗数:</strong> {sum(1 for r in results['results'] if not r['success'])}</p>
+        <p><strong>実行日時:</strong> {test_results_summary['timestamp']}</p>
+        <p><strong>テスト数:</strong> {test_results_summary['total_tests']}</p>
+        <p><strong>成功数:</strong> {test_results_summary['total_tests'] - test_results_summary['failures'] - test_results_summary['errors'] - test_results_summary['skipped']}</p>
+        <p><strong>失敗数:</strong> {test_results_summary['failures']}</p>
+        <p><strong>エラー数:</strong> {test_results_summary['errors']}</p>
+        <p><strong>スキップ数:</strong> {test_results_summary['skipped']}</p>
+        <p><strong>全体結果:</strong> <span class="{'valid' if test_results_summary['success'] else 'invalid'}">{batch_status_text(test_results_summary['success'])}</span></p>
     </div>
 
     <h2>テスト詳細</h2>
 """)
 
-            # 各テスト結果を書き込む
-            for i, result in enumerate(results['results']):
-                status_class = "success" if result['success'] else "failure"
-                status_text = "成功" if result['success'] else "失敗"
+            # テスト詳細の表示
+            if test_results_summary['test_details']:
+                for i, test_detail in enumerate(test_results_summary['test_details']):
+                    status = test_detail['status']
+                    status_class = {
+                        'success': 'success',
+                        'failure': 'failure',
+                        'error': 'error',
+                        'skipped': 'skipped'
+                    }.get(status, '')
 
-                f.write(f"""
+                    f.write(f"""
     <div class="test-case {status_class}">
-        <h3>{result['pattern']} - {status_text}</h3>
-        <div class="details">
-            <p><strong>開始時間:</strong> {result['start_time']}</p>
-            <p><strong>終了時間:</strong> {result['end_time']}</p>
-            <p><strong>実行時間:</strong> {result['elapsed_time']:.2f}秒</p>
+        <h3>{test_detail['test_name']} - {status}</h3>
 """)
 
-                if result['success']:
-                    f.write(f"""
-            <p><strong>出力パス:</strong> {result['output_path']}</p>
-""")
-                else:
-                    f.write(f"""
-            <p><strong>エラー:</strong> {result['error']}</p>
-""")
-
-                # 検証結果の詳細を表示
-                if 'validation_results' in result:
-                    validation_results = result['validation_results']
-
-                    # バッチ数の検証結果
-                    if 'batch_count_valid' in validation_results:
-                        batch_count_valid = validation_results['batch_count_valid']
-                        expected_batch_count = validation_results['expected_batch_count']
-                        actual_batch_count = validation_results['actual_batch_count']
-
-                        batch_status = "valid" if batch_count_valid else "invalid"
-
+                    if status == 'failure' or status == 'error':
                         f.write(f"""
+        <div class="toggle-button" onclick="toggleDetails('traceback-{i}')">トレースバックを表示/非表示</div>
+        <div id="traceback-{i}" class="hidden">
+            <pre>{test_detail['traceback']}</pre>
+        </div>
+""")
+                    elif status == 'skipped':
+                        f.write(f"""
+        <p><strong>スキップ理由:</strong> {test_detail['reason']}</p>
+""")
+
+                    f.write("""
+    </div>
+""")
+
+            # 詳細なテスト結果の表示（存在する場合）
+            if detailed_results:
+                f.write("""
+    <h2>パターン別テスト結果</h2>
+""")
+
+                if isinstance(detailed_results, dict) and 'results' in detailed_results:
+                    results = detailed_results['results']
+                else:
+                    results = detailed_results
+
+                for i, result in enumerate(results):
+                    status_class = "success" if result.get('success', False) else "failure"
+                    status_text = "成功" if result.get('success', False) else "失敗"
+
+                    f.write(f"""
+    <div class="test-case {status_class}">
+        <h3>{result.get('pattern', f'テスト {i+1}')} - {status_text}</h3>
+        <div class="details">
+            <p><strong>開始時間:</strong> {result.get('start_time', 'N/A')}</p>
+            <p><strong>終了時間:</strong> {result.get('end_time', 'N/A')}</p>
+            <p><strong>実行時間:</strong> {result.get('elapsed_time', 0):.2f}秒</p>
+""")
+
+                    if result.get('success', False):
+                        f.write(f"""
+            <p><strong>出力パス:</strong> {result.get('output_path', 'N/A')}</p>
+""")
+                    else:
+                        f.write(f"""
+            <p><strong>エラー:</strong> {result.get('error', 'N/A')}</p>
+""")
+
+                    # 検証結果の詳細を表示
+                    if 'validation_results' in result:
+                        validation_results = result['validation_results']
+
+                        # バッチ数の検証結果
+                        if 'batch_count_valid' in validation_results:
+                            batch_count_valid = validation_results['batch_count_valid']
+                            expected_batch_count = validation_results['expected_batch_count']
+                            actual_batch_count = validation_results['actual_batch_count']
+
+                            batch_status = "valid" if batch_count_valid else "invalid"
+
+                            f.write(f"""
             <div class="validation-section">
                 <h4>バッチ数検証</h4>
                 <div class="validation-item">
@@ -270,12 +436,12 @@ def generate_test_report():
             </div>
 """)
 
-                    # バージョン検証の結果
-                    if 'version_validation' in validation_results:
-                        version_validation = validation_results['version_validation']
-                        all_versions_valid = validation_results.get('all_versions_valid', False)
+                        # バージョン検証の結果
+                        if 'version_validation' in validation_results:
+                            version_validation = validation_results['version_validation']
+                            all_versions_valid = validation_results.get('all_versions_valid', False)
 
-                        f.write(f"""
+                            f.write(f"""
             <div class="validation-section">
                 <h4>バージョン検証</h4>
                 <p><strong>全体結果:</strong> <span class="{'valid' if all_versions_valid else 'invalid'}">{batch_status_text(all_versions_valid)}</span></p>
@@ -284,13 +450,13 @@ def generate_test_report():
                 <div id="version-details-{i}" class="hidden">
 """)
 
-                        # 各シードフォルダの検証結果
-                        for j, version_result in enumerate(version_validation):
-                            seed_folder = version_result['seed_folder']
-                            all_valid = version_result['all_valid']
-                            seed_status_class = "seed-folder-success" if all_valid else "seed-folder-failure"
+                            # 各シードフォルダの検証結果
+                            for j, version_result in enumerate(version_validation):
+                                seed_folder = version_result['seed_folder']
+                                all_valid = version_result['all_valid']
+                                seed_status_class = "seed-folder-success" if all_valid else "seed-folder-failure"
 
-                            f.write(f"""
+                                f.write(f"""
                     <div class="seed-folder {seed_status_class}">
                         <h5>シードフォルダ: {seed_folder}</h5>
                         <p><strong>結果:</strong> <span class="{'valid' if all_valid else 'invalid'}">{batch_status_text(all_valid)}</span></p>
@@ -299,27 +465,27 @@ def generate_test_report():
                         <div id="seed-details-{i}-{j}" class="hidden">
 """)
 
-                            # ファイル検証の詳細
-                            files_validation = version_result['files_validation']
-                            for location, validation in files_validation.items():
-                                f.write(f"""
+                                # ファイル検証の詳細
+                                files_validation = version_result['files_validation']
+                                for location, validation in files_validation.items():
+                                    f.write(f"""
                             <div class="file-validation">
                                 <h6>{location}</h6>
 """)
 
-                                if 'error' in validation:
-                                    f.write(f"""
+                                    if 'error' in validation:
+                                        f.write(f"""
                                 <p class="invalid">{validation['error']}</p>
 """)
-                                else:
-                                    for file_type, file_validation in validation.items():
-                                        if isinstance(file_validation, dict) and 'expected' in file_validation:
-                                            expected = file_validation['expected']
-                                            actual = file_validation['actual']
-                                            valid = file_validation['valid']
-                                            file_status = "valid" if valid else "invalid"
+                                    else:
+                                        for file_type, file_validation in validation.items():
+                                            if isinstance(file_validation, dict) and 'expected' in file_validation:
+                                                expected = file_validation['expected']
+                                                actual = file_validation['actual']
+                                                valid = file_validation['valid']
+                                                file_status = "valid" if valid else "invalid"
 
-                                            f.write(f"""
+                                                f.write(f"""
                                 <p><strong>{file_type}ファイル:</strong> 期待値={expected}, 実際={actual}, 結果=<span class="{file_status}">{batch_status_text(valid)}</span></p>
 """)
 
@@ -327,17 +493,17 @@ def generate_test_report():
                             </div>
 """)
 
-                            f.write("""
+                                f.write("""
                         </div>
                     </div>
 """)
 
-                        f.write("""
+                            f.write("""
                 </div>
             </div>
 """)
 
-                f.write("""
+                    f.write("""
         </div>
     </div>
 """)
@@ -415,6 +581,9 @@ if __name__ == "__main__":
     parser.add_argument('--list', action='store_true', help='利用可能なテストパターンを一覧表示')
     parser.add_argument('--no-report', action='store_true', help='テスト結果のレポートを生成しない')
     parser.add_argument('--no-clean', action='store_true', help='テスト実行前に以前のテスト出力を削除しない')
+    parser.add_argument('--run-all', action='store_true', help='全てのテストを実行する')
+    parser.add_argument('--failfast', action='store_true', help='テストが失敗した時点で実行を中止する')
+    parser.add_argument('--test-files', nargs='+', help='実行する特定のテストファイル名のリスト（例: test_image_save test_image_generation）')
 
     args = parser.parse_args()
 
@@ -428,6 +597,9 @@ if __name__ == "__main__":
             subcategory=args.subcategory,
             model=args.model,
             generate_report=not args.no_report,
-            clean_output=not args.no_clean
+            clean_output=not args.no_clean,
+            run_all=args.run_all,
+            failfast=args.failfast,
+            test_files=args.test_files
         )
         sys.exit(0 if success else 1)

@@ -1,8 +1,9 @@
-from auto_image_generator import AutoImageGenerator
+from autoimagegenerator.auto_image_generator import AutoImageGenerator
 import sys
 import time
 import json
 import argparse
+import os
 
 # 定数定義
 IMAGE_STYLES = {
@@ -70,8 +71,20 @@ OUTPUT_FOLDER_TRANSPARENT_BACKGROUND_PREFIX = "-transparent"
 OUTPUT_FOLDER_SELFIE_PREFIX = "-selfie"
 
 # settings.json から設定を読み込む
-with open('settings.json', 'r') as f:
-    settings = json.load(f)
+try:
+    # 現在のファイルのディレクトリパスを取得
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    settings_path = os.path.join(current_dir, 'settings.json')
+
+    with open(settings_path, 'r') as f:
+        settings = json.load(f)
+except FileNotFoundError:
+    # settings.jsonが見つからない場合はデフォルト値を使用
+    settings = {
+        "image_generate_batch_execute_count": 2,
+        "another_version_generate_count": 12
+    }
+    print(f"警告: {settings_path} が見つかりません。デフォルト設定を使用します。")
 
 def validate_image_type(style, category, subcategory):
     """画像タイプの組み合わせが有効かチェック"""
