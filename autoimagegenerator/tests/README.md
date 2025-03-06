@@ -25,6 +25,9 @@ python -m tests.run_tests
 - `--list`: 利用可能なテストパターンを一覧表示します
 - `--no-report`: テスト結果のHTMLレポートを生成しません
 - `--no-clean`: テスト実行前に以前のテスト出力を削除しません
+- `--run-all`: 全てのテストを実行します
+- `--failfast`: テストが失敗した時点で実行を中止します
+- `--test-files <ファイル名1> <ファイル名2> ...`: 指定したテストファイルのみを実行します（拡張子は省略可能）
 
 例：
 ```bash
@@ -39,6 +42,15 @@ python -m tests.run_tests --style realistic --category female
 
 # 特定のスタイルとカテゴリおよびサブカテゴリのテストを実行
 python -m tests.run_tests --style realistic --category female --subcategory selfie
+
+# 全てのテストを実行
+python -m tests.run_tests --run-all
+
+# 特定のテストファイルのみを実行
+python -m tests.run_tests --test-files test_image_save test_image_generation
+
+# テストが失敗しても全てのテストを実行
+python -m tests.run_tests --run-all
 ```
 
 ## テスト検証機能
