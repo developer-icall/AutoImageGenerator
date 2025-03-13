@@ -1,0 +1,67 @@
+{
+  "dragon": [
+    "tiny",
+    "small"
+  ],
+  "goblin": [
+    "huge",
+    "gigantic",
+    "colossal"
+  ],
+  "fairy": [
+    "huge",
+    "gigantic",
+    "colossal"
+  ],
+  "pixie": [
+    "huge",
+    "gigantic",
+    "colossal"
+  ],
+  "giant": [
+    "tiny",
+    "small"
+  ],
+  "behemoth": [
+    "tiny",
+    "small"
+  ],
+  "leviathan": [
+    "tiny",
+    "small"
+  ],
+  "kraken": [
+    "tiny",
+    "small"
+  ],
+  "hydra": [
+    "tiny",
+    "small"
+  ],
+  "slime": [
+    "with armor",
+    "with weapon",
+    "with shield",
+    "with helmet"
+  ],
+  "ghost": [
+    "with armor",
+    "with weapon",
+    "with shield",
+    "with helmet"
+  ],
+  "elemental": [
+    "with armor",
+    "with weapon",
+    "with shield",
+    "with helmet"
+  ],
+  "flying pose": [
+    "swimming pose",
+    "crawling pose"
+  ],
+  "swimming pose": [
+    "flying pose",
+    "crawling pose"
+  ]
+}

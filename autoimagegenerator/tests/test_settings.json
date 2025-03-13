@@ -56,7 +56,7 @@
             "style": "illustration",
             "category": "rpg_icon",
             "subcategory": "weapon",
-            "model": "rpg_icon",
+            "model": "photoRealV15_photorealv21",
             "enable_hr": false
         },
         {
@@ -64,7 +64,7 @@
             "style": "illustration",
             "category": "rpg_icon",
             "subcategory": "monster",
-            "model": "rpg_icon",
+            "model": "photoRealV15_photorealv21",
             "enable_hr": false
         },
         {

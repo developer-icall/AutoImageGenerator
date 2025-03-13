@@ -55,13 +55,13 @@ PoetryはPythonの依存関係管理ツールで、以下の手順でインス�
 
 1. カレントディレクトリにて以下を実行
     ```
-    python -m venv venv
+    python -m venv .venv
     ```
 2. 仮想環境を開始
     ```
-    .\venv\Scripts\activate
+    .\.venv\Scripts\activate
     # 以下のように表示されていればOK
-    (venv) PS C:\GitHub\AutoImageGenerator>
+    (.venv) PS C:\GitHub\AutoImageGenerator>
     ```
     - ※エラーが出るようであれば管理者権限で PowerShell を起動し、上記コマンドを実行することで解消される可能性があります
 

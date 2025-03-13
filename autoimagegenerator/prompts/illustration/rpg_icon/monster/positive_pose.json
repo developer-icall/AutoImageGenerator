@@ -1,0 +1,38 @@
+{
+  "Pose": {
+    "prompts": [
+      "standing pose",
+      "sitting pose",
+      "crouching pose",
+      "flying pose",
+      "swimming pose",
+      "crawling pose",
+      "charging pose",
+      "attacking pose",
+      "defensive pose",
+      "idle pose",
+      "alert pose",
+      "sleeping pose",
+      "resting pose",
+      "eating pose",
+      "drinking pose",
+      "hunting pose",
+      "stalking pose",
+      "ambush pose",
+      "death pose",
+      "victory pose",
+      "intimidation pose",
+      "mating display pose",
+      "territorial display pose",
+      "social interaction pose",
+      "grooming pose",
+      "playing pose",
+      "building pose",
+      "crafting pose",
+      "casting spell pose",
+      "praying pose"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  }
+}

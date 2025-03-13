@@ -8,7 +8,7 @@
 
 例）
 ```
-images/output/realistic/female/normal/20250221-12-2934224203/
+autoimagegenerator/images/output/realistic/female/normal/20250221-12-2934224203/
 ```
 
 フォルダ名の形式は以下の通りです：
@@ -40,7 +40,7 @@ images/output/realistic/female/normal/20250221-12-2934224203/
 以下は、実際の出力ディレクトリ構造の例です：
 
 ```
-images/output/
+autoimagegenerator/images/output/
 ├── realistic/
 │   ├── female/
 │   │   ├── normal/

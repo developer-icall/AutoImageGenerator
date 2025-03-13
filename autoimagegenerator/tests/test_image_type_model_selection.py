@@ -2,9 +2,26 @@ import unittest
 import sys
 import os
 from unittest.mock import patch, MagicMock
+import logging
+from datetime import datetime
 
 # テスト対象のモジュールへのパスを追加
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+# ログディレクトリの作成
+log_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logs')
+os.makedirs(log_dir, exist_ok=True)
+
+# ロギングの設定
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(),
+        logging.FileHandler(os.path.join(log_dir, f"test_image_type_model_selection_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"))
+    ]
+)
+logger = logging.getLogger(__name__)
 
 from auto_image_generator import AutoImageGenerator
 

@@ -1,4 +1,3 @@
-from autoimagegenerator.auto_image_generator import AutoImageGenerator
 import sys
 import time
 import json
@@ -40,7 +39,7 @@ IMAGE_STYLES = {
         },
         "rpg_icon": {
             "types": ["weapon", "monster", "other"],
-            "models": ["RPGIcon"]
+            "models": ["photoRealV15_photorealv21"]
         },
         "vehicle": {
             "types": ["car", "ship", "airplane", "other"],
@@ -57,7 +56,7 @@ SD_MODEL_CHECKPOINTS = {
     "brav6": "beautifulRealistic_v60.safetensors",
     "brav7": "beautifulRealistic_v7.safetensors",
     "brav7_men": "beautifulRealistic_v7.safetensors",
-    "rpg_icon": "RPGIcon.safetensors"  # RPGIcon用のモデル
+    "rpg_icon": "photoRealV15_photorealv21.safetensors"  # RPGIcon用のモデル
 }
 
 SD_MODEL_SCRITPS = {
@@ -88,17 +87,23 @@ except FileNotFoundError:
 
 def validate_image_type(style, category, subcategory):
     """画像タイプの組み合わせが有効かチェック"""
+    # スタイルが有効かチェック
     if style not in IMAGE_STYLES:
         return False
 
+    # カテゴリーが有効かチェック
     if category not in IMAGE_STYLES[style]:
         return False
 
+    # サブカテゴリーが指定されている場合のみチェック
     if subcategory:
+        # カテゴリーにtypesが定義されていない場合は、サブカテゴリーは無視して有効とする
         if "types" not in IMAGE_STYLES[style][category]:
-            return False
-        if subcategory not in IMAGE_STYLES[style][category]["types"]:
-            return False
+            return True
+
+        # サブカテゴリーが定義されたリストにない場合でも、
+        # auto_image_generator.pyで対応するようになったので有効とする
+        return True
 
     return True
 
@@ -132,14 +137,34 @@ def main():
                         help='サブカテゴリー (normal/transparent/selfie/dog/cat etc...)')
     parser.add_argument('--model',
                         help='使用するモデル (デフォルトはカテゴリーに応じて自動選択)')
+    parser.add_argument('--model-checkpoint',
+                        help='使用するモデルチェックポイントファイル名を直接指定 (例: RPGIcon.safetensors)')
     parser.add_argument('--enable-hr', type=str, choices=['true', 'false'], default='true',
                         help='ハイレゾ画像生成の有効/無効 (true/false, デフォルト: true)')
+    parser.add_argument('--dry-run', action='store_true',
+                        help='実際の画像生成を行わず、プロンプトの生成だけを行う')
+    parser.add_argument('--width', type=int,
+                        help='画像の幅 (デフォルトは画像タイプに応じて自動設定)')
+    parser.add_argument('--height', type=int,
+                        help='画像の高さ (デフォルトは画像タイプに応じて自動設定)')
+    parser.add_argument('--validate-weapon', action='store_true',
+                        help='武器画像の検証を有効にする（RPGアイコンの武器カテゴリのみ）')
+    parser.add_argument('--no-validate-weapon', action='store_true',
+                        help='武器画像の検証を無効にする（RPGアイコンの武器カテゴリのみ）')
+    parser.add_argument('--max-validation-attempts', type=int, default=3,
+                        help='武器検証失敗時の最大再生成回数 (デフォルト: 3)')
+    parser.add_argument('--enable-weapon-validation', action='store_true', help='武器画像の検証を有効にする')
 
     args = parser.parse_args()
 
     # 画像タイプの組み合わせをバリデーション
     if not validate_image_type(args.style, args.category, args.subcategory):
         print("エラー: 無効な画像タイプの組み合わせです")
+        sys.exit(1)
+
+    # 武器検証オプションの相互排他性をチェック
+    if args.validate_weapon and args.no_validate_weapon:
+        print("エラー: --validate-weaponと--no-validate-weaponは同時に指定できません")
         sys.exit(1)
 
     # モデルの選択
@@ -153,6 +178,45 @@ def main():
     if model not in SD_MODEL_CHECKPOINTS:
         print(f"エラー: 指定されたモデル '{model}' は存在しません")
         sys.exit(1)
+
+    # モデルチェックポイントの選択
+    if args.model_checkpoint:
+        # モデルチェックポイントが直接指定された場合は、それを使用
+        model_checkpoint = args.model_checkpoint
+        print(f"指定されたモデルチェックポイント '{model_checkpoint}' を使用します")
+    else:
+        # モデル名に対応するチェックポイントを使用
+        model_checkpoint = SD_MODEL_CHECKPOINTS[model]
+
+    # ドライランモードの場合は、必要なモジュールのインポートをスキップ
+    if args.dry_run:
+        try:
+            from auto_image_generator import AutoImageGenerator
+        except ImportError as e:
+            print(f"警告: {e}")
+            print("ドライランモードでは一部の機能が制限されます")
+
+            # 引数の表示
+            print("\n--- 指定された引数 ---")
+            print(f"スタイル: {args.style}")
+            print(f"カテゴリー: {args.category}")
+            print(f"サブカテゴリー: {args.subcategory}")
+            print(f"モデル: {model}")
+            print(f"モデルチェックポイント: {model_checkpoint}")
+            print(f"ハイレゾ画像生成: {args.enable_hr}")
+            print("----------------------\n")
+
+            print("ドライランモードで実行しました。実際の画像生成は行われません。")
+            sys.exit(0)
+    else:
+        # 通常モードでは必要なモジュールをインポート
+        try:
+            from auto_image_generator import AutoImageGenerator
+        except ImportError as e:
+            print(f"エラー: {e}")
+            print("必要なモジュールがインストールされていません。")
+            print("pip install requests pillow tqdm を実行してください。")
+            sys.exit(1)
 
     # 透過背景の判定
     is_transparent = args.subcategory == "transparent"
@@ -170,11 +234,11 @@ def main():
     auto_image_generator = AutoImageGenerator(
         image_generate_batch_execute_count=settings.get("image_generate_batch_execute_count", 2),
         another_version_generate_count=settings.get("another_version_generate_count", 12),
-        input_folder="../images/input",
-        output_folder="../images/output",
+        input_folder="./images/input",
+        output_folder="./images/output",
         prompts_folder="./prompts",
         url="http://localhost:7860",
-        sd_model_checkpoint=SD_MODEL_CHECKPOINTS[model],
+        sd_model_checkpoint=model_checkpoint,
         sd_model_prefix=model,
         enable_hr=args.enable_hr.lower() == 'true',
         output_folder_prefix=output_folder_prefix,
@@ -182,11 +246,39 @@ def main():
         is_selfie=is_selfie,
         style=args.style,
         category=args.category,
-        subcategory=args.subcategory
+        subcategory=args.subcategory,
+        width=args.width,
+        height=args.height,
+        use_custom_checkpoint=args.model_checkpoint is not None,
+        enable_weapon_validation=args.enable_weapon_validation,
+        max_validation_attempts=args.max_validation_attempts
     )
 
+    # 武器検証設定を適用（RPGアイコンの武器カテゴリの場合のみ）
+    if args.style == "illustration" and args.category == "rpg_icon" and args.subcategory == "weapon":
+        if args.validate_weapon:
+            auto_image_generator.enable_weapon_validation = True
+            print("武器画像の検証を有効にしました")
+        elif args.no_validate_weapon:
+            auto_image_generator.enable_weapon_validation = False
+            print("武器画像の検証を無効にしました")
+
+        # 最大検証試行回数を設定
+        if args.max_validation_attempts:
+            auto_image_generator.max_validation_attempts = args.max_validation_attempts
+            print(f"武器検証の最大試行回数を {args.max_validation_attempts} に設定しました")
+
     # 画像生成の実行
-    auto_image_generator.run()
+    if args.dry_run:
+        # ドライラン（プロンプトの生成だけを行う）
+        print("ドライラン: 実際の画像生成は行いません")
+        prompts = auto_image_generator.generate_prompts()
+        print("生成されるプロンプト:")
+        print(f"ポジティブプロンプト: {prompts['positive_prompt']}")
+        print(f"ネガティブプロンプト: {prompts['negative_prompt']}")
+    else:
+        # 実際の画像生成を実行
+        auto_image_generator.run()
 
     # 処理の終了時間を記録と表示
     end_time = time.time()

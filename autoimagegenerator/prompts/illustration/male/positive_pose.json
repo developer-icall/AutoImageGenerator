@@ -1,0 +1,41 @@
+{
+  "pose": {
+    "prompts": [
+      "leaning forward",
+      "arched back",
+      "dynamic pose",
+      "(look back:1.3)",
+      "sit in a chair",
+      "men sitting",
+      "selfie, smile",
+      "Hands on Hips",
+      "left hand on hips",
+      "men with left hand in pockets",
+      "fashion model posing",
+      "(Looking Over Shoulder:1.3), smile",
+      "tilting head"
+    ],
+    "use max prompts": 1,
+    "use min prompts": 1
+  },
+  "Face": {
+    "prompts": [
+      "smile",
+      "smile",
+      "smile",
+      "smile",
+      "smile",
+      "Half-smile",
+      "Half-smile",
+      "Half-smile",
+      "Smirk",
+      "Smirk",
+      "Mournful",
+      "",
+      "",
+      ""
+    ],
+    "use max prompts": 1,
+    "use min prompts": 1
+  }
+}

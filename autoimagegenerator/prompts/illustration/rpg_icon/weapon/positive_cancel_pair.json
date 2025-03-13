@@ -1,0 +1,213 @@
+{
+  "sword": [
+    "bow",
+    "crossbow",
+    "wand",
+    "staff",
+    "sling",
+    "blowgun"
+  ],
+  "dagger": [
+    "bow",
+    "crossbow",
+    "wand",
+    "staff",
+    "sling",
+    "blowgun"
+  ],
+  "axe": [
+    "bow",
+    "crossbow",
+    "wand",
+    "staff",
+    "sling",
+    "blowgun"
+  ],
+  "hammer": [
+    "bow",
+    "crossbow",
+    "wand",
+    "staff",
+    "sling",
+    "blowgun"
+  ],
+  "mace": [
+    "bow",
+    "crossbow",
+    "wand",
+    "staff",
+    "sling",
+    "blowgun"
+  ],
+  "spear": [
+    "bow",
+    "crossbow",
+    "wand",
+    "staff",
+    "sling",
+    "blowgun"
+  ],
+  "helmet": [
+    "hat",
+    "hood",
+    "crown",
+    "circlet",
+    "mask"
+  ],
+  "crown": [
+    "helmet",
+    "hat",
+    "hood",
+    "mask"
+  ],
+  "breastplate": [
+    "robe",
+    "cloak",
+    "cape"
+  ],
+  "leather armor": [
+    "robe",
+    "cloak",
+    "cape"
+  ],
+  "chainmail": [
+    "robe",
+    "cloak",
+    "cape"
+  ],
+  "steel shield": [
+    "with wooden grip",
+    "polished wood",
+    "wooden"
+  ],
+  "iron dagger": [
+    "polished wood",
+    "wooden"
+  ],
+  "medieval sword": [
+    "polished wood",
+    "wooden"
+  ],
+  "battle axe": [
+    "polished wood",
+    "wooden"
+  ],
+  "war hammer": [
+    "polished wood",
+    "wooden"
+  ],
+  "plate armor": [
+    "with wooden grip",
+    "polished wood",
+    "wooden",
+    "with leather handle",
+    "supple leather"
+  ],
+  "knight helmet": [
+    "with wooden grip",
+    "polished wood",
+    "wooden",
+    "with leather handle",
+    "supple leather"
+  ],
+  "gold ring": [
+    "with wooden grip",
+    "polished wood",
+    "wooden",
+    "with leather handle",
+    "supple leather",
+    "with steel blade",
+    "gleaming steel"
+  ],
+  "healing potion": [
+    "with steel blade",
+    "gleaming steel",
+    "with silver edge",
+    "shining silver"
+  ],
+  "modern gun": [
+    "polished wood",
+    "wooden"
+  ],
+  "sniper rifle": [
+    "polished wood",
+    "wooden"
+  ],
+  "crystal staff": [
+    "with steel blade",
+    "gleaming steel",
+    "with wooden grip",
+    "polished wood"
+  ],
+  "magic wand": [
+    "with steel blade",
+    "gleaming steel",
+    "with wooden grip",
+    "polished wood"
+  ],
+  "spellbook": [
+    "with steel blade",
+    "gleaming steel",
+    "with silver edge"
+  ],
+  "katana": [
+    "polished wood",
+    "wooden"
+  ],
+  "throwing knife": [
+    "polished wood",
+    "wooden"
+  ],
+  "halberd": [
+    "polished wood",
+    "wooden"
+  ],
+  "scythe": [
+    "polished wood",
+    "wooden"
+  ],
+  "twin daggers": [
+    "polished wood",
+    "wooden"
+  ],
+  "enchanted orb": [
+    "with steel blade",
+    "gleaming steel",
+    "with wooden grip",
+    "polished wood",
+    "with leather handle"
+  ],
+  "magic scroll": [
+    "with steel blade",
+    "gleaming steel",
+    "with silver edge"
+  ],
+  "obsidian blade": [
+    "with steel blade",
+    "gleaming steel",
+    "polished wood",
+    "wooden"
+  ],
+  "dragon slayer sword": [
+    "polished wood",
+    "wooden"
+  ],
+  "runic axe": [
+    "polished wood",
+    "wooden"
+  ],
+  "ethereal bow": [
+    "with steel blade",
+    "gleaming steel"
+  ],
+  "demon blade": [
+    "polished wood",
+    "wooden"
+  ],
+  "holy staff": [
+    "with steel blade",
+    "gleaming steel",
+    "with wooden grip",
+    "polished wood"
+  ]
+}

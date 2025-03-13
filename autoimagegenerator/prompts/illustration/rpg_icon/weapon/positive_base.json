@@ -1,0 +1,99 @@
+{
+  "Must Positive Prompt": {
+    "prompts": [
+      "Awesome RPG icon of a weapon"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1,
+    "position": "start"
+  },
+  "Base Positive Prompt": {
+    "prompts": [
+      "(no human:1.4), (single object:1.4), (game asset:1.3), game asset trending on artstation"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  },
+  "Weapon Type": {
+    "prompts": [
+      "(medieval sword:1.4)",
+      "(iron dagger:1.4)",
+      "(battle axe:1.4)",
+      "(longbow:1.4)",
+      "(steel shield:1.4)",
+      "(knight helmet:1.4)",
+      "(plate armor:1.4)",
+      "(gold ring:1.4)",
+      "(healing potion:1.4)",
+      "(modern gun:1.4)",
+      "(sniper rifle:1.4)",
+      "(crystal staff:1.4)",
+      "(magic wand:1.4)",
+      "(spellbook:1.4)",
+      "(war hammer:1.4)",
+      "(katana:1.4)",
+      "(crossbow:1.4)",
+      "(throwing knife:1.4)",
+      "(mace:1.4)",
+      "(halberd:1.4)",
+      "(twin daggers:1.4)",
+      "(enchanted orb:1.4)",
+      "(obsidian blade:1.4)",
+      "(dragon slayer sword:1.4)",
+      "(runic axe:1.4)",
+      "(ethereal bow:1.4)",
+      "(blade:1.4)",
+      "(holy staff:1.4)"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1,
+    "position": "start"
+  },
+  "Dagger Base Prompt": {
+    "prompts": [
+      "(detailed fantasy dagger:1.2)"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0,
+    "condition": {
+      "category": "Weapon Type",
+      "contains": ["dagger"]
+    }
+  },
+  "Chain Whip Base Prompt": {
+    "prompts": [
+      "(flexible weapon with multiple segments:1.2)"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0,
+    "condition": {
+      "category": "Weapon Type",
+      "contains": ["chain whip", "spiked chain"]
+    }
+  },
+  "Bow Base Prompt": {
+    "prompts": [
+      "(detailed fantasy bow:1.2)"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0,
+    "condition": {
+      "category": "Weapon Type",
+      "contains": ["bow", "longbow", "shortbow", "recurve"]
+    }
+  },
+  "Material Detail": {
+    "prompts": [
+      "with wooden grip",
+      "with leather handle",
+      "with crystal core",
+      "with gold inlay",
+      "with silver edge",
+      "with steel",
+      "with polished surface",
+      "with matte black finish"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  }
+}

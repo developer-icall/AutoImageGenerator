@@ -1,0 +1,53 @@
+{
+  "pose": {
+    "prompts": [
+      "(selfie: 1.4)",
+      "(selfie: 1.4)",
+      "(selfie: 1.4)",
+      "(selfie: 1.4)",
+      "(Selfie with right hand: 1.4)",
+      "(Selfie with right hand: 1.4)",
+      "(Selfie with right hand: 1.4)",
+      "(Selfie with right hand: 1.4)",
+      "(Selfie with both hands: 1.4)",
+      "(Selfie with both hands: 1.4)",
+      "(Selfie with both hands: 1.4)",
+      "(Selfie with right hand: 1.4), a women sitting on bed",
+      "(Selfie with right hand: 1.4), looking up, smile, from above, (20 years old)",
+      "(selfie: 1.4), dynamic pose",
+      "(Selfie with right hand: 1.4), dynamic pose",
+      "(selfie: 1.4), sit in a chair",
+      "(Selfie with right hand: 1.4), sit in a chair",
+      "(selfie: 1.4), girl sitting",
+      "(Selfie with right hand: 1.4), girl sitting",
+      "(Selfie with left hand: 1.4), right hand between legs, room",
+      "(Selfie with right hand: 1.4), left hand between legs, room",
+      "(Selfie with left hand: 1.4), right hand on hips",
+      "(Selfie with right hand: 1.4), left hand on hips",
+      "(Selfie with left hand: 1.4), fashion model posing",
+      "(Selfie with right hand: 1.4), fashion model posing",
+      "(Selfie with right hand: 1.4), tilting head",
+      "(Selfie with left hand: 1.4), tilting head",
+      "(Selfie with left hand: 1.4), Seductive pose",
+      "(Selfie with right hand: 1.4), Seductive pose"
+    ],
+    "use max prompts": 1,
+    "use min prompts": 1
+  },
+  "Face": {
+    "prompts": [
+      "smile",
+      "smile",
+      "smile",
+      "smile",
+      "smile",
+      "Smirk",
+      "Smirk",
+      "",
+      "",
+      ""
+    ],
+    "use max prompts": 1,
+    "use min prompts": 1
+  }
+}

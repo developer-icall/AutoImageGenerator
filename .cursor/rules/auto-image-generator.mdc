@@ -23,11 +23,21 @@ alwaysApply: false
     - [Beautiful Realistic Asians - v7 | Stable Diffusion Checkpoint | Civitai](mdc:https:/civitai.com/models/25494/brabeautiful-realistic-asians-v2)からダウンロード可能
 - 男性 or 女性およびそれぞれ透過写真、セルフィー写真を起動時のパラメータで指定して生成可能
 
+## フォルダ構成
+
+- プロンプトファイルのフォルダ構成は docs/folder_structure.md を参照してください
+- 生成画像フォルダの構成は docs/folder_structure.md を参照してください
+
 ## 主な技術スタック
 
 - Python
 - Stable Diffusion Web UI, API
 
+## 開発実行環境について
+
+- docs/installation.md に記載のある通り `python -m venv .venv` で仮想環境を作成し、`.\.venv\Scripts\activate` で仮想環境を有効化した環境を使用してください
+- AutoImageGenerator/autoimagegenerator フォルダ以下にて実行および各種テストを行ってください
+- log ファイルを作成する際は AutoImageGenerator/autoimagegenerator/logs フォルダ以下に作成してください
 
 ## 実装時の注意点
 

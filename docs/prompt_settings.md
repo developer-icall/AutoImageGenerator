@@ -36,7 +36,8 @@ autoimagegenerator/prompts/
       ...
     ],
     "use_max_prompts": 数値,
-    "use_min_prompts": 数値
+    "use_min_prompts": 数値,
+    "position": "start" または "end"  // オプション: プロンプトの配置位置
   },
   "別のプロンプト分類名": {
     ...
@@ -48,12 +49,45 @@ autoimagegenerator/prompts/
 - **prompts**: 選択対象となるプロンプトの配列
 - **use_max_prompts**: 最大選択数（この分類から最大何個のプロンプトを選ぶか）
 - **use_min_prompts**: 最小選択数（この分類から最低何個のプロンプトを選ぶか）
+- **position**: プロンプトの配置位置（オプション）
+  - `"start"`: プロンプト文字列の先頭に配置
+  - `"end"`: プロンプト文字列の末尾に配置
+  - 指定なし: 通常の位置（他のプロンプトと混合）
 
 ### 選択ルール例
 
 - `"use_max_prompts": 1, "use_min_prompts": 1` → 必ず1つだけ選択
 - `"use_max_prompts": 2, "use_min_prompts": 0` → 0〜2個をランダムに選択
 - `"use_max_prompts": 0, "use_min_prompts": 0` → 選択しない（オプション）
+
+### 条件付きプロンプト
+
+特定の条件が満たされた場合にのみプロンプトを選択するには、`condition`要素を追加します：
+
+```json
+{
+  "特定条件付きプロンプト": {
+    "prompts": [
+      "条件付きプロンプト1",
+      "条件付きプロンプト2",
+      ...
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0,
+    "position": "start",  // オプション: プロンプトの配置位置
+    "condition": {
+      "category": "Weapon Type",
+      "contains": ["dagger"]
+    }
+  }
+}
+```
+
+- **condition**: 条件を指定するオブジェクト
+  - **category**: 条件をチェックするプロンプト分類名
+  - **contains**: 指定した文字列が含まれているかをチェックする配列
+
+この例では、「Weapon Type」カテゴリで選択されたプロンプトに「dagger」という文字列が含まれている場合にのみ、このプロンプト分類からプロンプトが選択されます。また、選択されたプロンプトはプロンプト文字列の先頭に配置されます。
 
 ## 3. 各プロンプト設定ファイルの役割
 
@@ -91,6 +125,16 @@ autoimagegenerator/prompts/
     ],
     "use_max_prompts": 1,
     "use_min_prompts": 1
+  },
+  "Weapon Type": {
+    "prompts": [
+      "(medieval sword:1.4)",
+      "(iron dagger:1.4)",
+      "(battle axe:1.4)"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1,
+    "position": "start"  // 武器タイプをプロンプトの先頭に配置
   }
 }
 ```
@@ -159,11 +203,18 @@ autoimagegenerator/prompts/
   ],
   "dress": [
     "woman with left hand in pockets"
+  ],
+  "steel shield": [
+    "with wooden grip",
+    "polished wood",
+    "wooden"
   ]
 }
 ```
 
-例: "bikini"が選択された場合、"bed room"、"street"、"Park"は削除されます（ビキニ姿で街中にいる不自然な画像を防ぐため）。
+例:
+- "bikini"が選択された場合、"bed room"、"street"、"Park"は削除されます（ビキニ姿で街中にいる不自然な画像を防ぐため）。
+- "steel shield"が選択された場合、"with wooden grip"、"polished wood"、"wooden"は削除されます（鋼鉄の盾に木製の要素が含まれる矛盾を防ぐため）。
 
 ## 4. プロンプト設定のテクニック
 
@@ -196,6 +247,31 @@ autoimagegenerator/prompts/
 - `masterpiece:1.2` → masterpiece の重みを1.2倍に
 - `1girl:1.3` → 1girl の重みを1.3倍に
 
+### 4.3 プロンプトの配置位置の制御
+
+`position`パラメータを使用して、プロンプトの配置位置を制御できます。これは特に特定の要素（武器タイプなど）を強調したい場合に有効です。
+
+```json
+"Weapon Type": {
+  "prompts": [
+    "(medieval sword:1.4)",
+    "(iron dagger:1.4)",
+    "(battle axe:1.4)"
+  ],
+  "use_max_prompts": 1,
+  "use_min_prompts": 1,
+  "position": "start"  // 武器タイプをプロンプトの先頭に配置
+}
+```
+
+この設定により、生成されるプロンプトは以下のようになります：
+
+```
+(iron dagger:1.4), Awesome RPG icon of a weapon, (single object:1.4), (game asset:1.3), game asset trending on artstation, ...
+```
+
+先頭に配置することで、モデルがより明確に指定された武器を認識し、より高品質な画像を生成できるようになります。
+
 ## 5. 使用例
 
 リアルな女性の画像を生成する場合：
@@ -208,3 +284,12 @@ autoimagegenerator/prompts/
 6. `cancel_seeds.json`を参照して使用しないseed値を除外
 
 これらの設定を組み合わせることで、多様でありながらも自然な画像生成が可能になります。
+
+RPGアイコンの武器を生成する場合：
+
+1. `positive_base.json`から基本的な設定と武器タイプ（先頭に配置）を選択
+2. `positive_optional.json`からエフェクトや表示設定を選択
+3. `negative.json`から除外要素を適用
+4. `positive_cancel_pair.json`を参照して矛盾する材質の組み合わせを除外
+
+武器タイプを先頭に配置することで、より明確に指定された武器が生成されます。

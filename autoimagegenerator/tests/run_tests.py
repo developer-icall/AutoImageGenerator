@@ -11,13 +11,21 @@ import shutil
 from pathlib import Path
 from datetime import datetime
 
+# ログディレクトリの作成
+log_dir = os.path.join(os.path.dirname(__file__), 'logs')
+os.makedirs(log_dir, exist_ok=True)
+
+# run_testsログ用のサブディレクトリを作成
+run_tests_log_dir = os.path.join(log_dir, 'run_tests')
+os.makedirs(run_tests_log_dir, exist_ok=True)
+
 # ロギングの設定
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
         logging.StreamHandler(),
-        logging.FileHandler(os.path.join(os.path.dirname(__file__), 'test_run.log'))
+        logging.FileHandler(os.path.join(run_tests_log_dir, f"test_run_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"))
     ]
 )
 logger = logging.getLogger(__name__)
@@ -43,7 +51,7 @@ def clean_test_output_directory():
         logger.error(f"テスト出力ディレクトリのクリーンアップ中にエラーが発生しました: {e}")
         return False
 
-def run_tests(pattern=None, style=None, category=None, subcategory=None, model=None, generate_report=True, clean_output=True, run_all=False, failfast=False, test_files=None):
+def run_tests(pattern=None, style=None, category=None, subcategory=None, model=None, model_checkpoint=None, generate_report=True, clean_output=True, run_all=False, failfast=False, test_files=None):
     """
     テストを実行する関数
 
@@ -53,6 +61,7 @@ def run_tests(pattern=None, style=None, category=None, subcategory=None, model=N
         category (str, optional): 実行するテストのカテゴリー（female/male/animal等）
         subcategory (str, optional): 実行するテストのサブカテゴリー（normal/selfie/transparent等）
         model (str, optional): 実行するテストのモデル（brav6/brav7等）
+        model_checkpoint (str, optional): 使用するモデルチェックポイントファイル名（例: RPGIcon.safetensors）
         generate_report (bool, optional): テスト結果のレポートを生成するかどうか
         clean_output (bool, optional): テスト実行前に以前のテスト出力を削除するかどうか
         run_all (bool, optional): 全てのテストを実行するかどうか
@@ -112,6 +121,12 @@ def run_tests(pattern=None, style=None, category=None, subcategory=None, model=N
         logger.error(f"指定された条件に一致するテストパターンが見つかりません。")
         logger.info(f"利用可能なパターン: {[p['name'] for p in original_patterns]}")
         return False
+
+    # モデルチェックポイントが指定されている場合、全てのパターンに適用
+    if model_checkpoint:
+        for pattern in filtered_patterns:
+            pattern["model_checkpoint"] = model_checkpoint
+        logger.info(f"モデルチェックポイントを指定: {model_checkpoint}")
 
     # フィルタリングされたパターンを設定に適用
     settings["test_patterns"] = filtered_patterns
@@ -578,6 +593,7 @@ if __name__ == "__main__":
     parser.add_argument('--category', help='実行するテストのカテゴリー（female/male/animal等）')
     parser.add_argument('--subcategory', help='実行するテストのサブカテゴリー（normal/selfie/transparent等）')
     parser.add_argument('--model', help='実行するテストのモデル（brav6/brav7等）')
+    parser.add_argument('--model-checkpoint', help='使用するモデルチェックポイントファイル名（例: RPGIcon.safetensors）')
     parser.add_argument('--list', action='store_true', help='利用可能なテストパターンを一覧表示')
     parser.add_argument('--no-report', action='store_true', help='テスト結果のレポートを生成しない')
     parser.add_argument('--no-clean', action='store_true', help='テスト実行前に以前のテスト出力を削除しない')
@@ -596,6 +612,7 @@ if __name__ == "__main__":
             category=args.category,
             subcategory=args.subcategory,
             model=args.model,
+            model_checkpoint=args.model_checkpoint,
             generate_report=not args.no_report,
             clean_output=not args.no_clean,
             run_all=args.run_all,

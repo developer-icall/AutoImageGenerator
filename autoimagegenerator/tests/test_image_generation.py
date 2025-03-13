@@ -15,13 +15,21 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from auto_image_generator import AutoImageGenerator
 
+# ログディレクトリの作成
+log_dir = os.path.join(os.path.dirname(__file__), 'logs')
+os.makedirs(log_dir, exist_ok=True)
+
+# image_generationログ用のサブディレクトリを作成
+image_generation_log_dir = os.path.join(log_dir, 'image_generation')
+os.makedirs(image_generation_log_dir, exist_ok=True)
+
 # ロギングの設定
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
         logging.StreamHandler(),
-        logging.FileHandler('test_image_generation.log')
+        logging.FileHandler(os.path.join(image_generation_log_dir, f"test_image_generation_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"))
     ]
 )
 logger = logging.getLogger(__name__)
@@ -183,11 +191,19 @@ class TestImageGeneration(unittest.TestCase):
                         "brav6": "beautifulRealistic_v60.safetensors",
                         "brav7": "beautifulRealistic_v7.safetensors",
                         "brav7_men": "beautifulRealistic_v7.safetensors",
-                        "rpg_icon": "RPGIcon.safetensors"
+                        "rpg_icon": "photoRealV15_photorealv21.safetensors",
+                        "photoRealV15_photorealv21": "photoRealV15_photorealv21.safetensors",
+                        "RPGIcon": "RPGIcon.safetensors"
                     }
 
-                    # モデル名からモデルファイル名を取得（存在しない場合はそのまま使用）
-                    model_checkpoint = model_checkpoints.get(pattern["model"], f"{pattern['model']}.safetensors")
+                    # パターンに model_checkpoint が指定されている場合はそれを優先
+                    if "model_checkpoint" in pattern and pattern["model_checkpoint"]:
+                        model_checkpoint = pattern["model_checkpoint"]
+                        logger.info(f"指定されたモデルチェックポイントを使用: {model_checkpoint}")
+                    else:
+                        # モデル名からモデルファイル名を取得（存在しない場合はそのまま使用）
+                        model_checkpoint = model_checkpoints.get(pattern["model"], f"{pattern['model']}.safetensors")
+                        logger.info(f"モデル名 {pattern['model']} に基づいてモデルチェックポイント {model_checkpoint} を使用")
 
                     # 設定から画像生成数とバージョン数を取得
                     image_generate_batch_execute_count = pattern.get("image_generate_batch_execute_count", self.settings["image_generate_batch_execute_count"])
@@ -211,7 +227,8 @@ class TestImageGeneration(unittest.TestCase):
                         is_selfie=pattern["subcategory"] == "selfie",
                         style=pattern["style"],
                         category=pattern["category"],
-                        subcategory=pattern["subcategory"]
+                        subcategory=pattern["subcategory"],
+                        use_custom_checkpoint="model_checkpoint" in pattern and pattern["model_checkpoint"] is not None
                     )
 
                     # 画像生成を実行
