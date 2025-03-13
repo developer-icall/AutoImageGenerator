@@ -44,6 +44,8 @@ class AutoImageGenerator:
     ):
         # モデル切り替えが実行済みかどうかを管理するフラグを追加
         self._model_switch_executed = False
+        # 現在使用中のモデルを記録
+        self._current_model = None
 
         # 画像タイプの設定を追加
         self.style = style
@@ -361,10 +363,6 @@ class AutoImageGenerator:
 
         self.logger.info(f"モデル切り替え開始: {model_name}")
 
-        option_payload = {
-            "sd_model_checkpoint": model_name
-        }
-
         try:
             # 現在のモデルを確認
             current_model_response = requests.get(self.OPTIONS_URL)
@@ -376,13 +374,9 @@ class AutoImageGenerator:
                 self.logger.info(f"モデル {model_name} は既に設定されています")
                 self._model_switch_executed = True
                 return True
-            else:
-                self.logger.info(f"モデル {model_name} への切り替えを行います")
 
-            # モデル切り替えリクエスト
-            response = requests.post(url=self.OPTIONS_URL, json=option_payload)
-            response.raise_for_status()
-            self.logger.info(f"モデル切り替えリクエスト送信完了: ステータスコード {response.status_code}")
+            # _switch_modelを呼び出してモデルを切り替え
+            self._switch_model(model_name)
 
             # モデルの切り替えが完了するまで待機
             max_retries = 20
@@ -1169,23 +1163,33 @@ class AutoImageGenerator:
         return selected_prompts
 
     def _check_prompt_compatibility(self, prompts):
-        """プロンプトの組み合わせをチェックし、相性の悪い組み合わせを除外する"""
-        # 相性の悪いプロンプトの組み合わせがない場合はそのまま返す
-        if not self.DATA_POSITIVE_CANCEL_PAIR:
-            return prompts
+        """
+        プロンプトの互換性をチェックし、最適化されたプロンプトリストを返す
 
-        # プロンプトをチェック
-        result_prompts = prompts.copy()
-        for prompt in prompts:
-            # このプロンプトと相性の悪いプロンプトのリストを取得
-            incompatible_prompts = self.DATA_POSITIVE_CANCEL_PAIR.get(prompt, [])
+        Args:
+            prompts (list): プロンプトのリスト
 
-            # 相性の悪いプロンプトを結果から除外
-            for incompatible in incompatible_prompts:
-                if incompatible in result_prompts:
-                    result_prompts.remove(incompatible)
+        Returns:
+            list: 最適化されたプロンプトのリスト
+        """
+        if not prompts:
+            return []
 
-        return result_prompts
+        # 重複を除去
+        unique_prompts = self._remove_duplicate_prompts(prompts)
+
+        # プロンプトの最適化
+        optimized_prompts = self._optimize_prompts(unique_prompts)
+
+        # プロンプトの品質チェック
+        final_prompts = self._check_prompt_quality(optimized_prompts)
+
+        # 除外されたプロンプトの数をログに出力
+        excluded_count = len(prompts) - len(final_prompts)
+        if excluded_count > 0:
+            logging.info(f"互換性チェックにより{excluded_count}個のプロンプトが除外されました")
+
+        return final_prompts
 
     def _generate_images(self):
         """画像生成処理を実行する内部メソッド"""
@@ -1655,3 +1659,151 @@ class AutoImageGenerator:
                 result[param.lower().replace(" ", "_")] = param_match.group(1).strip()
 
         return result
+
+    def _switch_model(self, model_name: str) -> None:
+        """モデルを切り替える"""
+        if self._model_switched:
+            return
+
+        try:
+            # モデル切り替えリクエスト
+            option_payload = {
+                "sd_model_checkpoint": model_name
+            }
+            response = requests.post(url=self.OPTIONS_URL, json=option_payload)
+            response.raise_for_status()
+            self.logger.info(f"モデル切り替えリクエスト送信完了: ステータスコード {response.status_code}")
+
+            # 現在のモデルを更新
+            self._current_model = model_name
+            self._model_switched = True
+
+        except Exception as e:
+            self.logger.error(f"モデル切り替え中にエラーが発生: {str(e)}")
+            raise
+
+    def _remove_duplicate_prompts(self, prompts):
+        """
+        重複するプロンプトを削除し、一意のプロンプトリストを返す
+
+        Args:
+            prompts (list): プロンプトのリスト
+
+        Returns:
+            list: 重複を除去したプロンプトのリスト
+        """
+        # 重複を除去（順序は保持）
+        seen = set()
+        unique_prompts = []
+        for prompt in prompts:
+            if prompt not in seen:
+                seen.add(prompt)
+                unique_prompts.append(prompt)
+            else:
+                logging.info(f"重複プロンプトを削除しました: {prompt}")
+
+        return unique_prompts
+
+    def _optimize_prompts(self, prompts):
+        """
+        プロンプトの最適化を行う
+
+        Args:
+            prompts (list): プロンプトのリスト
+
+        Returns:
+            list: 最適化されたプロンプトのリスト
+        """
+        if not prompts:
+            return []
+
+        optimized_prompts = []
+        prompt_weights = {}  # プロンプトの重みを管理
+
+        # プロンプトの重み付け
+        for prompt in prompts:
+            # 括弧内の重みを抽出
+            weight_match = re.search(r'\(([^)]+)\)', prompt)
+            if weight_match:
+                weight_text = weight_match.group(1)
+                # 重みの値を抽出（例: "1.3"）
+                weight_value = re.search(r'(\d+\.?\d*)', weight_text)
+                if weight_value:
+                    prompt_weights[prompt] = float(weight_value.group(1))
+                else:
+                    prompt_weights[prompt] = 1.0
+            else:
+                prompt_weights[prompt] = 1.0
+
+        # 重みの高いプロンプトを優先
+        sorted_prompts = sorted(prompts, key=lambda x: prompt_weights.get(x, 1.0), reverse=True)
+
+        # プロンプトの長さをチェック
+        total_length = 0
+        max_length = 500  # Stable Diffusionの制限
+
+        for prompt in sorted_prompts:
+            # プロンプトの長さを計算（カンマとスペースを考慮）
+            prompt_length = len(prompt)
+            if total_length + prompt_length + 2 <= max_length:  # +2 はカンマとスペース
+                optimized_prompts.append(prompt)
+                total_length += prompt_length + 2
+            else:
+                logging.warning(f"プロンプトが長すぎるため除外しました: {prompt[:50]}...")
+
+        # プロンプトの品質チェック
+        optimized_prompts = self._check_prompt_quality(optimized_prompts)
+
+        return optimized_prompts
+
+    def _check_prompt_quality(self, prompts):
+        """
+        プロンプトの品質をチェックし、問題のあるプロンプトを修正または除外する
+
+        Args:
+            prompts (list): プロンプトのリスト
+
+        Returns:
+            list: 品質チェック済みのプロンプトのリスト
+        """
+        quality_checked_prompts = []
+        excluded_prompts = []
+
+        for prompt in prompts:
+            # 空のプロンプトをチェック
+            if not prompt.strip():
+                logging.warning("空のプロンプトを除外しました")
+                excluded_prompts.append(prompt)
+                continue
+
+            # 特殊文字のチェック
+            if re.search(r'[<>{}]', prompt):
+                logging.warning(f"特殊文字を含むプロンプトを修正しました: {prompt}")
+                # 特殊文字を除去
+                prompt = re.sub(r'[<>{}]', '', prompt)
+
+            # 重複する括弧のチェック
+            if prompt.count('(') != prompt.count(')'):
+                logging.warning(f"括弧の数が一致しないプロンプトを修正しました: {prompt}")
+                # 括弧の数を調整
+                prompt = re.sub(r'\([^)]*\)', '', prompt)
+
+            # 重複するカンマのチェック
+            if re.search(r',\s*,', prompt):
+                logging.warning(f"重複するカンマを含むプロンプトを修正しました: {prompt}")
+                # 重複するカンマを除去
+                prompt = re.sub(r',\s*,', ',', prompt)
+
+            # プロンプトの長さチェック
+            if len(prompt) > 100:  # 個別のプロンプトの最大長
+                logging.warning(f"長すぎるプロンプトを短縮しました: {prompt[:50]}...")
+                # プロンプトを短縮
+                prompt = prompt[:100] + "..."
+
+            quality_checked_prompts.append(prompt)
+
+        # 除外されたプロンプトをログに出力
+        if excluded_prompts:
+            logging.info(f"品質チェックにより除外されたプロンプト: {', '.join(excluded_prompts)}")
+
+        return quality_checked_prompts
