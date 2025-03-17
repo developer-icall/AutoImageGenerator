@@ -1,0 +1,9 @@
+{
+  "Base Negative Prompt": {
+    "prompts": [
+      "(worst quality:1.4), (low quality:1.4), (normal quality:1.4), (lowres:1.2), (monochrome:1.1), (grayscale:1.1), text, watermark, signature, artist name, logo, copyright, blurry, out of focus, cropped, cut off, asymmetrical, disproportionate, deformed, distorted, disfigured, amateur, poorly drawn, beginner, messy, sketch, draft, unfinished, incomplete, test, sample, demo, placeholder, default, generic, stock, clip art, 3d render, photorealistic, photograph, person, human, character, figure, face, portrait, nsfw, explicit, mature, adult, offensive, inappropriate, controversial, political, religious, cultural, social, historical, news, current events, real world, real life"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  }
+}

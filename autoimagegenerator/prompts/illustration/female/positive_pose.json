@@ -1,0 +1,51 @@
+{
+  "pose": {
+    "prompts": [
+      "a women sitting on bed",
+      "looking up, smile, from above, (20 years old)",
+      "leaning forward",
+      "arched back",
+      "dynamic pose",
+      "(look back:1.3)",
+      "sit in a chair",
+      "girl sitting",
+      "hand between legs, room",
+      "(lie face down:1.2), bed room, smile",
+      "selfie, smile",
+      "Hands on Hips",
+      "left hand on hips",
+      "woman with left hand in pockets",
+      "fashion model posing",
+      "fashion model posing",
+      "(Looking Over Shoulder:1.3), smile",
+      "tilting head",
+      "tilting head",
+      "Spread legs",
+      "Arching the back",
+      "Seductive pose",
+      "Seductive pose"
+    ],
+    "use max prompts": 1,
+    "use min prompts": 1
+  },
+  "Face": {
+    "prompts": [
+      "smile",
+      "smile",
+      "smile",
+      "smile",
+      "smile",
+      "Half-smile",
+      "Half-smile",
+      "Half-smile",
+      "Smirk",
+      "Smirk",
+      "Mournful",
+      "",
+      "",
+      ""
+    ],
+    "use max prompts": 1,
+    "use min prompts": 1
+  }
+}

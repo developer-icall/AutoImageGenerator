@@ -1,0 +1,42 @@
+{
+  "Base Negative Prompt": {
+    "prompts": [
+      "(person:1.4), (human:1.4), text, watermark, signature, artist name, logo, copyright"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  },
+  "Chain Whip Negative": {
+    "prompts": [
+      "solid weapon, wrong weapon shape"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0,
+    "condition": {
+      "category": "Weapon Type",
+      "contains": ["chain whip", "spiked chain"]
+    }
+  },
+  "Bow Negative": {
+    "prompts": [
+      "missing bowstring, broken bow"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0,
+    "condition": {
+      "category": "Weapon Type",
+      "contains": ["bow", "longbow", "shortbow", "recurve"]
+    }
+  },
+  "Staff Negative": {
+    "prompts": [
+      "short weapon, broken staff"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0,
+    "condition": {
+      "category": "Weapon Type",
+      "contains": ["staff", "wizard's staff", "magic staff"]
+    }
+  }
+}

@@ -1,4 +1,20 @@
 {
     "image_generate_batch_execute_count": 2,
-    "another_version_generate_count": 12
+    "another_version_generate_count": 12,
+    "default_image_sizes": {
+        "realistic": {
+            "female": {"width": 512, "height": 768},
+            "male": {"width": 512, "height": 768},
+            "animal": {"width": 512, "height": 768}
+        },
+        "illustration": {
+            "female": {"width": 512, "height": 768},
+            "male": {"width": 512, "height": 768},
+            "animal": {"width": 512, "height": 768},
+            "background": {"width": 768, "height": 512},
+            "rpg_icon": {"width": 512, "height": 512},
+            "vehicle": {"width": 768, "height": 512},
+            "other": {"width": 512, "height": 768}
+        }
+    }
 }

@@ -1,6 +1,7 @@
 .venv/
 venv
 images/output/
+autoimagegenerator/images/output/
 autoimagegenerator/settings.json
 
 # Python関連
@@ -58,6 +59,11 @@ ENV/
 # プロジェクト固有
 autoimagegenerator/images/output/
 autoimagegenerator/images/input/
+
+# テスト関連
+autoimagegenerator/tests/output/
+autoimagegenerator/tests/reports/
+autoimagegenerator/tests/temp_test_settings.json
 
 # ドキュメント関連
 docs/**/*.tmp

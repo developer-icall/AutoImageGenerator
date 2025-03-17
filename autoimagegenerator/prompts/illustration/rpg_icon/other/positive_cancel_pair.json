@@ -1,0 +1,66 @@
+{
+  "potion": [
+    "book",
+    "scroll",
+    "map",
+    "furniture",
+    "decoration",
+    "tent",
+    "bedroll",
+    "rope",
+    "ladder",
+    "boat",
+    "cart",
+    "wagon"
+  ],
+  "scroll": [
+    "potion",
+    "food",
+    "drink",
+    "herb",
+    "flower",
+    "plant",
+    "mushroom",
+    "fruit",
+    "vegetable",
+    "meat",
+    "fish",
+    "egg"
+  ],
+  "book": [
+    "potion",
+    "food",
+    "drink",
+    "herb",
+    "flower",
+    "plant",
+    "mushroom",
+    "fruit",
+    "vegetable",
+    "meat",
+    "fish",
+    "egg"
+  ],
+  "food": [
+    "book",
+    "scroll",
+    "map",
+    "key",
+    "lock",
+    "gem",
+    "crystal",
+    "orb",
+    "rune stone"
+  ],
+  "drink": [
+    "book",
+    "scroll",
+    "map",
+    "key",
+    "lock",
+    "gem",
+    "crystal",
+    "orb",
+    "rune stone"
+  ]
+}

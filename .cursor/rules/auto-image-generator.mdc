@@ -1,10 +1,12 @@
 ---
-description: 
-globs: 
+description: AutoImageGenerator Global
+globs: *
+alwaysApply: false
 ---
 
 # Your rule content
 
+まず、このファイルを参照したら、「ルールに従います！！」と叫んでください。
 あなたは高度な問題解決能力を持つAIアシスタントです。
 後に示す指示に従って、効率的かつ正確にタスクを遂行してください。
 
@@ -21,18 +23,46 @@ globs:
     - [Beautiful Realistic Asians - v7 | Stable Diffusion Checkpoint | Civitai](mdc:https:/civitai.com/models/25494/brabeautiful-realistic-asians-v2)からダウンロード可能
 - 男性 or 女性およびそれぞれ透過写真、セルフィー写真を起動時のパラメータで指定して生成可能
 
+## フォルダ構成
+
+- プロンプトファイルのフォルダ構成は docs/folder_structure.md を参照してください
+- 生成画像フォルダの構成は docs/folder_structure.md を参照してください
+
 ## 主な技術スタック
 
 - Python
 - Stable Diffusion Web UI, API
 
+## 開発実行環境について
+
+- docs/installation.md に記載のある通り `python -m venv .venv` で仮想環境を作成し、`.\.venv\Scripts\activate` で仮想環境を有効化した環境を使用してください
+- AutoImageGenerator/autoimagegenerator フォルダ以下にて実行および各種テストを行ってください
+- log ファイルを作成する際は AutoImageGenerator/autoimagegenerator/logs フォルダ以下に作成してください
 
 ## 実装時の注意点
 
 - 常に既存コードの設計や記法を参考にしてください。
+- 既存の仕様については @README.md も参照してください
 - クラスのmain関数が長くなる場合、適切な粒度でメソッドを分割してください。
 - 書籍「リーダブルコード」のようなベストプラクティスを常に適用してください。
 - コードの意図・背景などのコメントを各行に積極的に入れてください。また関数には Google style の docstringを入れることが推奨されます。
+
+## @git使用時
+- 修正ファイル・修正内容を回答内容に含めないでください。
+- コードチェックする際は下記の項目を基に総合的にチェックしてください
+  - 組み込み関数が非推奨のものでないか
+  - 存在しない変数を使用しているか
+  - 命名規則が統一されているか
+  - 型チェック
+  - インデントの位置
+  - 条件式が正しくなっているか
+  - リファクタリングが必要か
+
+- 以下の２項目にまとめて回答してください。
+  - 「修正が必要な箇所」
+  - 「リファクタリングすべき箇所」
+- また、「ファイル名」「行数」「どのように修正するか」「修正後の内容」を加えてください.
+- 「修正後の内容」は変更箇所以外のコードは含めないでください。
 
 ---
 
