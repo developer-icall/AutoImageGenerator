@@ -8,30 +8,30 @@ import os
 IMAGE_STYLES = {
     "realistic": {
         "female": {
-            "models": ["brav6", "brav7"],
+            "models": ["brav6", "brav7", "yayoiMix"],
             "types": ["normal", "transparent", "selfie"]
         },
         "male": {
-            "models": ["brav6", "brav7"],
+            "models": ["brav6", "brav7", "yayoiMix"],
             "types": ["normal", "transparent", "selfie"]
         },
         "animal": {
             "types": ["dog", "cat", "bird", "fish", "other"],
-            "models": []  # 未確定
+            "models": ["yayoiMix"]  # yayoiMix_v25モデルを追加
         }
     },
     "illustration": {
         "female": {
-            "models": [],  # 未確定
+            "models": ["animagineXL"],  # animagineXLを追加
             "types": ["normal", "transparent", "selfie"]
         },
         "male": {
-            "models": [],  # 未確定
+            "models": ["animagineXL"],  # animagineXLを追加
             "types": ["normal", "transparent", "selfie"]
         },
         "animal": {
             "types": ["dog", "cat", "bird", "fish", "other"],
-            "models": []  # 未確定
+            "models": ["animagineXL"]  # animagineXL40_v4Optモデルを追加
         },
         "background": {
             "types": ["nature", "city", "sea", "sky", "other"],
@@ -57,7 +57,9 @@ SD_MODEL_CHECKPOINTS = {
     "brav7": "beautifulRealistic_v7.safetensors",
     "brav7_men": "beautifulRealistic_v7.safetensors",
     "photoRealRPG": "photoRealV15_photorealv21.safetensors",  # photoRealV15_photorealv21モデル
-    "RPGIcon": "RPGIcon.safetensors"  # RPGIcon用モデル
+    "RPGIcon": "RPGIcon.safetensors",  # RPGIcon用モデル
+    "animagineXL": "animagineXL40_v4Opt.safetensors",  # animagineXL40_v4Optモデル
+    "yayoiMix": "yayoiMix_v25.safetensors"  # yayoiMix_v25モデル
 }
 
 SD_MODEL_SCRITPS = {
