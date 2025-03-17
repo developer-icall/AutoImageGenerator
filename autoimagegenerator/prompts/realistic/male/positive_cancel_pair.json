@@ -3,5 +3,16 @@
   "selfie": ["from above"],
   "v-neck sweater": ["woman with left hand in pockets"],
   "from above": ["Spread legs", "arched back"],
-  "golf": ["sit in a chair"]
+  "golf": ["sit in a chair"],
+  "military cut": ["faux fur coat", "faux fur-trimmed coat"],
+  "spiky hairstyle": ["business suits", "gray suits", "black suit", "charcoal gray suit", "navy blue suit"],
+  "winter coat": ["at beach"],
+  "down jacket": ["at beach"],
+  "wool coat": ["at beach"],
+  "turtleneck": ["at beach"],
+  "fleece jacket": ["at beach"],
+  "arched back": ["business suits", "gray suits", "black suit", "charcoal gray suit", "navy blue suit", "black three-piece suit"],
+  "dynamic pose": ["black three-piece suit", "gray pinstripe suit", "navy pinstripe suit, light blue dress shirt, striped tie"],
+  "(50 years old:1.2)": ["graphic tank top", "jogger shorts", "cargo shorts"],
+  "(20 years old:1.2)": ["charcoal gray suit", "dark brown suit"]
 }

@@ -222,7 +222,8 @@
     "skirt",
     "curly hair",
     "f/ 1. 8",
-    "from above"
+    "from above",
+    "hoodie jacket"
   ],
   "Spread legs": [
     "street",
@@ -297,7 +298,8 @@
     "smock blouse",
     "tunic blouse",
     "blouse",
-    "poncho"
+    "poncho",
+    "winter coat"
   ],
   "street": ["middle shot"],
   "girl sitting": [
@@ -373,7 +375,7 @@
   "sauvage": ["(lie face down:1.2)"],
   "tailored jacket": ["(lie face down:1.2)"],
   "low ponytail": ["(lie face down:1.2)", "sit in a chair"],
-  "ponytail": ["(lie face down:1.2)", "sit in a chair"],
+  "ponytail": ["(lie face down:1.2)", "sit in a chair", "Pixie Cut"],
   "hair bun": ["(lie face down:1.2)", "hand between legs"],
   "flipped hair": ["a women sitting on bed"],
   "wavy hair": ["hand between legs", "bell sleeve"],
@@ -426,7 +428,7 @@
     "sit in a chair",
     "a women sitting on bed"
   ],
-  "hoodie": ["sit in a chair", "hand between legs"],
+  "hoodie": ["sit in a chair", "hand between legs", "very long hair"],
   "Wearing cross halter bikini": ["hand between legs"],
   "off-the-shoulder top": ["hand between legs"],
   "cold shoulder top": ["hand between legs"],
@@ -447,5 +449,20 @@
   "cape knit": ["Three-Quarter Length shot", "bed room", "hand between legs"],
   "bell sleeve": ["hand between legs"],
   "fleece jacket": ["a pendant"],
-  "Three-Quarter Length shot": ["(lie face down:1.2), bed room"]
+  "Three-Quarter Length shot": ["(lie face down:1.2), bed room"],
+  "very long hair": [
+    "hoodie"
+  ],
+  "Pixie Cut": [
+    "ponytail"
+  ],
+  "winter coat": [
+    "at beach"
+  ],
+  "down jacket": [
+    "at beach"
+  ],
+  "pink hair": [
+    "autumn wear"
+  ]
 }

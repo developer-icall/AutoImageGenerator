@@ -1,7 +1,7 @@
 {
   "Base Negative Prompt": {
     "prompts": [
-      "text, watermark, signature, artist name, logo, copyright, blurry, out of focus, (person:1.4), (human:1.4), nsfw"
+      "(person:1.4), (human:1.4), text, watermark, signature, artist name, logo, copyright"
     ],
     "use_max_prompts": 1,
     "use_min_prompts": 1

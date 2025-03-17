@@ -78,19 +78,23 @@
   "steel shield": [
     "with wooden grip",
     "polished wood",
-    "wooden"
+    "wooden",
+    "with silver edge"
   ],
   "iron dagger": [
     "polished wood",
-    "wooden"
+    "wooden",
+    "futuristic design"
   ],
   "medieval sword": [
     "polished wood",
-    "wooden"
+    "wooden",
+    "futuristic design"
   ],
   "battle axe": [
     "polished wood",
-    "wooden"
+    "wooden",
+    "futuristic design"
   ],
   "war hammer": [
     "polished wood",
@@ -101,14 +105,16 @@
     "polished wood",
     "wooden",
     "with leather handle",
-    "supple leather"
+    "supple leather",
+    "futuristic design"
   ],
   "knight helmet": [
     "with wooden grip",
     "polished wood",
     "wooden",
     "with leather handle",
-    "supple leather"
+    "supple leather",
+    "futuristic design"
   ],
   "gold ring": [
     "with wooden grip",
@@ -117,33 +123,47 @@
     "with leather handle",
     "supple leather",
     "with steel blade",
-    "gleaming steel"
+    "gleaming steel",
+    "with steel"
   ],
   "healing potion": [
     "with steel blade",
     "gleaming steel",
     "with silver edge",
-    "shining silver"
+    "shining silver",
+    "with fire effect"
   ],
   "modern gun": [
     "polished wood",
-    "wooden"
+    "wooden",
+    "historical design",
+    "with arcane mana aura",
+    "with magic energy",
+    "with silver edge"
   ],
   "sniper rifle": [
     "polished wood",
-    "wooden"
+    "wooden",
+    "historical design",
+    "with arcane mana aura",
+    "with magic energy",
+    "with silver edge",
+    "fantasy design",
+    "enchanted with magic"
   ],
   "crystal staff": [
     "with steel blade",
     "gleaming steel",
     "with wooden grip",
-    "polished wood"
+    "polished wood",
+    "with silver edge"
   ],
   "magic wand": [
     "with steel blade",
     "gleaming steel",
     "with wooden grip",
-    "polished wood"
+    "polished wood",
+    "with silver edge"
   ],
   "spellbook": [
     "with steel blade",
@@ -194,11 +214,13 @@
   ],
   "runic axe": [
     "polished wood",
-    "wooden"
+    "wooden",
+    "futuristic design"
   ],
   "ethereal bow": [
     "with steel blade",
-    "gleaming steel"
+    "gleaming steel",
+    "with silver edge"
   ],
   "demon blade": [
     "polished wood",
@@ -209,5 +231,8 @@
     "gleaming steel",
     "with wooden grip",
     "polished wood"
+  ],
+  "longbow": [
+    "with silver edge"
   ]
 }
