@@ -57,8 +57,7 @@ ENV/
 *.bmp
 
 # プロジェクト固有
-autoimagegenerator/images/output/
-autoimagegenerator/images/input/
+autoimagegenerator/images/output/**
 
 # テスト関連
 autoimagegenerator/tests/output/
