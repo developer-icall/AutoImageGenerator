@@ -74,7 +74,7 @@ PoetryはPythonの依存関係管理ツールで、以下の手順でインス�
 python -m pip install --upgrade pip
 
 # 必要なモジュールをインストール
-(venv) PS C:\GitHub\AutoImageGenerator> poetry install
+(.venv) PS C:\GitHub\AutoImageGenerator> poetry install
 ```
 
 ## Stable Diffusion Web UI のセットアップ

@@ -21,7 +21,7 @@
 
 2. 仮想環境を有効化
    ```
-   .\venv\Scripts\activate
+   .\.venv\Scripts\activate
    ```
 
 3. 実行環境のパスへ移動

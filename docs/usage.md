@@ -6,7 +6,7 @@
 
 1. 仮想環境を有効化します
    ```
-   .\venv\Scripts\activate
+   .\.venv\Scripts\activate
    ```
 
 2. 実行環境のパスへ移動します
@@ -66,7 +66,9 @@
 - **--model**: 使用するモデル（デフォルトはカテゴリーに応じて自動選択）
   - `brav6`: Beautiful Realistic Asians v6
   - `brav7`: Beautiful Realistic Asians v7
-  - `rpg_icon`: RPGアイコン用モデル
+  - `brav7_men`: Beautiful Realistic Asians v7（男性向け）
+  - `photoRealRPG`: RPGアイコン用モデル（photoRealV15_photorealv21.safetensors）
+  - `RPGIcon`: RPGIcon.safetensorsモデル
 
 - **--enable-hr**: ハイレゾ画像生成の有効/無効
   - `true`: 有効（デフォルト）
@@ -86,6 +88,9 @@ python main.py --style realistic --category female --subcategory selfie --model 
 # リアルテイストの女性の透過背景画像を生成（ハイレゾ無効）
 python main.py --style realistic --category female --subcategory transparent --enable-hr false
 
-# イラストテイストのRPGアイコン（武器）を生成
-python main.py --style illustration --category rpg_icon --subcategory weapon
+# イラストテイストのRPGアイコン（武器）をphotoRealRPGモデルで生成
+python main.py --style illustration --category rpg_icon --subcategory weapon --model photoRealRPG
+
+# イラストテイストのRPGアイコン（武器）をRPGIconモデルを使用して生成
+python main.py --style illustration --category rpg_icon --subcategory weapon --model RPGIcon
 ```
