@@ -29,7 +29,6 @@
       "overcoat",
       "party dress",
       "pea coat",
-      "performance jacket",
       "polo shirt",
       "poncho",
       "quilted jacket",
@@ -82,7 +81,7 @@
     "use min prompts": 0
   },
   "Camera Settings": {
-    "prompts": ["(depth of field, blurry:1.4)", "f/ 1. 8"],
+    "prompts": ["(depth of field, blurry:1.4)"],
     "use max prompts": 1,
     "use min prompts": 0
   },
