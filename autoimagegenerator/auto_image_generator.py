@@ -72,6 +72,9 @@ class AutoImageGenerator:
         # Stable Diffusion Web UI APIのURL
         self.URL = url
         self.OPTIONS_URL = f'{self.URL}/sdapi/v1/options'
+        # txt2imgエンドポイントを明示的に指定
+        self.TXT2IMG_URL = f'{self.URL}/sdapi/v1/txt2img'
+        self.PNGINFO_URL = f'{self.URL}/sdapi/v1/png-info'
 
         # 使用するモデルのチェックポイント
         self.SD_MODEL_CHECKPOINT = sd_model_checkpoint
@@ -116,8 +119,6 @@ class AutoImageGenerator:
         self.WITH_SAMPLE_THUMBNAIL_FOLDER = "/sample-thumbnail"
 
         self.IMAGE_FILE_EXTENSION = ".png"
-        self.TEXT2IMG_URL = f'{self.URL}/sdapi/v1/txt2img'
-        self.PNGINFO_URL = f'{self.URL}/sdapi/v1/png-info'
 
         # ロガーの設定
         self.logger = logging.getLogger(__name__)
@@ -1446,8 +1447,19 @@ class AutoImageGenerator:
                     logging.info(f"武器画像の検証に失敗したため、再生成を試みます（試行回数: {validation_attempts}/{max_attempts}）")
 
                 # 画像生成APIを呼び出す
-                response = requests.post(url=self.URL, json=payload)
-                response.raise_for_status()
+                try:
+                    # 正しいエンドポイントを使用
+                    response = requests.post(url=self.TXT2IMG_URL, json=payload)
+                    response.raise_for_status()
+                except requests.exceptions.HTTPError as e:
+                    self.logger.error(f"画像生成中にエラーが発生しました: {e}")
+                    self.logger.error(f"HTTPエラー: {e}")
+                    try:
+                        error_detail = response.json()
+                        self.logger.error(f"サーバーからのエラー詳細: {json.dumps(error_detail, indent=2, ensure_ascii=False)}")
+                    except:
+                        self.logger.error("サーバーからのエラー詳細を取得できませんでした")
+                    raise
 
                 # レスポンスからJSONデータを取得
                 r = response.json()
