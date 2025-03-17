@@ -1,7 +1,7 @@
 {
   "Base Positive Prompt": {
     "prompts": [
-      "no beard, (1 man:1.5), (best quality, masterpiece:1.2), (looking at viewer:1.4), (illustration:1.4)"
+      "no beard, (1 man:1.5), (best quality), (looking at viewer:1.4), (illustration:1.4)"
     ],
     "use max prompts": 1,
     "use min prompts": 1
@@ -38,7 +38,7 @@
       "(40 years old:1.2)",
       "(50 years old:1.2)"
     ],
-    "use max prompts": 1,
+    "use max prompts": 0,
     "use min prompts": 0
   },
   "Hair Type": {

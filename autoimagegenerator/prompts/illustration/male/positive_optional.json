@@ -114,8 +114,7 @@
       "portrait",
       "upper body",
       "close-up shot",
-      "middle shot",
-      "Three-Quarter Length shot"
+      "middle shot"
     ],
     "use max prompts": 1,
     "use min prompts": 0
