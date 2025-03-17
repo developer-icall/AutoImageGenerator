@@ -1,7 +1,7 @@
 .venv/
 venv
 images/output/
-autoimagegenerator/images/output/
+autoimagegenerator/images/output/**
 autoimagegenerator/settings.json
 
 # Python関連
@@ -55,9 +55,8 @@ ENV/
 *.jpeg
 *.gif
 *.bmp
-
-# プロジェクト固有
-autoimagegenerator/images/output/**
+# 例外：サンプル画像は含める
+!autoimagegenerator/images/input/sample.png
 
 # テスト関連
 autoimagegenerator/tests/output/
