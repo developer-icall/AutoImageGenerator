@@ -69,6 +69,8 @@
   - `brav7_men`: Beautiful Realistic Asians v7（男性向け）
   - `photoRealRPG`: RPGアイコン用モデル（photoRealV15_photorealv21.safetensors）
   - `RPGIcon`: RPGIcon.safetensorsモデル
+  - `animagineXL`: イラストテイスト画像用モデル（animagineXL40_v4Opt.safetensors）
+  - `yayoiMix`: リアルテイスト画像用モデル（yayoiMix_v25.safetensors）
 
 - **--enable-hr**: ハイレゾ画像生成の有効/無効
   - `true`: 有効（デフォルト）
@@ -93,4 +95,63 @@ python main.py --style illustration --category rpg_icon --subcategory weapon --m
 
 # イラストテイストのRPGアイコン（武器）をRPGIconモデルを使用して生成
 python main.py --style illustration --category rpg_icon --subcategory weapon --model RPGIcon
-```
+
+# イラストテイストの動物（犬）画像を生成（animagineXLモデルを指定）
+python main.py --style illustration --category animal --subcategory dog --model animagineXL
+
+# イラストテイストの動物（猫）画像を生成（animagineXLモデルを指定）
+python main.py --style illustration --category animal --subcategory cat --model animagineXL
+
+# イラストテイストの動物（鳥）画像を生成（animagineXLモデルを指定）
+python main.py --style illustration --category animal --subcategory bird --model animagineXL
+
+# イラストテイストの動物（魚）画像を生成（animagineXLモデルを指定）
+python main.py --style illustration --category animal --subcategory fish --model animagineXL
+
+# リアルテイストの動物（犬）画像を生成（yayoiMixモデルを指定）
+python main.py --style realistic --category animal --subcategory dog --model yayoiMix
+
+# リアルテイストの動物（猫）画像を生成（yayoiMixモデルを指定）
+python main.py --style realistic --category animal --subcategory cat --model yayoiMix
+
+# リアルテイストの動物（鳥）画像を生成（yayoiMixモデルを指定）
+python main.py --style realistic --category animal --subcategory bird --model yayoiMix
+
+# リアルテイストの動物（魚）画像を生成（yayoiMixモデルを指定）
+python main.py --style realistic --category animal --subcategory fish --model yayoiMix
+
+# イラストテイストの女性の通常画像を生成（animagineXLモデルを指定）
+python main.py --style illustration --category female --subcategory normal --model animagineXL
+
+# イラストテイストの女性のセルフィー画像を生成（animagineXLモデルを指定）
+python main.py --style illustration --category female --subcategory selfie --model animagineXL
+
+# イラストテイストの女性の透過背景画像を生成（animagineXLモデルを指定）
+python main.py --style illustration --category female --subcategory transparent --model animagineXL
+
+# イラストテイストの男性の通常画像を生成（animagineXLモデルを指定）
+python main.py --style illustration --category male --subcategory normal --model animagineXL
+
+# イラストテイストの男性のセルフィー画像を生成（animagineXLモデルを指定）
+python main.py --style illustration --category male --subcategory selfie --model animagineXL
+
+# イラストテイストの男性の透過背景画像を生成（animagineXLモデルを指定）
+python main.py --style illustration --category male --subcategory transparent --model animagineXL
+
+# リアルテイストの女性の通常画像を生成（yayoiMixモデルを指定）
+python main.py --style realistic --category female --subcategory normal --model yayoiMix
+
+# リアルテイストの女性のセルフィー画像を生成（yayoiMixモデルを指定）
+python main.py --style realistic --category female --subcategory selfie --model yayoiMix
+
+# リアルテイストの女性の透過背景画像を生成（yayoiMixモデルを指定）
+python main.py --style realistic --category female --subcategory transparent --model yayoiMix
+
+# リアルテイストの男性の通常画像を生成（yayoiMixモデルを指定）
+python main.py --style realistic --category male --subcategory normal --model yayoiMix
+
+# リアルテイストの男性のセルフィー画像を生成（yayoiMixモデルを指定）
+python main.py --style realistic --category male --subcategory selfie --model yayoiMix
+
+# リアルテイストの男性の透過背景画像を生成（yayoiMixモデルを指定）
+python main.py --style realistic --category male --subcategory transparent --model yayoiMix
