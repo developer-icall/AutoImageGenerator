@@ -1,7 +1,11 @@
 .venv/
 venv
 images/output/
-autoimagegenerator/images/output/**
+autoimagegenerator/images/output/illustration/**
+autoimagegenerator/images/output/realistic/**
+# 例外：.gitkeepファイルは含める
+!autoimagegenerator/images/output/illustration/.gitkeep
+!autoimagegenerator/images/output/realistic/.gitkeep
 autoimagegenerator/settings.json
 
 # Python関連
