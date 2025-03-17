@@ -846,7 +846,11 @@ class AutoImageGenerator:
         elif self.style == "illustration":
             if self.category == "rpg_icon":
                 # RPGアイコン用モデル
-                return "rpg_icon"
+                # SD_MODEL_PREFIXがRPGIconの場合はそれを使用、それ以外はphotoRealRPG（photoRealV15_photorealv21）を使用
+                if self.SD_MODEL_PREFIX == "RPGIcon":
+                    return "RPGIcon"
+                else:
+                    return "photoRealRPG"
             elif self.category in ["female", "male"]:
                 # イラスト系の人物モデル（将来的に追加予定）
                 # 現時点では暫定的にbrav7を使用
@@ -1662,7 +1666,7 @@ class AutoImageGenerator:
 
     def _switch_model(self, model_name: str) -> None:
         """モデルを切り替える"""
-        if self._model_switched:
+        if self._model_switch_executed:
             return
 
         try:
@@ -1676,7 +1680,7 @@ class AutoImageGenerator:
 
             # 現在のモデルを更新
             self._current_model = model_name
-            self._model_switched = True
+            self._model_switch_executed = True
 
         except Exception as e:
             self.logger.error(f"モデル切り替え中にエラーが発生: {str(e)}")

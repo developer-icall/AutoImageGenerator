@@ -39,7 +39,7 @@ IMAGE_STYLES = {
         },
         "rpg_icon": {
             "types": ["weapon", "monster", "other"],
-            "models": ["photoRealV15_photorealv21"]
+            "models": ["photoRealRPG", "RPGIcon"]
         },
         "vehicle": {
             "types": ["car", "ship", "airplane", "other"],
@@ -56,7 +56,8 @@ SD_MODEL_CHECKPOINTS = {
     "brav6": "beautifulRealistic_v60.safetensors",
     "brav7": "beautifulRealistic_v7.safetensors",
     "brav7_men": "beautifulRealistic_v7.safetensors",
-    "rpg_icon": "photoRealV15_photorealv21.safetensors"  # RPGIcon用のモデル
+    "photoRealRPG": "photoRealV15_photorealv21.safetensors",  # photoRealV15_photorealv21モデル
+    "RPGIcon": "RPGIcon.safetensors"  # RPGIcon用モデル
 }
 
 SD_MODEL_SCRITPS = {
@@ -119,7 +120,13 @@ def get_default_model(category):
     if category == "male":
         return "brav7_men"
     elif category == "rpg_icon":
-        return "rpg_icon"
+        # RPGアイコンの場合は、環境変数またはデフォルト設定に基づいてモデルを選択
+        # 環境変数RPG_ICON_MODELが設定されている場合はその値を使用
+        rpg_icon_model = os.environ.get("RPG_ICON_MODEL", "photoRealRPG")
+        if rpg_icon_model in ["photoRealRPG", "RPGIcon"]:
+            return rpg_icon_model
+        else:
+            return "photoRealRPG"
     else:
         return "brav6"
 
