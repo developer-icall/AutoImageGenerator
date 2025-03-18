@@ -55,7 +55,7 @@
   - `female`: 女性
   - `male`: 男性
   - `animal`: 動物
-  - `background`: 背景（illustrationのみ）
+  - `background`: 背景（realistic/illustration）
   - `rpg_icon`: RPGアイコン（illustrationのみ）
   - `vehicle`: 乗り物（illustrationのみ）
   - `other`: その他（illustrationのみ）
@@ -73,6 +73,12 @@
     - `bird`: 鳥
     - `fish`: 魚
     - `other`: その他
+  - 背景の場合:
+    - `city`: 都市
+    - `nature`: 自然
+    - `sea`: 海
+    - `sky`: 空
+    - `house`: 家
   - 乗り物の場合:
     - `car`: 車
     - `ship`: 船
@@ -90,6 +96,7 @@
   - `yayoiMix`: リアルテイスト画像用モデル（yayoiMix_v25.safetensors）
   - `petPhotography`: ペット写真用モデル（petPhotographyAlbumOf_v10HomeEdition.safetensors）
   - `sd_xl_base_1.0`: SDXL Base 1.0モデル（LoRA使用時）
+  - `landscapeRealistic`: 背景画像用モデル（landscapeRealistic_v20WarmColor.safetensors）
 
 - **--enable-hr**: ハイレゾ画像生成の有効/無効
   - `true`: 有効（デフォルト）
@@ -196,3 +203,18 @@ python main.py --style illustration --category vehicle --subcategory car --model
 
 # リアルテイストの車の画像を生成（SDXL Base 1.0モデルとLoRAを使用、モデルを明示的に指定）
 python main.py --style realistic --category vehicle --subcategory car --use-lora --lora-name cars-000008 --model sd_xl_base_1.0
+
+# リアルテイストの都市背景画像を生成（landscapeRealisticモデルを指定）
+python main.py --style realistic --category background --subcategory city --model landscapeRealistic
+
+# リアルテイストの自然背景画像を生成（landscapeRealisticモデルを指定）
+python main.py --style realistic --category background --subcategory nature --model landscapeRealistic
+
+# リアルテイストの海背景画像を生成（landscapeRealisticモデルを指定）
+python main.py --style realistic --category background --subcategory sea --model landscapeRealistic
+
+# リアルテイストの空背景画像を生成（landscapeRealisticモデルを指定）
+python main.py --style realistic --category background --subcategory sky --model landscapeRealistic
+
+# リアルテイストの家背景画像を生成（landscapeRealisticモデルを指定）
+python main.py --style realistic --category background --subcategory house --model landscapeRealistic

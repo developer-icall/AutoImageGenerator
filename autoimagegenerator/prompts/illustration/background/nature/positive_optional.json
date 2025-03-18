@@ -1,0 +1,59 @@
+{
+  "Nature Atmosphere": {
+    "prompts": [
+      "anime pristine wilderness",
+      "fantasy untouched nature",
+      "magical serene landscape",
+      "anime wild terrain",
+      "fantasy idyllic setting",
+      "magical remote location",
+      "anime tranquil environment",
+      "fantasy majestic vista",
+      "magical natural wonder"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  },
+  "Natural Colors": {
+    "prompts": [
+      "anime vibrant greenery",
+      "fantasy autumn colors",
+      "magical golden landscape",
+      "anime lush green",
+      "fantasy blue-tinted mountains",
+      "magical purple wildflowers",
+      "anime rich earthy tones",
+      "fantasy verdant foliage",
+      "magical multicolored landscape",
+      "anime moss green",
+      "fantasy forest green",
+      "magical fiery autumn foliage"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  },
+  "Landscape Details": {
+    "prompts": [
+      "anime morning dew",
+      "fantasy blooming flowers",
+      "magical fallen leaves",
+      "anime fresh snow",
+      "fantasy icy formations",
+      "magical floating petals",
+      "anime natural patterns",
+      "fantasy layered mountains",
+      "magical twisted tree roots",
+      "anime moss-covered stones",
+      "fantasy pine needles",
+      "magical rich soil",
+      "anime geological formations",
+      "fantasy exotic plants",
+      "magical ancient trees",
+      "anime fantasy mushrooms",
+      "fantasy glowing plants",
+      "magical crystal formations"
+    ],
+    "use_max_prompts": 2,
+    "use_min_prompts": 0
+  }
+}

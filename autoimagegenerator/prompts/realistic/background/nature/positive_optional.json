@@ -1,0 +1,57 @@
+{
+  "Nature Atmosphere": {
+    "prompts": [
+      "pristine wilderness",
+      "untouched nature",
+      "serene landscape",
+      "wild terrain",
+      "idyllic setting",
+      "remote location",
+      "tranquil environment",
+      "majestic vista",
+      "natural wonder",
+      "scenic beauty"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  },
+  "Natural Colors": {
+    "prompts": [
+      "vibrant greenery",
+      "autumn colors",
+      "golden landscape",
+      "lush green",
+      "blue-tinted mountains",
+      "purple wildflowers",
+      "rich earthy tones",
+      "verdant foliage",
+      "multicolored landscape",
+      "moss green",
+      "forest green",
+      "fiery autumn foliage"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  },
+  "Landscape Details": {
+    "prompts": [
+      "morning dew",
+      "blooming flowers",
+      "fallen leaves",
+      "fresh snow",
+      "icy formations",
+      "petals floating",
+      "natural patterns",
+      "layers of mountains",
+      "twisted tree roots",
+      "moss-covered stones",
+      "pine needles",
+      "rich soil",
+      "geological formations",
+      "exotic plants",
+      "ancient trees"
+    ],
+    "use_max_prompts": 2,
+    "use_min_prompts": 0
+  }
+}

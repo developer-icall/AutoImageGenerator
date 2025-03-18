@@ -1,0 +1,82 @@
+{
+  "Sea Type": {
+    "prompts": [
+      "ocean view",
+      "open sea",
+      "tropical ocean",
+      "crystal clear waters",
+      "coastal view",
+      "shoreline",
+      "rocky coast",
+      "sandy beach",
+      "tropical beach",
+      "secluded cove",
+      "bay view",
+      "harbor scene",
+      "island view",
+      "archipelago",
+      "coral reef",
+      "tide pools",
+      "sea cliffs",
+      "seaside",
+      "mediterranean coast",
+      "tropical islands",
+      "lagoon"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  },
+  "Water Condition": {
+    "prompts": [
+      "calm waters",
+      "gentle waves",
+      "rolling waves",
+      "crashing waves",
+      "stormy sea",
+      "rough waters",
+      "tidal waves",
+      "crystal clear water",
+      "turquoise water",
+      "deep blue water",
+      "emerald water",
+      "shallow waters",
+      "foamy waves",
+      "rippling surface",
+      "glassy surface",
+      "sun-sparkled water"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  },
+  "Coastal Features": {
+    "prompts": [
+      "white sand beach",
+      "golden sand beach",
+      "black sand beach",
+      "pebble beach",
+      "rocky shore",
+      "coastal rocks",
+      "sea stacks",
+      "tide pools",
+      "coastal cliffs",
+      "sea caves",
+      "natural arch over water",
+      "coral reef",
+      "coastal vegetation",
+      "palm trees",
+      "coastal pines",
+      "mangroves",
+      "driftwood",
+      "seashells on shore",
+      "lighthouse",
+      "pier",
+      "dock",
+      "fishing boats",
+      "sailing boats in distance",
+      "small island",
+      "distant islands"
+    ],
+    "use_max_prompts": 2,
+    "use_min_prompts": 0
+  }
+}

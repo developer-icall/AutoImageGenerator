@@ -1,0 +1,33 @@
+{
+  "Viewing Angle": {
+    "prompts": [
+      "anime high angle view",
+      "fantasy low angle view",
+      "magical eye level view",
+      "anime bird's eye view",
+      "fantasy aerial view",
+      "magical top-down view",
+      "anime side view",
+      "fantasy distant view",
+      "magical close-up view",
+      "anime dynamic angle",
+      "fantasy extreme perspective"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  },
+  "Camera Position": {
+    "prompts": [
+      "anime camera facing cityscape",
+      "fantasy camera from rooftop",
+      "magical camera from street level",
+      "anime camera looking up at skyscrapers",
+      "fantasy camera positioned at height",
+      "magical camera positioned far away",
+      "anime dramatic urban angle",
+      "fantasy cinematic city view"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "Viewing Angle": {
+    "prompts": [
+      "anime looking upward",
+      "fantasy wide view of sky",
+      "magical panoramic view",
+      "anime horizon view",
+      "fantasy tilted skyward",
+      "magical dramatic sky angle",
+      "anime low angle sky view",
+      "fantasy high in the air",
+      "magical bird's-eye perspective",
+      "anime cosmic view",
+      "fantasy celestial perspective"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  },
+  "Camera Position": {
+    "prompts": [
+      "anime camera pointed at sky",
+      "fantasy camera among clouds",
+      "magical floating viewpoint",
+      "anime from mountain top",
+      "fantasy from flying perspective",
+      "magical hovering camera",
+      "anime cinematic sky view",
+      "fantasy dramatic sky framing"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "City Atmosphere": {
+    "prompts": [
+      "bustling anime city",
+      "peaceful fantasy town",
+      "lively cartoon district",
+      "magical night life",
+      "futuristic morning scene",
+      "fantasy festival",
+      "anime market day",
+      "quiet fantasy Sunday",
+      "bustling magical district"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  },
+  "Urban Elements": {
+    "prompts": [
+      "fantasy street lamps",
+      "magical traffic lights",
+      "anime-style crosswalks",
+      "magical sidewalks",
+      "fantasy public benches",
+      "anime cafes",
+      "magical street vendors",
+      "fantasy public art",
+      "animated street murals",
+      "magical fountains",
+      "fantasy monuments",
+      "animated plazas",
+      "magical urban greenery",
+      "fantasy rooftop gardens",
+      "anime-style transportation"
+    ],
+    "use_max_prompts": 2,
+    "use_min_prompts": 0
+  },
+  "Urban Setting": {
+    "prompts": [
+      "fantasy commercial district",
+      "magical financial center",
+      "anime historic district",
+      "fantasy cultural quarter",
+      "magical entertainment area",
+      "anime school district",
+      "fantasy government quarter",
+      "magical embassy district",
+      "anime shopping area",
+      "fantasy industrial zone",
+      "magical port area",
+      "anime train station district",
+      "fantasy ethnic quarter"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  }
+}

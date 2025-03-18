@@ -1,0 +1,24 @@
+{
+  "Viewing Angle": {
+    "prompts": [
+      "personal perspective view",
+      "first-person view",
+      "looking out at the landscape",
+      "immersive view",
+      "point-of-view shot"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  },
+  "Framing": {
+    "prompts": [
+      "framed by natural elements",
+      "viewed through opening",
+      "through window frame",
+      "through doorway",
+      "through branches"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  }
+}

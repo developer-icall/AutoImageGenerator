@@ -1,0 +1,59 @@
+{
+  "Marine Atmosphere": {
+    "prompts": [
+      "anime tropical paradise",
+      "fantasy serene coastline",
+      "magical wild shores",
+      "anime pristine beach",
+      "fantasy secluded cove",
+      "magical exotic island",
+      "anime rocky seashore",
+      "fantasy dramatic coastal cliffs",
+      "magical windswept coast"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  },
+  "Water Colors": {
+    "prompts": [
+      "anime azure waters",
+      "fantasy crystal blue water",
+      "magical turquoise sea",
+      "anime emerald green water",
+      "fantasy deep blue ocean",
+      "magical teal waters",
+      "anime aquamarine sea",
+      "fantasy indigo depths",
+      "magical sapphire waters",
+      "anime glistening water surface",
+      "fantasy glowing waters",
+      "magical sparkling ocean"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  },
+  "Coastal Details": {
+    "prompts": [
+      "anime sea foam",
+      "fantasy wave patterns",
+      "magical ripples on water",
+      "anime smooth pebbles",
+      "fantasy coral fragments",
+      "magical fantasy seashells",
+      "anime stylized starfish",
+      "fantasy colorful driftwood",
+      "magical coastal rocks",
+      "anime glowing sea life",
+      "fantasy rock pools",
+      "magical coastal flora",
+      "anime sand patterns",
+      "fantasy wet sand reflections",
+      "magical shoreline details",
+      "anime fantasy marine creatures",
+      "fantasy underwater ruins",
+      "magical floating islands"
+    ],
+    "use_max_prompts": 2,
+    "use_min_prompts": 0
+  }
+}

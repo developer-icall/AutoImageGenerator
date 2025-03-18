@@ -1,0 +1,59 @@
+{
+  "House Atmosphere": {
+    "prompts": [
+      "anime inviting home",
+      "fantasy cozy dwelling",
+      "magical elegant residence",
+      "anime luxurious property",
+      "fantasy charming abode",
+      "magical rustic retreat",
+      "anime stylish residence",
+      "fantasy dream home",
+      "magical idyllic house"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  },
+  "Building Materials": {
+    "prompts": [
+      "anime wooden construction",
+      "fantasy stone masonry",
+      "magical brick exterior",
+      "anime glass and steel",
+      "fantasy timber frame",
+      "magical crystal walls",
+      "anime natural materials",
+      "fantasy ornate details",
+      "magical glowing elements",
+      "anime fantasy metals",
+      "fantasy candy house",
+      "magical living plant walls",
+      "anime marble features",
+      "fantasy gleaming surfaces",
+      "magical ice construction"
+    ],
+    "use_max_prompts": 2,
+    "use_min_prompts": 0
+  },
+  "Property Details": {
+    "prompts": [
+      "anime well-maintained property",
+      "fantasy landscaped grounds",
+      "magical manicured lawn",
+      "anime stone pathway",
+      "fantasy magical driveway",
+      "magical picket fence",
+      "anime wrought iron gates",
+      "fantasy ornate entrance",
+      "magical grand doorway",
+      "anime covered porch",
+      "fantasy floating veranda",
+      "magical outdoor lighting",
+      "anime fantasy trees",
+      "fantasy blooming magical garden",
+      "magical floating water feature"
+    ],
+    "use_max_prompts": 2,
+    "use_min_prompts": 0
+  }
+}

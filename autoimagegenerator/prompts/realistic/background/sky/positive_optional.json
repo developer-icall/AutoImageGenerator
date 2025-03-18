@@ -1,0 +1,60 @@
+{
+  "Sky Atmosphere": {
+    "prompts": [
+      "majestic sky",
+      "endless heavens",
+      "celestial view",
+      "heavenly atmosphere",
+      "dynamic skyscape",
+      "atmospheric beauty",
+      "stunning firmament",
+      "ethereal sky",
+      "luminous sky",
+      "breathtaking sky"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  },
+  "Sky Colors": {
+    "prompts": [
+      "blue gradient",
+      "fiery sunset colors",
+      "pastel dawn colors",
+      "golden sunset",
+      "pink and purple hues",
+      "crimson sunset",
+      "amber glow",
+      "azure blue",
+      "violet twilight",
+      "peach colored sky",
+      "lavender sky",
+      "indigo night",
+      "silver moonlight",
+      "copper tones",
+      "multicolored sky"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  },
+  "Celestial Objects": {
+    "prompts": [
+      "bright sun",
+      "setting sun",
+      "rising sun",
+      "full moon",
+      "crescent moon",
+      "visible stars",
+      "bright star",
+      "venus planet",
+      "visible planets",
+      "meteor",
+      "comet tail",
+      "constellations",
+      "milky way",
+      "galaxy view",
+      "shooting star"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  }
+}

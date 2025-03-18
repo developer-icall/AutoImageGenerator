@@ -1,0 +1,102 @@
+{
+  "Sky Type": {
+    "prompts": [
+      "vast sky",
+      "open sky",
+      "infinite sky",
+      "expansive sky",
+      "clear blue sky",
+      "azure sky",
+      "dramatic sky",
+      "stormy sky",
+      "cloudy sky",
+      "partly cloudy sky",
+      "sunset sky",
+      "sunrise sky",
+      "twilight sky",
+      "dawn sky",
+      "dusk sky",
+      "night sky",
+      "starry sky",
+      "milky way",
+      "galaxy view",
+      "northern lights",
+      "aurora borealis"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  },
+  "Cloud Formations": {
+    "prompts": [
+      "fluffy clouds",
+      "scattered clouds",
+      "wispy clouds",
+      "cirrus clouds",
+      "cumulus clouds",
+      "stratus clouds",
+      "cloud layers",
+      "rolling clouds",
+      "billowing clouds",
+      "storm clouds",
+      "thunderclouds",
+      "dark storm clouds",
+      "rain clouds",
+      "cloud bank",
+      "cloud cover",
+      "overcast sky",
+      "cloud patterns",
+      "contrails",
+      "no clouds"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  },
+  "Atmospheric Effects": {
+    "prompts": [
+      "vibrant colors",
+      "pink and purple hues",
+      "orange and red hues",
+      "golden light",
+      "god rays",
+      "sunbeams",
+      "sun rays through clouds",
+      "sunburst",
+      "rainbow",
+      "double rainbow",
+      "moon halo",
+      "sun halo",
+      "foggy atmosphere",
+      "misty sky",
+      "hazy atmosphere",
+      "clear atmosphere",
+      "star trails",
+      "meteor shower",
+      "shooting star",
+      "full moon",
+      "crescent moon",
+      "new moon",
+      "planet visible",
+      "lightning strike",
+      "lightning storm"
+    ],
+    "use_max_prompts": 2,
+    "use_min_prompts": 0
+  },
+  "Horizon Elements": {
+    "prompts": [
+      "distant mountains",
+      "mountain silhouettes",
+      "tree line silhouette",
+      "city skyline silhouette",
+      "ocean horizon",
+      "desert horizon",
+      "flat horizon",
+      "distant landscape",
+      "rolling hills in distance",
+      "clear horizon",
+      "hazy horizon"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  }
+}

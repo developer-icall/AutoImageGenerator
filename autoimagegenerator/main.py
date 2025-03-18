@@ -22,6 +22,10 @@ IMAGE_STYLES = {
         "vehicle": {
             "types": ["car", "ship", "airplane", "other"],
             "models": ["sd_xl_base_1.0"]  # SDXL Base 1.0モデルを追加
+        },
+        "background": {
+            "types": ["city", "nature", "sea", "sky", "house"],
+            "models": ["landscapeRealistic"]  # landscapeRealisticモデルを追加
         }
     },
     "illustration": {
@@ -65,7 +69,8 @@ SD_MODEL_CHECKPOINTS = {
     "animagineXL": "animagineXL40_v4Opt.safetensors",  # animagineXL40_v4Optモデル
     "yayoiMix": "yayoiMix_v25.safetensors",  # yayoiMix_v25モデル
     "petPhotography": "petPhotographyAlbumOf_v10HomeEdition.safetensors",  # ペット写真用モデル
-    "sd_xl_base_1.0": "sd_xl_base_1.0.safetensors"  # SDXL Base 1.0モデル
+    "sd_xl_base_1.0": "sd_xl_base_1.0.safetensors",  # SDXL Base 1.0モデル
+    "landscapeRealistic": "landscapeRealistic_v20WarmColor.safetensors"  # landscapeRealisticモデル
 }
 
 # LoRAの設定
@@ -157,6 +162,9 @@ def get_default_model(category, use_lora=False, lora_name=None):
     elif category == "animal":
         # 動物カテゴリーの場合はpetPhotographyモデルをデフォルトとして使用
         return "petPhotography"
+    elif category == "background":
+        # 背景カテゴリーの場合はlandscapeRealisticモデルをデフォルトとして使用
+        return "landscapeRealistic"
     else:
         return "brav6"
 

@@ -1,0 +1,30 @@
+{
+  "Viewing Angle": {
+    "prompts": [
+      "anime personal perspective",
+      "fantasy first-person view",
+      "magical looking out at cityscape",
+      "anime immersive view",
+      "fantasy point-of-view shot",
+      "magical character's perspective",
+      "anime through character's eyes"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  },
+  "Framing": {
+    "prompts": [
+      "anime framed by skyscrapers",
+      "fantasy viewed through window",
+      "magical through neon lights",
+      "anime through shop window",
+      "fantasy through train window",
+      "magical through glowing portal",
+      "anime through anime-style frame",
+      "fantasy through city arch",
+      "magical through urban doorway"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  }
+}

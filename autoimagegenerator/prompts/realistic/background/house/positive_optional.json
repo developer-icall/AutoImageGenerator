@@ -1,0 +1,60 @@
+{
+  "House Atmosphere": {
+    "prompts": [
+      "inviting home",
+      "cozy dwelling",
+      "elegant residence",
+      "luxurious property",
+      "charming abode",
+      "rustic retreat",
+      "stylish residence",
+      "dream home",
+      "idyllic house",
+      "picturesque dwelling"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  },
+  "Building Materials": {
+    "prompts": [
+      "wooden construction",
+      "stone masonry",
+      "brick exterior",
+      "concrete architecture",
+      "glass and steel",
+      "timber frame",
+      "adobe walls",
+      "natural materials",
+      "slate roof",
+      "cedar shingles",
+      "terracotta tiles",
+      "metal roofing",
+      "marble features",
+      "granite elements",
+      "copper accents"
+    ],
+    "use_max_prompts": 2,
+    "use_min_prompts": 0
+  },
+  "Property Details": {
+    "prompts": [
+      "well-maintained property",
+      "landscaped grounds",
+      "manicured lawn",
+      "stone pathway",
+      "brick driveway",
+      "white picket fence",
+      "wrought iron gates",
+      "ornate entrance",
+      "grand doorway",
+      "covered porch",
+      "wraparound veranda",
+      "outdoor lighting",
+      "mature trees",
+      "blooming garden",
+      "water feature"
+    ],
+    "use_max_prompts": 2,
+    "use_min_prompts": 0
+  }
+}
