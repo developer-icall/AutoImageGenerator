@@ -1,0 +1,14 @@
+{
+  "Selfie": {
+    "prompts": [
+      "dog looking at camera",
+      "dog close to camera",
+      "dog facing camera",
+      "dog with head tilted at camera",
+      "dog with paw on camera",
+      "dog selfie"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  }
+}

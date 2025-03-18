@@ -1,0 +1,12 @@
+{
+  "Selfie": {
+    "prompts": [
+      "cat looking at camera",
+      "cat close to camera",
+      "cat facing camera",
+      "cat with head tilted at camera"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  }
+}

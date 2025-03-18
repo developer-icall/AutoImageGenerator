@@ -72,6 +72,9 @@ class AutoImageGenerator:
         # Stable Diffusion Web UI APIのURL
         self.URL = url
         self.OPTIONS_URL = f'{self.URL}/sdapi/v1/options'
+        # txt2imgエンドポイントを明示的に指定
+        self.TXT2IMG_URL = f'{self.URL}/sdapi/v1/txt2img'
+        self.PNGINFO_URL = f'{self.URL}/sdapi/v1/png-info'
 
         # 使用するモデルのチェックポイント
         self.SD_MODEL_CHECKPOINT = sd_model_checkpoint
@@ -116,8 +119,6 @@ class AutoImageGenerator:
         self.WITH_SAMPLE_THUMBNAIL_FOLDER = "/sample-thumbnail"
 
         self.IMAGE_FILE_EXTENSION = ".png"
-        self.TEXT2IMG_URL = f'{self.URL}/sdapi/v1/txt2img'
-        self.PNGINFO_URL = f'{self.URL}/sdapi/v1/png-info'
 
         # ロガーの設定
         self.logger = logging.getLogger(__name__)
@@ -829,18 +830,23 @@ class AutoImageGenerator:
         # リアルテイスト画像の場合
         if self.style == "realistic":
             if self.category == "female":
-                # 女性の場合はbrav6またはbrav7を使用
-                return self.SD_MODEL_PREFIX
+                # 女性の場合
+                if self.SD_MODEL_PREFIX == "yayoiMix":
+                    return "yayoiMix"  # yayoiMixが指定されている場合はそれを使用
+                else:
+                    # それ以外はbrav6またはbrav7を使用
+                    return self.SD_MODEL_PREFIX
             elif self.category == "male":
-                # 男性の場合はbrav7_menを使用
-                if self.SD_MODEL_PREFIX == "brav7":
+                # 男性の場合
+                if self.SD_MODEL_PREFIX == "yayoiMix":
+                    return "yayoiMix"  # yayoiMixが指定されている場合はそれを使用
+                elif self.SD_MODEL_PREFIX == "brav7":
                     return "brav7_men"
                 else:
                     return self.SD_MODEL_PREFIX
             elif self.category == "animal":
-                # 動物の場合は将来的に追加予定のモデル
-                # 現時点では暫定的にbrav7を使用
-                return "brav7"  # 将来的には動物専用モデルに変更予定
+                # 動物の場合はyayoiMixを使用
+                return "yayoiMix"
 
         # イラスト風画像の場合
         elif self.style == "illustration":
@@ -852,15 +858,18 @@ class AutoImageGenerator:
                 else:
                     return "photoRealRPG"
             elif self.category in ["female", "male"]:
-                # イラスト系の人物モデル（将来的に追加予定）
-                # 現時点では暫定的にbrav7を使用
-                if self.category == "male":
-                    return "brav7_men"
+                # イラスト系の人物モデル
+                if self.SD_MODEL_PREFIX == "animagineXL":
+                    return "animagineXL"  # animagineXLが指定されている場合はそれを使用
                 else:
-                    return "brav7"
+                    # それ以外は暫定的にbrav7を使用
+                    if self.category == "male":
+                        return "brav7_men"
+                    else:
+                        return "brav7"
             elif self.category == "animal":
-                # イラスト系の動物モデル（将来的に追加予定）
-                return "brav7"  # 仮のモデル名
+                # イラスト系の動物モデル
+                return "animagineXL"
             elif self.category == "background":
                 # 背景用モデル（将来的に追加予定）
                 return "brav7"  # 仮のモデル名
@@ -968,9 +977,18 @@ class AutoImageGenerator:
         self._load_prompt_files()
 
         # 画像生成バッチを実行
-        for i in range(self.IMAGE_GENERATE_BATCH_EXECUTE_COUNT):
+        total_batches = self.IMAGE_GENERATE_BATCH_EXECUTE_COUNT
+        logging.info(f"画像生成バッチを開始します。合計バッチ数: {total_batches}")
+
+        for i in range(total_batches):
+            # 現在のバッチ番号をログに表示
+            current_batch = i + 1
+            logging.info(f"画像生成バッチ進捗: {current_batch}/{total_batches} ({(current_batch/total_batches)*100:.1f}%)")
+
             # 画像生成処理を実行
-            self._generate_images()
+            self._generate_images(current_batch, total_batches)
+
+        logging.info(f"画像生成バッチが完了しました。合計バッチ数: {total_batches}")
 
     def generate_prompts(self, reuse_positive_base=None, reuse_positive_base_dict=None):
         """
@@ -1195,7 +1213,7 @@ class AutoImageGenerator:
 
         return final_prompts
 
-    def _generate_images(self):
+    def _generate_images(self, current_batch, total_batches):
         """画像生成処理を実行する内部メソッド"""
         # プロンプトを生成
         positive_prompt, negative_prompt, seed, prompt_info = self._create_prompts()
@@ -1220,6 +1238,9 @@ class AutoImageGenerator:
         logging.info(f"画像生成: モデルチェックポイント={self.SD_MODEL_CHECKPOINT}")
         logging.info(f"画像生成: モデル名（JSONに記録）={os.path.splitext(self.SD_MODEL_CHECKPOINT)[0]}")
         logging.info(f"画像生成: カスタムチェックポイント使用={self.USE_CUSTOM_CHECKPOINT}")
+
+        # バッチ進捗情報をログに出力
+        logging.info(f"バッチ {current_batch}/{total_batches} の画像生成を開始します")
 
         # 最初にモデルを切り替え
         if not self.set_model(self.SD_MODEL_CHECKPOINT):
@@ -1268,6 +1289,7 @@ class AutoImageGenerator:
 
         try:
             # オリジナル画像の生成
+            logging.info(f"バッチ {current_batch}/{total_batches} - オリジナル画像 (1/{self.ANOTHER_VERSION_GENERATE_COUNT + 1}) の生成を開始します")
             self._generate_single_image(payload, output_folder_path, "00001", result_images, prompt_info)
 
             # オリジナル画像のSeed値を保存
@@ -1275,6 +1297,11 @@ class AutoImageGenerator:
 
             # 別バージョンの画像を生成
             for i in range(1, self.ANOTHER_VERSION_GENERATE_COUNT + 1):
+                # 進捗状況をログに出力
+                version_number = i + 1
+                total_versions = self.ANOTHER_VERSION_GENERATE_COUNT + 1
+                logging.info(f"バッチ {current_batch}/{total_batches} - バージョン画像 ({version_number}/{total_versions}) の生成を開始します")
+
                 # 別バージョン用のプロンプトを生成（ベースプロンプトを再利用）
                 version_positive_prompt, version_negative_prompt, _, version_prompt_info = self._create_prompts(
                     reuse_positive_base=reusable_base_prompts,
@@ -1393,194 +1420,199 @@ class AutoImageGenerator:
                         weapon_prompts = weapon_type_data
                     else:
                         weapon_prompts = []
-                        logging.warning(f"予期しない形式のWeapon Typeデータです: {type(weapon_type_data)}")
 
-                    logging.info(f"抽出されたweapon_prompts: {weapon_prompts}")
-
-                    if weapon_prompts and len(weapon_prompts) > 0:
-                        weapon_type = weapon_prompts[0]
-                        logging.info(f"武器タイプを抽出しました: {weapon_type}")
+                    # 武器タイプを抽出
+                    if weapon_prompts:
+                        # 最初の武器タイプを使用
+                        weapon_type = weapon_prompts[0].lower()
+                        logging.info(f"抽出された武器タイプ: {weapon_type}")
                     else:
-                        logging.warning("weapon_promptsが空です")
+                        logging.warning("武器タイプが見つかりませんでした")
                 else:
-                    logging.warning("positive_base_prompt_dictまたはWeapon Typeキーが見つかりません")
+                    logging.warning("武器タイプ情報が見つかりませんでした")
 
-            # 検証試行回数のカウンタ
-            validation_attempts = 0
+            # 画像生成開始をログに記録
+            logging.info(f"画像生成開始: {filename}")
+
+            # 武器検証が有効で武器タイプが指定されている場合の処理
             max_attempts = self.max_validation_attempts if self.enable_weapon_validation and weapon_type else 1
+            validation_attempts = 0
+            is_valid = False
+            validation_message = ""
 
-            while validation_attempts < max_attempts:
+            # 武器検証のための再試行ループ
+            while validation_attempts < max_attempts and not is_valid:
                 validation_attempts += 1
+                if validation_attempts > 1:
+                    logging.info(f"武器画像の検証に失敗したため、再生成を試みます（試行回数: {validation_attempts}/{max_attempts}）")
 
-            # 画像生成APIを呼び出し
-            response = requests.post(url=self.TEXT2IMG_URL, json=payload)
-
-            # 500エラーの場合は詳細情報を取得して表示
-            if response.status_code == 500:
-                logging.info(f"サーバーエラー (500): APIサーバーで内部エラーが発生しました")
-                logging.info(f"透過画像生成に失敗した可能性があります。別のモードで試してください。")
-                # エラー詳細を表示
+                # 画像生成APIを呼び出す
                 try:
-                    error_content = response.json()
-                    logging.info(f"エラーの詳細情報: {json.dumps(error_content, indent=2, ensure_ascii=False)}")
-                except json.JSONDecodeError:
-                    logging.info(f"エラーレスポンス (テキスト形式): {response.text}")
-                # プログラムを終了
-                import sys
-                sys.exit(1)
-
-            response.raise_for_status()
-
-            # レスポンスからJSONデータを取得
-            r = response.json()
-
-            # 画像処理用の変数を初期化
-            images_processed_count = 0
-            seed_value = 0
-            parameters = ""
-            self.current_parameters = ""  # 現在のパラメータをクラス変数に保存
-
-            # 生成された画像を処理
-            for i, image_data in enumerate(r['images']):
-                images_processed_count += 1
-                # Base64エンコードされた画像データをデコード
-                image = Image.open(io.BytesIO(base64.b64decode(image_data.split(",", 1)[0])))
-
-                # 透過画像生成時は最初の１つ目の r['images'] にのみ PNG 画像情報があるので、そこから各種値を取得
-                if seed_value == 0:
+                    # 正しいエンドポイントを使用
+                    response = requests.post(url=self.TXT2IMG_URL, json=payload)
+                    response.raise_for_status()
+                except requests.exceptions.HTTPError as e:
+                    self.logger.error(f"画像生成中にエラーが発生しました: {e}")
+                    self.logger.error(f"HTTPエラー: {e}")
                     try:
-                        png_payload = {
-                            "image": "data:image/png;base64," + image_data
-                        }
-                        response2 = requests.post(url=self.PNGINFO_URL, json=png_payload)
-                        response2.raise_for_status()
+                        error_detail = response.json()
+                        self.logger.error(f"サーバーからのエラー詳細: {json.dumps(error_detail, indent=2, ensure_ascii=False)}")
+                    except:
+                        self.logger.error("サーバーからのエラー詳細を取得できませんでした")
+                    raise
 
-                        # PNGInfoを取得
-                        info_text = response2.json().get("info", "")
-                        logging.info(f"取得したPNGInfo: {info_text[:200]}...")  # 最初の200文字だけログに出力
+                # レスポンスからJSONデータを取得
+                r = response.json()
 
-                        # パラメータを保存
-                        parameters = info_text
-                        self.current_parameters = info_text  # 現在のパラメータをクラス変数に保存
+                # 画像処理用の変数を初期化
+                images_processed_count = 0
+                seed_value = 0
+                parameters = ""
+                self.current_parameters = ""  # 現在のパラメータをクラス変数に保存
 
-                        # PNGInfoを解析（先頭に「Prompt:」はない前提）
-                        lines = info_text.split('\n')
-                        self.current_png_info = {}
+                # 生成された画像を処理
+                for i, image_data in enumerate(r['images']):
+                    images_processed_count += 1
+                    # Base64エンコードされた画像データをデコード
+                    image = Image.open(io.BytesIO(base64.b64decode(image_data.split(",", 1)[0])))
 
-                        # 最初の行をプロンプトとして扱う
-                        if lines:
-                            prompt_line = lines[0].strip()
-                            self.current_png_info["prompt"] = prompt_line
-                            logging.info(f"最初の行からプロンプトを抽出しました: {prompt_line[:100]}...")
-
-                        # Negative promptを探す
-                        for i, line in enumerate(lines):
-                            if line.startswith("Negative prompt:"):
-                                negative_prompt = line[len("Negative prompt:"):].strip()
-                                self.current_png_info["negative_prompt"] = negative_prompt
-                                logging.info(f"Negative promptを抽出しました: {negative_prompt[:100]}...")
-                                break
-
-                        # Seedを探す
-                        seed_match = re.search(r"Seed:\s*(\d+)", info_text)
-                        if seed_match:
-                            seed_value = int(seed_match.group(1))
-                            self.current_png_info["seed"] = seed_value
-                            self.current_seed = seed_value
-                            logging.info(f"シード値を抽出しました: {seed_value}")
-                        else:
-                            logging.warning("Seedが見つかりませんでした。")
-
-                        # その他の情報を抽出
-                        for param in ["Steps", "Sampler", "CFG scale", "Size", "Model"]:
-                            param_match = re.search(rf"{param}:\s*([^,]+)", info_text)
-                            if param_match:
-                                self.current_png_info[param.lower().replace(" ", "_")] = param_match.group(1).strip()
-
-                        # デバッグ用に抽出結果をログ出力
-                        logging.info(f"PNGInfo解析結果: {json.dumps(self.current_png_info, ensure_ascii=False)[:200]}...")
-
-                        # 注: 元のプロンプト辞書をそのまま使用するため、_update_prompt_dicts_from_actual_promptメソッドの呼び出しを削除
-                    except Exception as e:
-                        logging.error(f"PNGInfo取得中にエラーが発生しました: {e}")
-                        # エラーが発生しても処理を続行
-
-                # 透過画像生成時は３つ目の画像のみを保存するため、１つ目と２つ目はスキップ
-                if self.IS_TRANSPARENT_BACKGROUND and images_processed_count != 3:
-                    continue
-
-                # 画像のメタデータを設定
-                pnginfo = PngImagePlugin.PngInfo()
-                pnginfo.add_text("parameters", parameters)
-
-                # 画像ファイルパスを生成
-                image_path = os.path.normpath(os.path.join(output_folder_path, filename + self.IMAGE_FILE_EXTENSION))
-
-                # 画像を保存
-                image.save(image_path, pnginfo=pnginfo)
-
-                # 画像をJPG形式でも保存
-                jpg_file_path = os.path.normpath(os.path.join(output_folder_path, filename + ".jpg"))
-                image.convert("RGB").save(jpg_file_path, format="JPEG")
-
-                # 武器画像の検証（RPGアイコンの武器カテゴリの場合のみ）
-                if self.enable_weapon_validation and weapon_type and self.style == "illustration" and self.category == "rpg_icon" and self.subcategory == "weapon":
-                    logging.info(f"武器画像の検証を実行します: {image_path}, 武器タイプ: {weapon_type}")
-                    is_valid, validation_message = self.weapon_validator.validate_weapon_image(image_path, weapon_type)
-
-                    if not is_valid and validation_attempts < max_attempts:
-                        logging.warning(f"武器画像の検証に失敗しました ({validation_attempts}/{max_attempts}): {validation_message}")
-                        logging.info(f"別のシード値で再生成を試みます...")
-
-                        # シード値を変更して再試行
-                        new_seed = random.randint(1, 4294967295)
-                        payload["seed"] = new_seed
-                        logging.info(f"新しいシード値: {new_seed}")
-
-                        # 一時ファイルを削除
+                    # 透過画像生成時は最初の１つ目の r['images'] にのみ PNG 画像情報があるので、そこから各種値を取得
+                    if seed_value == 0:
                         try:
-                            os.remove(image_path)
-                            os.remove(jpg_file_path)
-                            logging.info(f"一時ファイルを削除しました: {image_path}, {jpg_file_path}")
+                            png_payload = {
+                                "image": "data:image/png;base64," + image_data
+                            }
+                            response2 = requests.post(url=self.PNGINFO_URL, json=png_payload)
+                            response2.raise_for_status()
+
+                            # PNGInfoを取得
+                            info_text = response2.json().get("info", "")
+                            logging.info(f"取得したPNGInfo: {info_text[:200]}...")  # 最初の200文字だけログに出力
+
+                            # パラメータを保存
+                            parameters = info_text
+                            self.current_parameters = info_text  # 現在のパラメータをクラス変数に保存
+
+                            # PNGInfoを解析（先頭に「Prompt:」はない前提）
+                            lines = info_text.split('\n')
+                            self.current_png_info = {}
+
+                            # 最初の行をプロンプトとして扱う
+                            if lines:
+                                prompt_line = lines[0].strip()
+                                self.current_png_info["prompt"] = prompt_line
+                                logging.info(f"最初の行からプロンプトを抽出しました: {prompt_line[:100]}...")
+
+                            # 残りの行をパラメータとして解析
+                            for line in lines[1:]:
+                                if ":" in line:
+                                    key, value = line.split(":", 1)
+                                    key = key.strip()
+                                    value = value.strip()
+                                    self.current_png_info[key] = value
+
+                                    # Seed値を取得
+                                    if key.lower() == "seed":
+                                        try:
+                                            seed_value = int(value)
+                                            logging.info(f"Seed値を抽出しました: {seed_value}")
+                                        except ValueError:
+                                            logging.warning(f"Seed値の変換に失敗しました: {value}")
                         except Exception as e:
-                            logging.error(f"一時ファイルの削除中にエラーが発生しました: {e}")
+                            logging.error(f"PNG情報の取得中にエラーが発生しました: {e}")
 
-                        # ループを継続して再生成
-                        break
+                    # 透過画像生成時は３つ目の画像のみを保存するため、１つ目と２つ目はスキップ
+                    if self.IS_TRANSPARENT_BACKGROUND and images_processed_count != 3:
+                        continue
+
+                    # 画像のメタデータを設定
+                    pnginfo = PngImagePlugin.PngInfo()
+                    pnginfo.add_text("parameters", parameters)
+
+                    # 画像ファイルパスを生成
+                    image_path = os.path.normpath(os.path.join(output_folder_path, filename + self.IMAGE_FILE_EXTENSION))
+
+                    # 画像を保存
+                    image.save(image_path, pnginfo=pnginfo)
+
+                    # 画像をJPG形式でも保存
+                    jpg_file_path = os.path.normpath(os.path.join(output_folder_path, filename + ".jpg"))
+                    image.convert("RGB").save(jpg_file_path, format="JPEG")
+
+                    # 結果を辞書に追加
+                    result_images[filename] = {
+                        "path": image_path,
+                        "seed": seed_value,
+                        "parameters": parameters
+                    }
+
+                    # 武器検証が有効で武器タイプが指定されている場合は検証を実行
+                    if self.enable_weapon_validation and weapon_type:
+                        try:
+                            # 武器画像検証用のAPIを呼び出す
+                            validation_url = f"{self.URL.replace('/sdapi/v1/txt2img', '')}/weapon_validation"
+                            validation_payload = {
+                                "image": "data:image/png;base64," + image_data,
+                                "weapon_type": weapon_type
+                            }
+                            validation_response = requests.post(url=validation_url, json=validation_payload)
+                            validation_response.raise_for_status()
+
+                            # 検証結果を取得
+                            validation_result = validation_response.json()
+                            is_valid = validation_result.get("is_valid", False)
+                            validation_message = validation_result.get("message", "検証結果が不明です")
+
+                            if is_valid:
+                                logging.info(f"武器画像の検証に成功しました: {validation_message}")
+                                break  # 検証に成功したらループを終了
+                            else:
+                                logging.warning(f"武器画像の検証に失敗しました: {validation_message}")
+                                # 検証に失敗した場合は再試行（ループ内で処理）
+                        except Exception as e:
+                            logging.error(f"武器画像の検証中にエラーが発生しました: {e}")
+                            is_valid = False  # エラーが発生した場合は検証失敗とみなす
                     else:
-                        if is_valid:
-                            logging.info(f"武器画像の検証に成功しました: {validation_message}")
-                        else:
-                            logging.warning(f"武器画像の検証に失敗しましたが、最大試行回数に達したため処理を続行します: {validation_message}")
-
-                # 関連画像（サムネイル、サンプル画像など）を生成
-                self.generate_related_images(image, output_folder_path, filename, pnginfo)
-
-                # prompt_infoから必要な情報を取得
-                positive_base_prompt_dict = prompt_info["positive_base_prompt_dict"]
-                positive_pose_prompt_dict = prompt_info["positive_pose_prompt_dict"]
-                positive_optional_prompt_dict = prompt_info["positive_optional_prompt_dict"]
-                negative_prompt_dict = prompt_info["negative_prompt_dict"]
-                cancel_prompts = prompt_info["cancel_prompts"]
-
-                # プロンプト情報をJSONファイルとして保存
-                self.save_prompts_to_json(
-                    positive_base_prompt_dict,
-                    positive_pose_prompt_dict,
-                    positive_optional_prompt_dict,
-                    negative_prompt_dict,
-                    output_folder_path,
-                    filename,
-                    cancel_prompts
-                )
-                logging.info(f"save_prompts_to_json filename: {filename}")
+                        is_valid = True  # 武器検証が無効または武器タイプが指定されていない場合は常に成功とみなす
+                        validation_message = "武器検証は実行されませんでした"
 
                 # 検証に成功したか最大試行回数に達した場合はループを終了
-                return
+                if is_valid or validation_attempts >= max_attempts:
+                    break
 
-            # 最大試行回数に達した場合のログ
-            if weapon_type and validation_attempts >= max_attempts:
-                logging.warning(f"最大試行回数 ({max_attempts}) に達しました。最後に生成された画像を使用します。")
+            # 最終的な検証結果をログに出力
+            if self.enable_weapon_validation and weapon_type:
+                if is_valid:
+                    logging.info(f"武器画像の検証に成功しました: {validation_message}")
+                else:
+                    logging.warning(f"武器画像の検証に失敗しましたが、最大試行回数に達したため処理を続行します: {validation_message}")
+
+            # 関連画像（サムネイル、サンプル画像など）を生成
+            self.generate_related_images(image, output_folder_path, filename, pnginfo)
+
+            # prompt_infoから必要な情報を取得
+            positive_base_prompt_dict = prompt_info["positive_base_prompt_dict"]
+            positive_pose_prompt_dict = prompt_info["positive_pose_prompt_dict"]
+            positive_optional_prompt_dict = prompt_info["positive_optional_prompt_dict"]
+            negative_prompt_dict = prompt_info["negative_prompt_dict"]
+            cancel_prompts = prompt_info["cancel_prompts"]
+
+            # プロンプト情報をJSONファイルとして保存
+            self.save_prompts_to_json(
+                positive_base_prompt_dict,
+                positive_pose_prompt_dict,
+                positive_optional_prompt_dict,
+                negative_prompt_dict,
+                output_folder_path,
+                filename,
+                cancel_prompts
+            )
+
+            # 画像生成完了をログに記録
+            logging.info(f"画像生成完了: {filename}")
+
+            # 検証に成功したか最大試行回数に達した場合はループを終了
+            return
 
         except Exception as e:
             logging.error(f"画像生成中にエラーが発生しました: {e}")
@@ -1592,39 +1624,60 @@ class AutoImageGenerator:
         """
         # 画像サイズが指定されていない場合は、デフォルト値を設定
         if not self.width or not self.height:
-            if self.style == "realistic":
-                if self.category == "female":
-                    if self.IS_TRANSPARENT_BACKGROUND:
+            # モデルに基づいて画像サイズを設定
+            model_name = self._select_model_by_image_type()
+
+            if model_name == "animagineXL":
+                # animagineXLモデルの場合
+                if self.IS_TRANSPARENT_BACKGROUND:
+                    self.width = 768
+                    self.height = 1024
+                else:
+                    self.width = 768
+                    self.height = 1024
+            elif model_name == "yayoiMix":
+                # yayoiMixモデルの場合
+                if self.IS_TRANSPARENT_BACKGROUND:
+                    self.width = 768
+                    self.height = 1024
+                else:
+                    self.width = 768
+                    self.height = 1024
+            else:
+                # その他のモデルの場合
+                if self.style == "realistic":
+                    if self.category == "female":
+                        if self.IS_TRANSPARENT_BACKGROUND:
+                            self.width = 512
+                            self.height = 768
+                        else:
+                            self.width = 512
+                            self.height = 768
+                    elif self.category == "male":
+                        if self.IS_TRANSPARENT_BACKGROUND:
+                            self.width = 512
+                            self.height = 768
+                        else:
+                            self.width = 512
+                            self.height = 768
+                elif self.style == "illustration":
+                    if self.category == "female":
+                        if self.IS_TRANSPARENT_BACKGROUND:
+                            self.width = 512
+                            self.height = 768
+                        else:
+                            self.width = 512
+                            self.height = 768
+                    elif self.category == "male":
+                        if self.IS_TRANSPARENT_BACKGROUND:
+                            self.width = 512
+                            self.height = 768
+                        else:
+                            self.width = 512
+                            self.height = 768
+                    elif self.category == "rpg_icon":
                         self.width = 512
-                        self.height = 768
-                    else:
-                        self.width = 512
-                        self.height = 768
-                elif self.category == "male":
-                    if self.IS_TRANSPARENT_BACKGROUND:
-                        self.width = 512
-                        self.height = 768
-                    else:
-                        self.width = 512
-                        self.height = 768
-            elif self.style == "illustration":
-                if self.category == "female":
-                    if self.IS_TRANSPARENT_BACKGROUND:
-                        self.width = 512
-                        self.height = 768
-                    else:
-                        self.width = 512
-                        self.height = 768
-                elif self.category == "male":
-                    if self.IS_TRANSPARENT_BACKGROUND:
-                        self.width = 512
-                        self.height = 768
-                    else:
-                        self.width = 512
-                        self.height = 768
-                elif self.category == "rpg_icon":
-                    self.width = 512
-                    self.height = 512
+                        self.height = 512
 
         logging.info(f"画像サイズを設定しました: {self.width}x{self.height}")
 

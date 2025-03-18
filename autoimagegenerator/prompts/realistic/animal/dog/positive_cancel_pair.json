@@ -1,0 +1,68 @@
+{
+  "in water": [
+    "on sofa",
+    "on bed",
+    "on chair",
+    "on floor",
+    "in house",
+    "in apartment",
+    "in living room",
+    "in bedroom",
+    "in kitchen"
+  ],
+  "in snow": [
+    "in house",
+    "in apartment",
+    "in living room",
+    "in bedroom",
+    "in kitchen",
+    "on sofa",
+    "on bed",
+    "on chair"
+  ],
+  "in rain": [
+    "in house",
+    "in apartment",
+    "in living room",
+    "in bedroom",
+    "in kitchen",
+    "on sofa",
+    "on bed",
+    "on chair"
+  ],
+  "swimming": [
+    "on sofa",
+    "on bed",
+    "on chair",
+    "on floor",
+    "in house",
+    "in apartment",
+    "in living room",
+    "in bedroom",
+    "in kitchen",
+    "in car"
+  ],
+  "in car": [
+    "swimming",
+    "digging",
+    "in forest",
+    "in meadow",
+    "in park",
+    "on beach",
+    "by lake",
+    "by river"
+  ],
+  "chihuahua": [
+    "swimming",
+    "carrying stick in mouth",
+    "carrying toy in mouth",
+    "with stick",
+    "with bone",
+    "with frisbee"
+  ],
+  "dachshund": [
+    "jumping",
+    "mid-jump",
+    "climbing"
+  ]
+}

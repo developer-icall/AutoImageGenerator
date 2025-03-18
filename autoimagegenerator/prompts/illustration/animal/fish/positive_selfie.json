@@ -1,0 +1,14 @@
+{
+  "Selfie": {
+    "prompts": [
+      "fish looking at camera",
+      "fish close to camera",
+      "fish facing camera",
+      "fish with face near camera",
+      "fish selfie",
+      "fish with mouth open at camera"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  }
+}

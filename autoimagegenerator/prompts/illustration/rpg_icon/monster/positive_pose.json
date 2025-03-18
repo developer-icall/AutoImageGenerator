@@ -12,10 +12,8 @@
       "defensive pose",
       "idle pose",
       "alert pose",
-      "sleeping pose",
       "resting pose",
       "eating pose",
-      "drinking pose",
       "hunting pose",
       "stalking pose",
       "ambush pose",
@@ -28,7 +26,6 @@
       "grooming pose",
       "playing pose",
       "building pose",
-      "crafting pose",
       "casting spell pose",
       "praying pose"
     ],

@@ -1,0 +1,12 @@
+{
+  "Selfie": {
+    "prompts": [
+      "bird looking at camera",
+      "bird close to camera",
+      "bird facing camera",
+      "bird with head tilted at camera"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  }
+}

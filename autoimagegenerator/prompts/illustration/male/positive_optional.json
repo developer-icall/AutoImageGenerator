@@ -94,8 +94,8 @@
     "use min prompts": 0
   },
   "Camera Settings": {
-    "prompts": ["(depth of field, blurry:1.4)", "f/ 1. 8"],
-    "use max prompts": 1,
+    "prompts": ["(depth of field, blurry:1.4)"],
+    "use max prompts": 0,
     "use min prompts": 0
   },
   "Place": {

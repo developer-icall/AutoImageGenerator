@@ -1,7 +1,7 @@
 {
   "Base Positive Prompt": {
     "prompts": [
-      "(8k, RAW photo, best quality, masterpiece:1.2), (1girl:1.3), (looking at viewer:1.4), ultra detailed, ultra high res, (realistic, photo realistic:1.4), high detail RAW color photo"
+      "(best quality, masterpiece:1.2), (1girl:1.3), (looking at viewer:1.4), (illustration:1.4)"
     ],
     "use max prompts": 1,
     "use min prompts": 1

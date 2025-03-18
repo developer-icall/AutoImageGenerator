@@ -48,7 +48,9 @@
     "with armor",
     "with weapon",
     "with shield",
-    "with helmet"
+    "with helmet",
+    "with slime",
+    "howling"
   ],
   "elemental": [
     "with armor",
@@ -63,5 +65,18 @@
   "swimming pose": [
     "flying pose",
     "crawling pose"
+  ],
+  "mini boss": [
+    "colossal"
+  ],
+  "underworld": [
+    "angel"
+  ],
+  "griffin": [
+    "with fur and mechanical parts",
+    "with wand"
+  ],
+  "griffon": [
+    "howling"
   ]
 }
