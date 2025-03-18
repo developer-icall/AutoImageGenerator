@@ -1150,8 +1150,18 @@ class AutoImageGenerator:
                     lora_settings = LORA_SETTINGS[self.LORA_NAME]
                     trigger_word = lora_settings.get("trigger_word", "")
                     if trigger_word:
-                        # トリガーワードをpositive_base_prompt_dictに追加
-                        positive_base_prompt_dict["prompts"].append(trigger_word)
+                        # トリガーワードをBase Positive Promptカテゴリに追加
+                        if "Base Positive Prompt" not in positive_base_prompt_dict:
+                            positive_base_prompt_dict["Base Positive Prompt"] = {
+                                "prompts": [],
+                                "use_max_prompts": 1,
+                                "use_min_prompts": 1
+                            }
+                        positive_base_prompt_dict["Base Positive Prompt"]["prompts"].append(trigger_word)
+                        # プロンプトリストにも追加
+                        positive_prompts.append(trigger_word)
+                        # 最終的なプロンプトを更新
+                        positive_prompt = ", ".join(positive_prompts)
                         self.logger.info(f"LoRAトリガーワード '{trigger_word}' を追加しました")
             except ImportError as e:
                 self.logger.warning(f"警告: LoRA設定の取得中にエラーが発生しました: {e}")
