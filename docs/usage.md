@@ -28,6 +28,18 @@
 - `./autoimagegenerator/sample.settings.json` をコピーして `settings.json` を作成し、以下を設定します
   - `image_generate_batch_execute_count`: 何件の人物について画像を一括作成するか指定
   - `another_version_generate_count`: 同じ人物につき何件の画像を作成するか指定
+  - `lora_settings`: LoRAの設定を指定
+    ```json
+    {
+      "lora_settings": {
+        "cars-000008": {
+          "model": "sd_xl_base_1.0",
+          "weight": 0.7,
+          "trigger_word": "cars-000008"
+        }
+      }
+    }
+    ```
 
 ## コマンドライン引数の詳細
 
@@ -61,6 +73,11 @@
     - `bird`: 鳥
     - `fish`: 魚
     - `other`: その他
+  - 乗り物の場合:
+    - `car`: 車
+    - `ship`: 船
+    - `airplane`: 飛行機
+    - `other`: その他
   - その他のカテゴリーについては仕様書を参照
 
 - **--model**: 使用するモデル（デフォルトはカテゴリーに応じて自動選択）
@@ -72,10 +89,18 @@
   - `animagineXL`: イラストテイスト画像用モデル（animagineXL40_v4Opt.safetensors）
   - `yayoiMix`: リアルテイスト画像用モデル（yayoiMix_v25.safetensors）
   - `petPhotography`: ペット写真用モデル（petPhotographyAlbumOf_v10HomeEdition.safetensors）
+  - `sd_xl_base_1.0`: SDXL Base 1.0モデル（LoRA使用時）
 
 - **--enable-hr**: ハイレゾ画像生成の有効/無効
   - `true`: 有効（デフォルト）
   - `false`: 無効
+
+- **--use-lora**: LoRAを使用して画像を生成する（オプション）
+  - 指定時: LoRAを使用
+  - 未指定時: LoRAを使用しない
+
+- **--lora-name**: 使用するLoRAの名前
+  - `cars-000008`: 車のLoRA
 
 ## 使用例
 
@@ -162,3 +187,12 @@ python main.py --style realistic --category male --subcategory selfie --model ya
 
 # リアルテイストの男性の透過背景画像を生成（yayoiMixモデルを指定）
 python main.py --style realistic --category male --subcategory transparent --model yayoiMix
+
+# リアルテイストの車の画像を生成（SDXL Base 1.0モデルとLoRAを使用）
+python main.py --style realistic --category vehicle --subcategory car --use-lora --lora-name cars-000008
+
+# イラストテイストの車の画像を生成（animagineXLモデルを指定）
+python main.py --style illustration --category vehicle --subcategory car --model animagineXL
+
+# リアルテイストの車の画像を生成（SDXL Base 1.0モデルとLoRAを使用、モデルを明示的に指定）
+python main.py --style realistic --category vehicle --subcategory car --use-lora --lora-name cars-000008 --model sd_xl_base_1.0
