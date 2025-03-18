@@ -32,9 +32,14 @@
   ],
   "kraken": [
     "tiny",
-    "small"
+    "small",
+    "with wand"
   ],
   "hydra": [
+    "tiny",
+    "small"
+  ],
+  "boss": [
     "tiny",
     "small"
   ],

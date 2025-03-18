@@ -35,7 +35,6 @@
       "turkish angora",
       "egyptian mau",
       "somali cat",
-      "tonkinese cat",
       "balinese cat",
       "japanese bobtail",
       "manx cat",
@@ -108,18 +107,16 @@
       "scratching",
       "kneading"
     ],
-    "use_max_prompts": 1,
+    "use_max_prompts": 0,
     "use_min_prompts": 0
   },
   "Art Style": {
     "prompts": [
       "anime style",
-      "cartoon style",
       "watercolor style",
       "digital art",
       "oil painting style",
       "pencil sketch style",
-      "vector art style",
       "realistic illustration",
       "stylized illustration",
       "minimalist style",
@@ -128,12 +125,11 @@
       "comic book style",
       "stained glass style",
       "woodcut style",
-      "pop art style",
       "art nouveau style",
       "impressionist style",
       "ukiyo-e style"
     ],
-    "use_max_prompts": 1,
-    "use_min_prompts": 1
+    "use_max_prompts": 0,
+    "use_min_prompts": 0
   }
 }

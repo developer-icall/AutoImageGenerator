@@ -99,15 +99,7 @@
       "with dog boots",
       "with dog hat",
       "with flowers",
-      "with plants",
-      "with butterfly",
-      "with bird",
-      "with squirrel",
-      "with other dog",
-      "with cat",
-      "with human",
-      "with child",
-      "with family"
+      "with plants"
     ],
     "use_max_prompts": 1,
     "use_min_prompts": 0
