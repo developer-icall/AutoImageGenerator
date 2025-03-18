@@ -173,8 +173,8 @@ class AutoImageGenerator:
                     self.logger.info(f"デフォルトモデル {self.SD_MODEL_CHECKPOINT} を使用します")
 
         # 画像サイズを設定
-        self.width = width
-        self.height = height
+        self.width = width if width is not None else 768  # デフォルト値を設定
+        self.height = height if height is not None else 768  # デフォルト値を設定
         self._set_image_size_by_type()
 
         # 共通のpayload設定を定義
@@ -1150,16 +1150,8 @@ class AutoImageGenerator:
                     lora_settings = LORA_SETTINGS[self.LORA_NAME]
                     trigger_word = lora_settings.get("trigger_word", "")
                     if trigger_word:
-                        # トリガーワードをBase Positive Promptカテゴリに追加
-                        if "Base Positive Prompt" not in positive_base_prompt_dict:
-                            positive_base_prompt_dict["Base Positive Prompt"] = {
-                                "prompts": [],
-                                "use_max_prompts": 1,
-                                "use_min_prompts": 1
-                            }
-                        positive_base_prompt_dict["Base Positive Prompt"]["prompts"].append(trigger_word)
-                        # プロンプトリストにも追加
-                        positive_prompts.append(trigger_word)
+                        # トリガーワードを直接プロンプトリストに追加
+                        positive_prompts.insert(0, trigger_word)  # 先頭に追加
                         # 最終的なプロンプトを更新
                         positive_prompt = ", ".join(positive_prompts)
                         self.logger.info(f"LoRAトリガーワード '{trigger_word}' を追加しました")
@@ -1809,6 +1801,10 @@ class AutoImageGenerator:
                 # petPhotographyモデルの場合
                 self.width = 512
                 self.height = 512
+            elif model_name == "sd_xl_base_1.0":
+                # SDXL Base 1.0モデルの場合
+                self.width = 1024
+                self.height = 768
             else:
                 # その他のモデルの場合
                 if self.style == "realistic":
@@ -1830,6 +1826,10 @@ class AutoImageGenerator:
                         # 動物の場合は正方形の画像を生成
                         self.width = 512
                         self.height = 512
+                    elif self.category == "vehicle":
+                        # 車の場合は横長の画像を生成
+                        self.width = 1024
+                        self.height = 768
                 elif self.style == "illustration":
                     if self.category == "female":
                         if self.IS_TRANSPARENT_BACKGROUND:
@@ -1849,6 +1849,10 @@ class AutoImageGenerator:
                         # 動物の場合は正方形の画像を生成
                         self.width = 512
                         self.height = 512
+                    elif self.category == "vehicle":
+                        # 車の場合は横長の画像を生成
+                        self.width = 1024
+                        self.height = 768
 
         logging.info(f"画像サイズを設定しました: {self.width}x{self.height}")
 

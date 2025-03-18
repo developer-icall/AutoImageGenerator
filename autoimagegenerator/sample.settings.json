@@ -5,7 +5,8 @@
         "realistic": {
             "female": {"width": 512, "height": 768},
             "male": {"width": 512, "height": 768},
-            "animal": {"width": 512, "height": 768}
+            "animal": {"width": 512, "height": 768},
+            "vehicle": {"width": 768, "height": 512}
         },
         "illustration": {
             "female": {"width": 512, "height": 768},
