@@ -28,7 +28,7 @@
   "camisole": ["woman with left hand in pockets"],
   "lingerie": ["woman with left hand in pockets"],
   "T-shirt": ["woman with left hand in pockets", "selfie"],
-  "selfie": ["from above"],
+  "selfie": ["from above", "fashion model posing"],
   "v-neck sweater": ["woman with left hand in pockets"],
   "woman with left hand in pockets": [
     "white summer wear",
