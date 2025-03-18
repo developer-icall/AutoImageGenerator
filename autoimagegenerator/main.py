@@ -73,7 +73,7 @@ LORA_SETTINGS = {
     "cars-000008": {
         "model": "sd_xl_base_1.0",
         "weight": 0.7,
-        "trigger_word": "cars-000008"
+        "trigger_word": "aw0k car"
     }
 }
 
