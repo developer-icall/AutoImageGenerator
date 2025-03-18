@@ -255,8 +255,16 @@ class AutoImageGenerator:
                 self.DATA_POSITIVE_POSE = json.load(file)
             with open(os.path.join(self.PROMPT_PATH, self.POSITIVE_PROMPT_OPTIONAL_FILENAME), 'r', encoding='utf-8') as file:
                 self.DATA_POSITIVE_OPTIONAL = json.load(file)
-            with open(os.path.join(self.PROMPT_PATH, self.POSITIVE_PROMPT_SELFIE_FILENAME), 'r', encoding='utf-8') as file:
-                self.DATA_POSITIVE_SELFIE = json.load(file)
+
+            # 動物カテゴリーの場合はセルフィープロンプトをスキップ
+            if self.category != "animal":
+                with open(os.path.join(self.PROMPT_PATH, self.POSITIVE_PROMPT_SELFIE_FILENAME), 'r', encoding='utf-8') as file:
+                    self.DATA_POSITIVE_SELFIE = json.load(file)
+            else:
+                # 動物カテゴリーの場合は空の辞書を設定
+                self.DATA_POSITIVE_SELFIE = {}
+                self.logger.info("動物カテゴリーのため、セルフィープロンプトをスキップします")
+
             with open(os.path.join(self.PROMPT_PATH, self.NEGATIVE_PROMPT_FILENAME), 'r', encoding='utf-8') as file:
                 self.DATA_NEGATIVE = json.load(file)
             with open(os.path.join(self.PROMPT_PATH, self.POSITIVE_PROMPT_CANCEL_PAIR_FILENAME), 'r', encoding='utf-8') as file:
@@ -846,7 +854,10 @@ class AutoImageGenerator:
                     return self.SD_MODEL_PREFIX
             elif self.category == "animal":
                 # 動物の場合はyayoiMixを使用
-                return "yayoiMix"
+                if self.SD_MODEL_PREFIX == "petPhotography":
+                    return "petPhotography"  # petPhotographyが指定されている場合はそれを使用
+                else:
+                    return "yayoiMix"
 
         # イラスト風画像の場合
         elif self.style == "illustration":
@@ -1272,6 +1283,10 @@ class AutoImageGenerator:
             "seed": seed,
         }
 
+        # 最新の画像サイズを使用するように更新
+        payload["width"] = self.width
+        payload["height"] = self.height
+
         # 透過背景の場合は設定を変更
         if self.IS_TRANSPARENT_BACKGROUND:
             try:
@@ -1643,6 +1658,10 @@ class AutoImageGenerator:
                 else:
                     self.width = 768
                     self.height = 1024
+            elif model_name == "petPhotography":
+                # petPhotographyモデルの場合
+                self.width = 512
+                self.height = 512
             else:
                 # その他のモデルの場合
                 if self.style == "realistic":
@@ -1660,6 +1679,10 @@ class AutoImageGenerator:
                         else:
                             self.width = 512
                             self.height = 768
+                    elif self.category == "animal":
+                        # 動物の場合は正方形の画像を生成
+                        self.width = 512
+                        self.height = 512
                 elif self.style == "illustration":
                     if self.category == "female":
                         if self.IS_TRANSPARENT_BACKGROUND:
@@ -1675,11 +1698,18 @@ class AutoImageGenerator:
                         else:
                             self.width = 512
                             self.height = 768
-                    elif self.category == "rpg_icon":
+                    elif self.category == "animal":
+                        # 動物の場合は正方形の画像を生成
                         self.width = 512
                         self.height = 512
 
         logging.info(f"画像サイズを設定しました: {self.width}x{self.height}")
+
+        # COMMON_PAYLOAD_SETTINGSを更新
+        if hasattr(self, 'COMMON_PAYLOAD_SETTINGS'):
+            self.COMMON_PAYLOAD_SETTINGS["width"] = self.width
+            self.COMMON_PAYLOAD_SETTINGS["height"] = self.height
+            logging.info(f"COMMON_PAYLOAD_SETTINGSの画像サイズを更新しました: {self.width}x{self.height}")
 
     def _parse_png_info(self, info_text):
         """

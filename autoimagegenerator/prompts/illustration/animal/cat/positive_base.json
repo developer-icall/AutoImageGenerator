@@ -1,7 +1,7 @@
 {
   "Base Positive Prompt": {
     "prompts": [
-      "(8k, best quality, masterpiece:1.2), (illustration:1.4), (cat:1.5), (detailed fur:1.3)"
+      "(best quality), (illustration:1.4), (a cat:1.5)"
     ],
     "use_max_prompts": 1,
     "use_min_prompts": 1
@@ -35,7 +35,6 @@
       "turkish angora",
       "egyptian mau",
       "somali cat",
-      "tonkinese cat",
       "balinese cat",
       "japanese bobtail",
       "manx cat",
@@ -126,7 +125,6 @@
       "fantasy art style",
       "children's book illustration style",
       "comic book style",
-      "pixel art style",
       "stained glass style",
       "woodcut style",
       "pop art style",
