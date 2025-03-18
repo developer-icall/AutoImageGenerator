@@ -35,12 +35,18 @@ class AutoImageGenerator:
         subcategory="normal",
         width=None,
         height=None,
-        use_custom_checkpoint=False
+        use_custom_checkpoint=False,
+        use_lora=False,
+        lora_name=None
     ):
         # モデル切り替えが実行済みかどうかを管理するフラグを追加
         self._model_switch_executed = False
         # 現在使用中のモデルを記録
         self._current_model = None
+
+        # LoRAの設定
+        self.USE_LORA = use_lora
+        self.LORA_NAME = lora_name
 
         # 画像タイプの設定を追加
         self.style = style
@@ -1135,6 +1141,31 @@ class AutoImageGenerator:
         # 特にWeapon Typeの情報をログに出力
         if "Weapon Type" in positive_base_prompt_dict:
             self.logger.info(f"Weapon Type情報: {json.dumps(positive_base_prompt_dict['Weapon Type'], indent=2, ensure_ascii=False)}")
+
+        # LoRAを使用する場合、トリガーワードを追加
+        if self.USE_LORA and self.LORA_NAME:
+            try:
+                from main import LORA_SETTINGS
+                if self.LORA_NAME in LORA_SETTINGS:
+                    lora_settings = LORA_SETTINGS[self.LORA_NAME]
+                    trigger_word = lora_settings.get("trigger_word", "")
+                    if trigger_word:
+                        # トリガーワードをpositive_base_prompt_dictに追加
+                        positive_base_prompt_dict["prompts"].append(trigger_word)
+                        self.logger.info(f"LoRAトリガーワード '{trigger_word}' を追加しました")
+            except ImportError as e:
+                self.logger.warning(f"警告: LoRA設定の取得中にエラーが発生しました: {e}")
+
+        # プロンプトの保存
+        self.save_prompts_to_json(
+            positive_base_prompt_dict,
+            positive_pose_prompt_dict,
+            positive_optional_prompt_dict,
+            negative_prompt_dict,
+            self.OUTPUT_FOLDER,
+            "prompts.json",
+            self.DATA_CANCEL_SEEDS
+        )
 
         return positive_prompt, negative_prompt, seed, prompt_info
 

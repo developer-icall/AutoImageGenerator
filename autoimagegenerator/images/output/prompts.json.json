@@ -1,0 +1,35 @@
+{
+    "sd_model": "petPhotographyAlbumOf_v10HomeEdition",
+    "sd_model_checkpoint": "petPhotographyAlbumOf_v10HomeEdition.safetensors",
+    "Pose": [
+        "curled up sleeping"
+    ],
+    "Head Position": [
+        "eyes narrowed"
+    ],
+    "Base Positive Prompt": [
+        "(best quality), (a cat:1.5)"
+    ],
+    "Cat Type": [
+        "ocicat"
+    ],
+    "Cat Color": [],
+    "Cat Action": [],
+    "Art Style": [],
+    "Environment": [],
+    "Lighting": [],
+    "Composition": [
+        "front view"
+    ],
+    "Additional Elements": [
+        "with blanket"
+    ],
+    "Mood": [],
+    "Base Negative Prompt": [
+        "((deformed)), ((disfigured)), ((poor details)), ((bad anatomy)), ((bad proportions)), ((poorly drawn)), ((extra limbs)), ((mutation)), ((mutated)), ((ugly)), ((disgusting)), ((blurry)), ((grainy)), ((human)), ((person)), ((people))"
+    ],
+    "cancel_prompts": {
+        "Seeds": []
+    },
+    "actual_prompt": "(a cat:1.5), (best quality), ocicat, washing face, pupils dilated, in forest, front view, with cat glasses"
+}

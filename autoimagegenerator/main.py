@@ -60,7 +60,17 @@ SD_MODEL_CHECKPOINTS = {
     "RPGIcon": "RPGIcon.safetensors",  # RPGIcon用モデル
     "animagineXL": "animagineXL40_v4Opt.safetensors",  # animagineXL40_v4Optモデル
     "yayoiMix": "yayoiMix_v25.safetensors",  # yayoiMix_v25モデル
-    "petPhotography": "petPhotographyAlbumOf_v10HomeEdition.safetensors"  # ペット写真用モデル
+    "petPhotography": "petPhotographyAlbumOf_v10HomeEdition.safetensors",  # ペット写真用モデル
+    "sd_xl_base_1.0": "sd_xl_base_1.0.safetensors"  # SDXL Base 1.0モデル
+}
+
+# LoRAの設定
+LORA_SETTINGS = {
+    "cars-000008": {
+        "model": "sd_xl_base_1.0",
+        "weight": 0.7,
+        "trigger_word": "cars-000008"
+    }
 }
 
 SD_MODEL_SCRITPS = {
@@ -93,10 +103,12 @@ def validate_image_type(style, category, subcategory):
     """画像タイプの組み合わせが有効かチェック"""
     # スタイルが有効かチェック
     if style not in IMAGE_STYLES:
+        print(f"エラー: 無効なスタイル '{style}' が指定されました")
         return False
 
     # カテゴリーが有効かチェック
     if category not in IMAGE_STYLES[style]:
+        print(f"エラー: 無効なカテゴリー '{category}' が指定されました")
         return False
 
     # サブカテゴリーが指定されている場合のみチェック
@@ -105,8 +117,12 @@ def validate_image_type(style, category, subcategory):
         if "types" not in IMAGE_STYLES[style][category]:
             return True
 
-        # サブカテゴリーが定義されたリストにない場合でも、
-        # auto_image_generator.pyで対応するようになったので有効とする
+        # サブカテゴリーが定義されたリストにない場合はエラー
+        if subcategory not in IMAGE_STYLES[style][category]["types"]:
+            print(f"エラー: 無効なサブカテゴリー '{subcategory}' が指定されました")
+            print(f"有効なサブカテゴリー: {', '.join(IMAGE_STYLES[style][category]['types'])}")
+            return False
+
         return True
 
     return True
@@ -118,8 +134,12 @@ def get_output_folder_prefix(args):
         prefix += f"/{args.subcategory}"
     return prefix
 
-def get_default_model(category):
+def get_default_model(category, use_lora=False, lora_name=None):
     """カテゴリーに基づいてデフォルトのモデルを返す"""
+    # LoRAを使用する場合、LoRAの設定から適切なモデルを選択
+    if use_lora and lora_name and lora_name in LORA_SETTINGS:
+        return LORA_SETTINGS[lora_name]["model"]
+
     if category == "male":
         return "brav7_men"
     elif category == "rpg_icon":
@@ -160,6 +180,10 @@ def main():
                         help='画像の幅 (デフォルトは画像タイプに応じて自動設定)')
     parser.add_argument('--height', type=int,
                         help='画像の高さ (デフォルトは画像タイプに応じて自動設定)')
+    parser.add_argument('--use-lora', action='store_true',
+                        help='LoRAを使用して画像を生成する')
+    parser.add_argument('--lora-name',
+                        help='使用するLoRAの名前 (例: cars-000008)')
 
     args = parser.parse_args()
 
@@ -171,7 +195,7 @@ def main():
     # モデルの選択
     if not args.model:
         # カテゴリーに応じてデフォルトモデルを選択
-        model = get_default_model(args.category)
+        model = get_default_model(args.category, args.use_lora, args.lora_name)
     else:
         model = args.model
 
@@ -179,6 +203,17 @@ def main():
     if model not in SD_MODEL_CHECKPOINTS:
         print(f"エラー: 指定されたモデル '{model}' は存在しません")
         sys.exit(1)
+
+    # LoRAを使用する場合、LoRAの設定を確認
+    if args.use_lora:
+        if not args.lora_name:
+            print("エラー: LoRAを使用する場合は、--lora-nameオプションでLoRAの名前を指定してください")
+            sys.exit(1)
+        if args.lora_name not in LORA_SETTINGS:
+            print(f"エラー: 指定されたLoRA '{args.lora_name}' は存在しません")
+            sys.exit(1)
+        if LORA_SETTINGS[args.lora_name]["model"] != model:
+            print(f"警告: 指定されたモデル '{model}' は、LoRA '{args.lora_name}' の推奨モデル '{LORA_SETTINGS[args.lora_name]['model']}' と異なります")
 
     # モデルチェックポイントの選択
     if args.model_checkpoint:
@@ -250,7 +285,9 @@ def main():
         subcategory=args.subcategory,
         width=args.width,
         height=args.height,
-        use_custom_checkpoint=args.model_checkpoint is not None
+        use_custom_checkpoint=bool(args.model_checkpoint),
+        use_lora=args.use_lora,
+        lora_name=args.lora_name
     )
 
     # 画像生成の実行

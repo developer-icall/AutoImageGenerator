@@ -1,0 +1,34 @@
+{
+  "anime style": [
+    "realistic",
+    "photorealistic",
+    "concept art",
+    "vector art"
+  ],
+  "manga style": [
+    "realistic",
+    "photorealistic",
+    "vector art"
+  ],
+  "steampunk car": [
+    "futuristic",
+    "cyberpunk",
+    "neon",
+    "holographic",
+    "digital"
+  ],
+  "cyberpunk car": [
+    "steampunk",
+    "fantasy",
+    "magical"
+  ],
+  "in space": [
+    "on a rainbow road",
+    "in a steampunk city",
+    "on a floating road"
+  ],
+  "in a virtual reality": [
+    "post-apocalyptic",
+    "steampunk"
+  ]
+}

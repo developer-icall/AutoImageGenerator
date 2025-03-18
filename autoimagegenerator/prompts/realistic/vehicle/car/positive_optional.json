@@ -1,0 +1,65 @@
+{
+  "Environment": {
+    "prompts": [
+      "on a race track",
+      "in a showroom",
+      "on a mountain road",
+      "in a city street",
+      "in a parking lot",
+      "on a highway",
+      "in a garage",
+      "at sunset",
+      "at night",
+      "in the rain",
+      "in the snow",
+      "on a beach"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  },
+  "Lighting": {
+    "prompts": [
+      "studio lighting",
+      "natural lighting",
+      "dramatic lighting",
+      "soft lighting",
+      "golden hour lighting",
+      "blue hour lighting",
+      "neon lighting",
+      "spotlights"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  },
+  "Camera Settings": {
+    "prompts": [
+      "wide angle shot",
+      "front view",
+      "side view",
+      "3/4 view",
+      "rear view",
+      "low angle shot",
+      "high angle shot",
+      "close-up shot",
+      "bokeh background"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  },
+  "Additional Details": {
+    "prompts": [
+      "chrome wheels",
+      "custom rims",
+      "tinted windows",
+      "carbon fiber details",
+      "leather interior",
+      "sport exhaust",
+      "LED headlights",
+      "aerodynamic kit",
+      "racing stripes",
+      "custom paint job"
+    ],
+    "use_max_prompts": 2,
+    "use_min_prompts": 0
+  }
+}

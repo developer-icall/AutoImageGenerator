@@ -1,0 +1,9 @@
+{
+  "Base Negative Prompt": {
+    "prompts": [
+      "((worst quality, low quality, normal quality:1.4)), ((blurry:1.2)), ((grainy:1.2)), ((duplicate:1.2)), ((distorted:1.2)), ((deformed:1.2)), ((watermark:1.2)), ((signature:1.2)), ((text:1.2)), ((people:1.2)), ((person:1.2)), ((human:1.2)), ((cropped:1.2)), ((ugly:1.2)), ((bad anatomy:1.2)), ((bad proportions:1.2)), ((extra limbs:1.2)), ((disfigured:1.2)), ((out of frame:1.2)), ((extra wheels:1.2)), ((missing wheels:1.2)), ((double image:1.2)), ((multiple cars:1.2)), ((toy car:1.2)), ((model car:1.2)), ((cartoon:1.2)), ((anime:1.2)), ((illustration:1.2)), ((drawing:1.2)), ((painting:1.2)), ((artwork:1.2)), ((3d render:1.2)), ((cgi:1.2))"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  }
+}
