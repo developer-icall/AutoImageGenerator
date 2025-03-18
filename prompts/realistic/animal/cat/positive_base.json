@@ -16,38 +16,34 @@
     "use_max_prompts": 1,
     "use_min_prompts": 1
   },
-  "Dog Type": {
+  "Cat Type": {
     "prompts": [
-      "(labrador retriever:1.4)",
-      "(golden retriever:1.4)",
-      "(german shepherd:1.4)",
-      "(bulldog:1.4)",
-      "(beagle:1.4)",
-      "(poodle:1.4)",
-      "(siberian husky:1.4)",
-      "(chihuahua:1.4)",
-      "(shih tzu:1.4)",
-      "(border collie:1.4)",
-      "(dachshund:1.4)",
-      "(corgi:1.4)",
-      "(pomeranian:1.4)",
-      "(dalmatian:1.4)"
+      "(domestic cat:1.4)",
+      "(tabby cat:1.4)",
+      "(persian cat:1.4)",
+      "(siamese cat:1.4)",
+      "(maine coon cat:1.4)",
+      "(bengal cat:1.4)",
+      "(ragdoll cat:1.4)",
+      "(british shorthair cat:1.4)",
+      "(scottish fold cat:1.4)",
+      "(sphynx cat:1.4)"
     ],
     "use_max_prompts": 1,
     "use_min_prompts": 1
   },
-  "Dog Features": {
+  "Cat Features": {
     "prompts": [
       "fluffy fur",
       "short fur",
       "long fur",
-      "floppy ears",
-      "pointed ears",
-      "curly tail",
-      "straight tail",
-      "spotted coat",
+      "striped pattern",
+      "spotted pattern",
       "solid color",
-      "multicolored"
+      "multicolored",
+      "bright eyes",
+      "pointed ears",
+      "bushy tail"
     ],
     "use_max_prompts": 2,
     "use_min_prompts": 1

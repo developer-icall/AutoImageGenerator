@@ -17,7 +17,7 @@ IMAGE_STYLES = {
         },
         "animal": {
             "types": ["dog", "cat", "bird", "fish", "other"],
-            "models": ["yayoiMix"]  # yayoiMix_v25モデルを追加
+            "models": ["yayoiMix", "petPhotography"]  # petPhotographyモデルを追加
         }
     },
     "illustration": {
@@ -59,7 +59,8 @@ SD_MODEL_CHECKPOINTS = {
     "photoRealRPG": "photoRealV15_photorealv21.safetensors",  # photoRealV15_photorealv21モデル
     "RPGIcon": "RPGIcon.safetensors",  # RPGIcon用モデル
     "animagineXL": "animagineXL40_v4Opt.safetensors",  # animagineXL40_v4Optモデル
-    "yayoiMix": "yayoiMix_v25.safetensors"  # yayoiMix_v25モデル
+    "yayoiMix": "yayoiMix_v25.safetensors",  # yayoiMix_v25モデル
+    "petPhotography": "petPhotographyAlbumOf_v10HomeEdition.safetensors"  # ペット写真用モデル
 }
 
 SD_MODEL_SCRITPS = {
@@ -129,6 +130,9 @@ def get_default_model(category):
             return rpg_icon_model
         else:
             return "photoRealRPG"
+    elif category == "animal":
+        # 動物カテゴリーの場合はpetPhotographyモデルをデフォルトとして使用
+        return "petPhotography"
     else:
         return "brav6"
 

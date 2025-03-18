@@ -46,6 +46,7 @@
 - [生成画像フォルダ仕様](docs/folder_structure.md) - 出力ディレクトリ構造の説明
 - [プロンプト設定ファイル仕様](docs/prompt_settings.md) - プロンプト設定の詳細
 - [トラブルシューティング](docs/troubleshooting.md) - 一般的な問題と解決策
+- [petPhotographyモデルの使用ガイド](docs/pet_photography_guide.md) - ペット写真生成の詳細ガイド
 
 ## 使用例
 
@@ -58,11 +59,18 @@ python main.py --style realistic --category female --subcategory selfie
 
 # イラストテイストのRPGアイコンを生成
 python main.py --style illustration --category rpg_icon
+
+# リアルテイストの猫画像を生成（petPhotographyモデルを指定）
+python main.py --style realistic --category animal --subcategory cat --model petPhotography
+
+# リアルテイストの犬画像を生成（petPhotographyモデルを指定）
+python main.py --style realistic --category animal --subcategory dog --model petPhotography
 ```
 
 ## 必要なモデル
 
 - [Beautiful Realistic Asians - v7](https://civitai.com/models/25494/brabeautiful-realistic-asians-v2) - リアルな人物画像生成用モデル
+- [Pet Photography Album Of v10 Home Edition](https://civitai.com/models/90352/pet-photography-album-of) - リアルなペット写真生成用モデル
 
 ## ライセンス
 

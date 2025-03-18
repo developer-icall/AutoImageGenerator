@@ -71,6 +71,7 @@
   - `RPGIcon`: RPGIcon.safetensorsモデル
   - `animagineXL`: イラストテイスト画像用モデル（animagineXL40_v4Opt.safetensors）
   - `yayoiMix`: リアルテイスト画像用モデル（yayoiMix_v25.safetensors）
+  - `petPhotography`: ペット写真用モデル（petPhotographyAlbumOf_v10HomeEdition.safetensors）
 
 - **--enable-hr**: ハイレゾ画像生成の有効/無効
   - `true`: 有効（デフォルト）
@@ -119,6 +120,12 @@ python main.py --style realistic --category animal --subcategory bird --model ya
 
 # リアルテイストの動物（魚）画像を生成（yayoiMixモデルを指定）
 python main.py --style realistic --category animal --subcategory fish --model yayoiMix
+
+# リアルテイストの猫画像を生成（petPhotographyモデルを指定）
+python main.py --style realistic --category animal --subcategory cat --model petPhotography
+
+# リアルテイストの犬画像を生成（petPhotographyモデルを指定）
+python main.py --style realistic --category animal --subcategory dog --model petPhotography
 
 # イラストテイストの女性の通常画像を生成（animagineXLモデルを指定）
 python main.py --style illustration --category female --subcategory normal --model animagineXL

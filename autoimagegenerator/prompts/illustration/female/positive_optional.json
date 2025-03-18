@@ -35,7 +35,6 @@
       "ruffle dress",
       "short sleeves",
       "skirt",
-      "sleeveless top",
       "smock blouse",
       "sweater",
       "sweatshirt",
@@ -82,7 +81,7 @@
   },
   "Camera Settings": {
     "prompts": ["(depth of field, blurry:1.4)"],
-    "use max prompts": 1,
+    "use max prompts": 0,
     "use min prompts": 0
   },
   "Place": {
@@ -102,8 +101,7 @@
       "upper body",
       "close-up shot",
       "middle shot",
-      "from above",
-      "Three-Quarter Length shot"
+      "from above"
     ],
     "use max prompts": 1,
     "use min prompts": 0
