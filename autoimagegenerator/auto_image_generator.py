@@ -217,6 +217,10 @@ class AutoImageGenerator:
         self.TRANPARENT_PAYLOAD = {
             "script_name": "ABG Remover",
             "script_args": [False, True, False, 0, False]   # 背景除去スクリプトの引数(背景透過画像のみ保存, 自動保存, カスタム背景色使用, 背景色, ランダム背景色使用)
+            # 注意: ABG Removerを使用すると、3つの画像が生成されます:
+            # 1つ目：元の画像（PNGInfo付き）
+            # 2つ目：マスク画像
+            # 3つ目：透過背景画像（実際に使用する画像）
         }
         self.DATA_POSITIVE_BASE = None
         self.DATA_POSITIVE_OPTIONAL = None
@@ -1488,67 +1492,129 @@ class AutoImageGenerator:
                 # 生成された画像を処理
                 for i, image_data in enumerate(r['images']):
                     images_processed_count += 1
+                    logging.info(f"透過画像生成時の画像処理回数: {images_processed_count}")
                     # Base64エンコードされた画像データをデコード
                     image = Image.open(io.BytesIO(base64.b64decode(image_data.split(",", 1)[0])))
 
                     # 透過画像生成時は最初の１つ目の r['images'] にのみ PNG 画像情報があるので、そこから各種値を取得
-                    if seed_value == 0:
+                    # seed_value == 0 ではなく、最初の画像（images_processed_count == 1）から必ずPNGInfoを取得する
+                    if images_processed_count == 1:
                         try:
+                            # ABG Removerを使用した場合、最初の画像にのみPNGInfoが含まれているため、
+                            # ここで取得したPNGInfoを3つ目の透過画像用に保持する必要がある
                             png_payload = {
                                 "image": "data:image/png;base64," + image_data
                             }
+                            logging.info("最初の画像からPNGInfoを取得しています...")
+                            logging.info(f"PNGInfo APIエンドポイント: {self.PNGINFO_URL}")
+                            logging.info(f"PNGInfo APIペイロードの長さ: {len(json.dumps(png_payload))}")
+
+                            # リクエスト送信前にデータの先頭部分をログに記録
+                            image_data_preview = image_data[:100] + "..." if len(image_data) > 100 else image_data
+                            logging.info(f"画像データプレビュー: {image_data_preview}")
+
                             response2 = requests.post(url=self.PNGINFO_URL, json=png_payload)
+                            logging.info(f"PNGInfo APIステータスコード: {response2.status_code}")
                             response2.raise_for_status()
 
                             # PNGInfoを取得
                             info_text = response2.json().get("info", "")
-                            logging.info(f"取得したPNGInfo: {info_text[:200]}...")  # 最初の200文字だけログに出力
+                            if not info_text:
+                                logging.error("PNGInfoが空でした！レスポンス全体を確認します。")
+                                logging.error(f"PNGInfo API レスポンス: {json.dumps(response2.json(), indent=2, ensure_ascii=False)}")
+
+                                # PNGInfoが空の場合、元のプロンプト情報からデフォルトのPNGInfoを生成
+                                # payloadから直接情報を取得
+                                # 元のプロンプトとネガティブプロンプトを取得
+                                positive_prompt = payload.get("prompt", "")
+                                negative_prompt = payload.get("negative_prompt", "")
+                                seed = payload.get("seed", 0)
+
+                                # デフォルトのPNGInfo文字列を生成
+                                info_text = (
+                                    f"{positive_prompt}\n"
+                                    f"Negative prompt: {negative_prompt}\n"
+                                    f"Steps: {payload.get('steps', 60)}, "
+                                    f"Sampler: {payload.get('sampler_name', 'DPM++ 2M')}, "
+                                    f"CFG scale: {payload.get('cfg_scale', 7)}, "
+                                    f"Seed: {seed}, "
+                                    f"Size: {payload.get('width', 512)}x{payload.get('height', 768)}, "
+                                    f"Model: {self.SD_MODEL_CHECKPOINT}"
+                                )
+                                logging.info("デフォルトのPNGInfo情報を生成しました")
+                            else:
+                                logging.info(f"取得したPNGInfo: {info_text[:200]}...")  # 最初の200文字だけログに出力
 
                             # パラメータを保存
-                            parameters = info_text
-                            self.current_parameters = info_text  # 現在のパラメータをクラス変数に保存
+                            parameters = info_text if info_text else "デフォルトパラメータ（PNGInfoが取得できませんでした）"
+                            self.current_parameters = parameters  # 現在のパラメータをクラス変数に保存
+                            logging.info(f"保存したパラメータの長さ: {len(parameters)}")
 
-                            # PNGInfoを解析（先頭に「Prompt:」はない前提）
-                            lines = info_text.split('\n')
-                            self.current_png_info = {}
+                            # PNGInfoが取得できた場合のみ解析を行う
+                            if info_text:
+                                # PNGInfoを解析（先頭に「Prompt:」はない前提）
+                                lines = info_text.split('\n')
+                                self.current_png_info = {}
 
-                            # 最初の行をプロンプトとして扱う
-                            if lines:
-                                prompt_line = lines[0].strip()
-                                self.current_png_info["prompt"] = prompt_line
-                                logging.info(f"最初の行からプロンプトを抽出しました: {prompt_line[:100]}...")
+                                # 最初の行をプロンプトとして扱う
+                                if lines:
+                                    prompt_line = lines[0].strip()
+                                    self.current_png_info["prompt"] = prompt_line
+                                    logging.info(f"最初の行からプロンプトを抽出しました: {prompt_line[:100]}...")
 
-                            # 残りの行をパラメータとして解析
-                            for line in lines[1:]:
-                                if ":" in line:
-                                    key, value = line.split(":", 1)
-                                    key = key.strip()
-                                    value = value.strip()
-                                    self.current_png_info[key] = value
+                                # 残りの行をパラメータとして解析
+                                for line in lines[1:]:
+                                    if ":" in line:
+                                        key, value = line.split(":", 1)
+                                        key = key.strip()
+                                        value = value.strip()
+                                        self.current_png_info[key] = value
 
-                                    # Seed値を取得
-                                    if key.lower() == "seed":
-                                        try:
-                                            seed_value = int(value)
-                                            logging.info(f"Seed値を抽出しました: {seed_value}")
-                                        except ValueError:
-                                            logging.warning(f"Seed値の変換に失敗しました: {value}")
+                                        # Seed値を取得
+                                        if key.lower() == "seed":
+                                            try:
+                                                seed_value = int(value)
+                                                logging.info(f"Seed値を抽出しました: {seed_value}")
+                                            except ValueError:
+                                                logging.warning(f"Seed値の変換に失敗しました: {value}")
                         except Exception as e:
                             logging.error(f"PNG情報の取得中にエラーが発生しました: {e}")
 
                     # 透過画像生成時は３つ目の画像のみを保存するため、１つ目と２つ目はスキップ
+                    # ABG Removerの出力: 1つ目=元画像、2つ目=マスク画像、3つ目=透過背景画像
                     if self.IS_TRANSPARENT_BACKGROUND and images_processed_count != 3:
                         continue
 
                     # 画像のメタデータを設定
                     pnginfo = PngImagePlugin.PngInfo()
-                    pnginfo.add_text("parameters", parameters)
+                    # 透過画像生成時に3つ目の画像にも1つ目の画像から取得したPNGInfoを適用する
+                    if self.IS_TRANSPARENT_BACKGROUND and images_processed_count == 3 and self.current_parameters:
+                        logging.info(f"透過画像に元画像のPNGInfoを適用します。長さ: {len(self.current_parameters)}")
+                        pnginfo.add_text("parameters", self.current_parameters)
+                    else:
+                        if not parameters:
+                            logging.warning("PNGInfoに設定するパラメータが空です。")
+                            parameters = "自動生成された画像（詳細情報なし）"
+                        logging.info(f"通常の方法でPNGInfoを設定します。長さ: {len(parameters)}")
+                        pnginfo.add_text("parameters", parameters)
 
                     # 画像ファイルパスを生成
                     image_path = os.path.normpath(os.path.join(output_folder_path, filename + self.IMAGE_FILE_EXTENSION))
 
                     # 画像を保存
                     image.save(image_path, pnginfo=pnginfo)
+
+                    # 保存後にPNGInfoが正しく設定されたか確認（デバッグ用）
+                    if self.IS_TRANSPARENT_BACKGROUND and images_processed_count == 3:
+                        try:
+                            # 保存した画像を開いて確認
+                            with Image.open(image_path) as saved_image:
+                                if 'parameters' in saved_image.info:
+                                    logging.info(f"透過画像にPNGInfoが正しく保存されました。長さ: {len(saved_image.info['parameters'])}")
+                                else:
+                                    logging.warning("透過画像にPNGInfoが保存されていません")
+                        except Exception as e:
+                            logging.error(f"保存した透過画像のPNGInfo確認中にエラーが発生しました: {e}")
 
                     # 画像をJPG形式でも保存
                     jpg_file_path = os.path.normpath(os.path.join(output_folder_path, filename + ".jpg"))
