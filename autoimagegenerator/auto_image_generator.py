@@ -628,7 +628,7 @@ class AutoImageGenerator:
             positive_optional_prompt_dict (dict): オプショナルプロンプト辞書
             negative_prompt_dict (dict): ネガティブプロンプト辞書
             folder_path (str): 保存先フォルダパス
-            filename (str): ファイル名
+            filename (str): ファイル名（拡張子なし）
             cancel_prompts (list): キャンセルされたプロンプトのリスト
 
         Returns:
@@ -696,8 +696,8 @@ class AutoImageGenerator:
 
         # プロンプトをJSONファイルに保存
         json_filename = os.path.normpath(os.path.join(folder_path, filename + ".json"))
-        with open(json_filename, 'w') as json_file:
-            json.dump(merged_dict, json_file, indent=4)
+        with open(json_filename, 'w', encoding='utf-8') as json_file:
+            json.dump(merged_dict, json_file, indent=4, ensure_ascii=False)
 
         return {}
 
@@ -715,7 +715,7 @@ class AutoImageGenerator:
         transparent_image = transparent_image.resize(background_image.size)
 
         try:
-        # 透過画像を背景画像に合成
+            # 透過画像を背景画像に合成
             result_image = Image.alpha_composite(background_image, transparent_image)
         except ValueError as e:
             # エラーが発生した場合はログに記録し、背景画像をそのまま返す
@@ -1157,17 +1157,6 @@ class AutoImageGenerator:
                         self.logger.info(f"LoRAトリガーワード '{trigger_word}' を追加しました")
             except ImportError as e:
                 self.logger.warning(f"警告: LoRA設定の取得中にエラーが発生しました: {e}")
-
-        # プロンプトの保存
-        self.save_prompts_to_json(
-            positive_base_prompt_dict,
-            positive_pose_prompt_dict,
-            positive_optional_prompt_dict,
-            negative_prompt_dict,
-            self.OUTPUT_FOLDER,
-            "prompts.json",
-            self.DATA_CANCEL_SEEDS
-        )
 
         return positive_prompt, negative_prompt, seed, prompt_info
 
