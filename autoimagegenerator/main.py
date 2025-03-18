@@ -160,24 +160,12 @@ def main():
                         help='画像の幅 (デフォルトは画像タイプに応じて自動設定)')
     parser.add_argument('--height', type=int,
                         help='画像の高さ (デフォルトは画像タイプに応じて自動設定)')
-    parser.add_argument('--validate-weapon', action='store_true',
-                        help='武器画像の検証を有効にする（RPGアイコンの武器カテゴリのみ）')
-    parser.add_argument('--no-validate-weapon', action='store_true',
-                        help='武器画像の検証を無効にする（RPGアイコンの武器カテゴリのみ）')
-    parser.add_argument('--max-validation-attempts', type=int, default=3,
-                        help='武器検証失敗時の最大再生成回数 (デフォルト: 3)')
-    parser.add_argument('--enable-weapon-validation', action='store_true', help='武器画像の検証を有効にする')
 
     args = parser.parse_args()
 
     # 画像タイプの組み合わせをバリデーション
     if not validate_image_type(args.style, args.category, args.subcategory):
         print("エラー: 無効な画像タイプの組み合わせです")
-        sys.exit(1)
-
-    # 武器検証オプションの相互排他性をチェック
-    if args.validate_weapon and args.no_validate_weapon:
-        print("エラー: --validate-weaponと--no-validate-weaponは同時に指定できません")
         sys.exit(1)
 
     # モデルの選択
@@ -262,24 +250,8 @@ def main():
         subcategory=args.subcategory,
         width=args.width,
         height=args.height,
-        use_custom_checkpoint=args.model_checkpoint is not None,
-        enable_weapon_validation=args.enable_weapon_validation,
-        max_validation_attempts=args.max_validation_attempts
+        use_custom_checkpoint=args.model_checkpoint is not None
     )
-
-    # 武器検証設定を適用（RPGアイコンの武器カテゴリの場合のみ）
-    if args.style == "illustration" and args.category == "rpg_icon" and args.subcategory == "weapon":
-        if args.validate_weapon:
-            auto_image_generator.enable_weapon_validation = True
-            print("武器画像の検証を有効にしました")
-        elif args.no_validate_weapon:
-            auto_image_generator.enable_weapon_validation = False
-            print("武器画像の検証を無効にしました")
-
-        # 最大検証試行回数を設定
-        if args.max_validation_attempts:
-            auto_image_generator.max_validation_attempts = args.max_validation_attempts
-            print(f"武器検証の最大試行回数を {args.max_validation_attempts} に設定しました")
 
     # 画像生成の実行
     if args.dry_run:
