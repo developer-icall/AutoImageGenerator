@@ -28,7 +28,7 @@
   "camisole": ["woman with left hand in pockets"],
   "lingerie": ["woman with left hand in pockets"],
   "T-shirt": ["woman with left hand in pockets", "selfie"],
-  "selfie": ["from above", "fashion model posing"],
+  "selfie": ["from above", "fashion model posing", "(looking at viewer:1.4)", "portrait", "tilting head"],
   "v-neck sweater": ["woman with left hand in pockets"],
   "woman with left hand in pockets": [
     "white summer wear",
@@ -442,7 +442,11 @@
     "skirt",
     "white summer wear"
   ],
-  "party dress": ["Spread legs"],
+  "party dress": [
+    "Spread legs",
+    "left hand between legs",
+    "room"
+  ],
   "natural wave": ["Spread legs"],
   "cape knit": ["Three-Quarter Length shot", "bed room", "hand between legs"],
   "bell sleeve": ["hand between legs"],
