@@ -1,7 +1,17 @@
 {
+  "Must Positive Prompt": {
+    "prompts": [
+      "(1boy:1.3)",
+      "(1boy:1.3)",
+      "(1man:1.3)"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1,
+    "position": "start"
+  },
   "Base Positive Prompt": {
     "prompts": [
-      "no beard, (1 man:1.5), (best quality), (looking at viewer:1.4), (illustration:1.4)"
+      "no beard, (masterpiece:1.2, best quality), (illustration:1.4)"
     ],
     "use max prompts": 1,
     "use min prompts": 1
