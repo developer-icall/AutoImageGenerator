@@ -18,6 +18,10 @@ IMAGE_STYLES = {
         "animal": {
             "types": ["dog", "cat", "bird", "fish", "other"],
             "models": ["yayoiMix", "petPhotography"]  # petPhotographyモデルを追加
+        },
+        "vehicle": {
+            "types": ["car", "ship", "airplane", "other"],
+            "models": ["sd_xl_base_1.0"]  # SDXL Base 1.0モデルを追加
         }
     },
     "illustration": {
@@ -43,7 +47,7 @@ IMAGE_STYLES = {
         },
         "vehicle": {
             "types": ["car", "ship", "airplane", "other"],
-            "models": []  # 未確定
+            "models": ["sd_xl_base_1.0"]  # SDXL Base 1.0モデルを追加
         },
         "other": {
             "types": [],
