@@ -39,6 +39,9 @@ class AutoImageGenerator:
         use_lora=False,
         lora_name=None
     ):
+        # 設定ファイルの読み込み
+        self.settings = self._load_settings()
+
         # モデル切り替えが実行済みかどうかを管理するフラグを追加
         self._model_switch_executed = False
         # 現在使用中のモデルを記録
@@ -1762,94 +1765,28 @@ class AutoImageGenerator:
             raise e
 
     def _set_image_size_by_type(self):
-        """
-        画像タイプに応じて画像サイズを設定する
-        """
-        # 画像サイズが指定されていない場合は、デフォルト値を設定
-        if not self.width or not self.height:
-            # モデルに基づいて画像サイズを設定
-            model_name = self._select_model_by_image_type()
+        """画像タイプに基づいて画像サイズを設定する"""
+        try:
+            # settings.jsonから画像サイズを取得
+            if self.style in self.settings.get("default_image_sizes", {}):
+                style_settings = self.settings["default_image_sizes"][self.style]
+                if self.category in style_settings:
+                    size_settings = style_settings[self.category]
+                    self.width = size_settings.get("width", 512)
+                    self.height = size_settings.get("height", 768)
+                    self.logger.info(f"画像サイズを設定: {self.width}x{self.height}")
+                    return
 
-            if model_name == "animagineXL":
-                # animagineXLモデルの場合
-                if self.IS_TRANSPARENT_BACKGROUND:
-                    self.width = 768
-                    self.height = 1024
-                else:
-                    self.width = 768
-                    self.height = 1024
-            elif model_name == "yayoiMix":
-                # yayoiMixモデルの場合
-                if self.IS_TRANSPARENT_BACKGROUND:
-                    self.width = 768
-                    self.height = 1024
-                else:
-                    self.width = 768
-                    self.height = 1024
-            elif model_name == "petPhotography":
-                # petPhotographyモデルの場合
-                self.width = 512
-                self.height = 512
-            elif model_name == "sd_xl_base_1.0":
-                # SDXL Base 1.0モデルの場合
-                self.width = 1024
-                self.height = 768
-            else:
-                # その他のモデルの場合
-                if self.style == "realistic":
-                    if self.category == "female":
-                        if self.IS_TRANSPARENT_BACKGROUND:
-                            self.width = 512
-                            self.height = 768
-                        else:
-                            self.width = 512
-                            self.height = 768
-                    elif self.category == "male":
-                        if self.IS_TRANSPARENT_BACKGROUND:
-                            self.width = 512
-                            self.height = 768
-                        else:
-                            self.width = 512
-                            self.height = 768
-                    elif self.category == "animal":
-                        # 動物の場合は正方形の画像を生成
-                        self.width = 512
-                        self.height = 512
-                    elif self.category == "vehicle":
-                        # 車の場合は横長の画像を生成
-                        self.width = 1024
-                        self.height = 768
-                elif self.style == "illustration":
-                    if self.category == "female":
-                        if self.IS_TRANSPARENT_BACKGROUND:
-                            self.width = 512
-                            self.height = 768
-                        else:
-                            self.width = 512
-                            self.height = 768
-                    elif self.category == "male":
-                        if self.IS_TRANSPARENT_BACKGROUND:
-                            self.width = 512
-                            self.height = 768
-                        else:
-                            self.width = 512
-                            self.height = 768
-                    elif self.category == "animal":
-                        # 動物の場合は正方形の画像を生成
-                        self.width = 512
-                        self.height = 512
-                    elif self.category == "vehicle":
-                        # 車の場合は横長の画像を生成
-                        self.width = 1024
-                        self.height = 768
+            # デフォルト値の設定
+            self.width = 512
+            self.height = 768
+            self.logger.info(f"デフォルトの画像サイズを使用: {self.width}x{self.height}")
 
-        logging.info(f"画像サイズを設定しました: {self.width}x{self.height}")
-
-        # COMMON_PAYLOAD_SETTINGSを更新
-        if hasattr(self, 'COMMON_PAYLOAD_SETTINGS'):
-            self.COMMON_PAYLOAD_SETTINGS["width"] = self.width
-            self.COMMON_PAYLOAD_SETTINGS["height"] = self.height
-            logging.info(f"COMMON_PAYLOAD_SETTINGSの画像サイズを更新しました: {self.width}x{self.height}")
+        except Exception as e:
+            self.logger.error(f"画像サイズの設定中にエラーが発生しました: {e}")
+            # エラーが発生した場合はデフォルト値を使用
+            self.width = 512
+            self.height = 768
 
     def _parse_png_info(self, info_text):
         """
@@ -2074,3 +2011,13 @@ class AutoImageGenerator:
             "excluded_prompts": excluded_prompts,
             "cancel_pair_working": cancel_pair_working
         }
+
+    def _load_settings(self):
+        """設定ファイルを読み込む"""
+        try:
+            settings_path = os.path.join(os.path.dirname(__file__), "settings.json")
+            with open(settings_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            self.logger.error(f"設定ファイルの読み込みに失敗しました: {e}")
+            return {}
