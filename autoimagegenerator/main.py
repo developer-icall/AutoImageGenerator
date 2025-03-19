@@ -32,11 +32,11 @@ IMAGE_STYLES = {
     },
     "illustration": {
         "female": {
-            "models": ["animagineXL"],  # animagineXLを追加
+            "models": ["animagineXL", "kawaiiRealisticAnime"],  # kawaiiRealisticAnimeを追加
             "types": ["normal", "transparent", "selfie"]
         },
         "male": {
-            "models": ["animagineXL"],  # animagineXLを追加
+            "models": ["animagineXL", "kawaiiRealisticAnime"],  # kawaiiRealisticAnimeを追加
             "types": ["normal", "transparent", "selfie"]
         },
         "animal": {
@@ -72,7 +72,8 @@ SD_MODEL_CHECKPOINTS = {
     "yayoiMix": "yayoiMix_v25.safetensors",  # yayoiMix_v25モデル
     "petPhotography": "petPhotographyAlbumOf_v10HomeEdition.safetensors",  # ペット写真用モデル
     "sd_xl_base_1.0": "sd_xl_base_1.0.safetensors",  # SDXL Base 1.0モデル
-    "landscapeRealistic": "landscapeRealistic_v20WarmColor.safetensors"  # landscapeRealisticモデル
+    "landscapeRealistic": "landscapeRealistic_v20WarmColor.safetensors",  # landscapeRealisticモデル
+    "kawaiiRealisticAnime": "kawaiiRealisticAnime_a06.safetensors"  # kawaiiRealisticAnimeモデル
 }
 
 # LoRAの設定

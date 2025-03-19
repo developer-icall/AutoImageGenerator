@@ -56,5 +56,47 @@ class TestMain(unittest.TestCase):
         # backgroundカテゴリのデフォルトモデルがlandscapeRealisticか確認
         self.assertEqual(get_default_model("background"), "landscapeRealistic")
 
+    def test_validate_image_type_kawaiiRealisticAnime(self):
+        """kawaiiRealisticAnimeモデルの画像タイプバリデーションテスト"""
+        # 有効な組み合わせ
+        self.assertTrue(validate_image_type("illustration", "female", "normal"))
+        self.assertTrue(validate_image_type("illustration", "female", "transparent"))
+        self.assertTrue(validate_image_type("illustration", "female", "selfie"))
+        self.assertTrue(validate_image_type("illustration", "male", "normal"))
+        self.assertTrue(validate_image_type("illustration", "male", "transparent"))
+        self.assertTrue(validate_image_type("illustration", "male", "selfie"))
+
+        # 無効な組み合わせ
+        self.assertFalse(validate_image_type("illustration", "female", "invalid"))
+        self.assertFalse(validate_image_type("illustration", "male", "invalid"))
+        self.assertFalse(validate_image_type("realistic", "female", "normal"))  # スタイルが異なる
+
+    def test_image_styles_kawaiiRealisticAnime(self):
+        """IMAGE_STYLESのkawaiiRealisticAnimeモデル設定テスト"""
+        # illustration/femaleの設定を確認
+        self.assertIn("female", IMAGE_STYLES["illustration"])
+        self.assertIn("models", IMAGE_STYLES["illustration"]["female"])
+        self.assertIn("types", IMAGE_STYLES["illustration"]["female"])
+
+        # kawaiiRealisticAnimeがモデルに含まれているか確認
+        self.assertIn("kawaiiRealisticAnime", IMAGE_STYLES["illustration"]["female"]["models"])
+        self.assertIn("kawaiiRealisticAnime", IMAGE_STYLES["illustration"]["male"]["models"])
+
+        # サブカテゴリーが正しく設定されているか確認
+        self.assertIn("normal", IMAGE_STYLES["illustration"]["female"]["types"])
+        self.assertIn("transparent", IMAGE_STYLES["illustration"]["female"]["types"])
+        self.assertIn("selfie", IMAGE_STYLES["illustration"]["female"]["types"])
+
+    def test_model_checkpoints_kawaiiRealisticAnime(self):
+        """SD_MODEL_CHECKPOINTSのkawaiiRealisticAnimeモデル設定テスト"""
+        # kawaiiRealisticAnimeがSD_MODEL_CHECKPOINTSに含まれているか確認
+        self.assertIn("kawaiiRealisticAnime", SD_MODEL_CHECKPOINTS)
+
+        # kawaiiRealisticAnimeの設定が正しいか確認
+        self.assertEqual(
+            SD_MODEL_CHECKPOINTS["kawaiiRealisticAnime"],
+            "kawaiiRealisticAnime_a06.safetensors"
+        )
+
 if __name__ == '__main__':
     unittest.main()
