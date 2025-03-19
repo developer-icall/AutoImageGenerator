@@ -16,7 +16,7 @@
       "tilting head"
     ],
     "use_max_prompts": 1,
-    "use min prompts": 1
+    "use_min_prompts": 1
   },
   "Face": {
     "prompts": [
@@ -34,6 +34,6 @@
       ""
     ],
     "use_max_prompts": 1,
-    "use min prompts": 1
+    "use_min_prompts": 1
   }
 }
