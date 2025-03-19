@@ -4,7 +4,7 @@
       "no beard, (1 man:1.5), (8k, RAW photo, best quality, masterpiece:1.2), male focus, handsome, (looking at viewer:1.4), ultra detailed, ultra high res, (realistic, photo realistic:1.4), high detail RAW color photo"
     ],
     "use_max_prompts": 1,
-    "use min prompts": 1
+    "use_min_prompts": 1
   },
   "Women Type": {
     "prompts": [
@@ -20,7 +20,7 @@
       "Korean male fashion models"
     ],
     "use_max_prompts": 1,
-    "use min prompts": 1
+    "use_min_prompts": 1
   },
   "Body Type": {
     "prompts": [
@@ -28,7 +28,7 @@
       "macho body shape"
     ],
     "use_max_prompts": 0,
-    "use min prompts": 0
+    "use_min_prompts": 0
   },
   "age": {
     "prompts": [
@@ -39,7 +39,7 @@
       "(50 years old:1.2)"
     ],
     "use_max_prompts": 1,
-    "use min prompts": 0
+    "use_min_prompts": 0
   },
   "Hair Type": {
     "prompts": [
@@ -61,7 +61,7 @@
       "sideburns hair"
     ],
     "use_max_prompts": 1,
-    "use min prompts": 1
+    "use_min_prompts": 1
   },
   "Hair Color": {
     "prompts": [
@@ -106,6 +106,6 @@
       "two-tone hair"
     ],
     "use_max_prompts": 1,
-    "use min prompts": 1
+    "use_min_prompts": 1
   }
 }

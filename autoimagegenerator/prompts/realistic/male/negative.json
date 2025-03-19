@@ -4,6 +4,6 @@
       "(woman:1.5), (girl:1.5), 1girl, 2girls, big chest, ((3hands, 3arms, 3legs:1.2, 4 fingers:1.4, six fingers:1.2, 2faces:2, bad hands, bad finger)), (nsfw:1.3), (worst quality:2), (backlight:1.2), bad anatomy, double navel, collapsed eyeshadow, multiple eyebrows, freckles, signature, logo"
     ],
     "use_max_prompts": 1,
-    "use min prompts": 1
+    "use_min_prompts": 1
   }
 }
