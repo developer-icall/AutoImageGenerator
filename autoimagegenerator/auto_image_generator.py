@@ -38,13 +38,17 @@ class AutoImageGenerator:
         use_custom_checkpoint=False,
         use_lora=False,
         lora_name=None,
-        dry_run=False
+        dry_run=False,
+        debug_mode=False
     ):
         # 設定ファイルの読み込み
         self.settings = self._load_settings()
 
         # ドライランモードの設定
         self.dry_run = dry_run
+
+        # デバッグモードの設定
+        self.debug_mode = debug_mode
 
         # モデル切り替えが実行済みかどうかを管理するフラグを追加
         self._model_switch_executed = False
@@ -130,7 +134,7 @@ class AutoImageGenerator:
 
         # ロガーの設定
         self.logger = logging.getLogger(__name__)
-        self.logger.setLevel(logging.DEBUG)  # INFOからDEBUGに変更
+        self.logger.setLevel(logging.DEBUG if self.debug_mode else logging.INFO)
         if not self.logger.handlers:
             # コンソール出力用ハンドラ
             console_handler = logging.StreamHandler()
@@ -154,6 +158,8 @@ class AutoImageGenerator:
             self.logger.addHandler(file_handler)
 
             self.logger.info(f"ログファイルを作成しました: {log_file}")
+            if self.debug_mode:
+                self.logger.info("デバッグモードが有効です")
 
         # 画像タイプに応じたフォルダ構造を作成
         self._create_output_directories()
@@ -1003,17 +1009,17 @@ class AutoImageGenerator:
 
             # 画像生成の実行
             total_batches = self.IMAGE_GENERATE_BATCH_EXECUTE_COUNT
-            logging.info(f"画像生成バッチを開始します。合計バッチ数: {total_batches}")
+            self.logger.info(f"画像生成バッチを開始します。合計バッチ数: {total_batches}")
 
             for i in range(total_batches):
                 # 現在のバッチ番号をログに表示
                 current_batch = i + 1
-                logging.info(f"画像生成バッチ進捗: {current_batch}/{total_batches} ({(current_batch/total_batches)*100:.1f}%)")
+                self.logger.info(f"画像生成バッチ進捗: {current_batch}/{total_batches} ({(current_batch/total_batches)*100:.1f}%)")
 
                 # 画像生成処理を実行
                 self._generate_images(current_batch, total_batches)
 
-            logging.info(f"画像生成バッチが完了しました。合計バッチ数: {total_batches}")
+            self.logger.info(f"画像生成バッチが完了しました。合計バッチ数: {total_batches}")
 
         except Exception as e:
             self.logger.error(f"エラーが発生しました: {e}")

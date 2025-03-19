@@ -207,6 +207,8 @@ def main():
                         help='使用するLoRAの名前 (例: KawasakiNinja300, waifu_on_Motorcycle_v2, cybervehiclev4)')
     parser.add_argument('--prompts-folder',
                         help='プロンプトフォルダのパス (デフォルト: autoimagegenerator/prompts)')
+    parser.add_argument('--debug', action='store_true',
+                        help='デバッグモードを有効にする（DEBUGレベルのログを表示）')
 
     args = parser.parse_args()
 
@@ -262,7 +264,8 @@ def main():
         lora_name=args.lora_name,
         width=args.width,
         height=args.height,
-        dry_run=args.dry_run
+        dry_run=args.dry_run,
+        debug_mode=args.debug
     )
 
     # 画像生成の実行
