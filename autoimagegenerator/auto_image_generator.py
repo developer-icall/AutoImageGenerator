@@ -165,11 +165,11 @@ class AutoImageGenerator:
         self._create_output_directories()
 
         # 画像タイプに基づいて適切なモデルを選択
-        # カスタムチェックポイントが指定されている場合は、モデル選択をスキップ
+        # カスタムチェックポイントが指定されている場合のみモデルを上書き
         if self.USE_CUSTOM_CHECKPOINT:
             self.model = self.SD_MODEL_PREFIX
             self.logger.info(f"カスタムチェックポイント {self.SD_MODEL_CHECKPOINT} を使用します")
-        else:
+        elif not self.SD_MODEL_PREFIX:  # モデルが指定されていない場合のみ自動選択
             self.model = self._select_model_by_image_type()
             # 選択されたモデルに基づいてSD_MODEL_CHECKPOINTを更新
             if self.model != self.SD_MODEL_PREFIX:
@@ -184,6 +184,9 @@ class AutoImageGenerator:
                 except (ImportError, KeyError) as e:
                     self.logger.warning(f"警告: モデルチェックポイントの取得中にエラーが発生しました: {e}")
                     self.logger.info(f"デフォルトモデル {self.SD_MODEL_CHECKPOINT} を使用します")
+        else:
+            self.model = self.SD_MODEL_PREFIX
+            self.logger.info(f"指定されたモデル {self.model} ({self.SD_MODEL_CHECKPOINT}) を使用します")
 
         # 画像サイズを設定
         self.width = width if width is not None else 768  # デフォルト値を設定
@@ -432,7 +435,7 @@ class AutoImageGenerator:
         }
 
         # デバッグログを追加
-        logging.info(f"generate_random_prompts開始。データキー: {list(data.keys())}")
+        self.logger.debug(f"generate_random_prompts開始。データキー: {list(data.keys())}")
 
         # 最初にすべてのカテゴリーのプロンプトを収集
         all_selected_prompts = {}
@@ -450,14 +453,14 @@ class AutoImageGenerator:
                 position = value.get("position", None)  # 位置パラメータを取得
 
                 # デバッグログを追加
-                logging.info(f"カテゴリー: {key}, use_max_prompts: {use_max_prompts}, use_min_prompts: {use_min_prompts}, プロンプト数: {len(prompts)}, position: {position}")
+                self.logger.debug(f"カテゴリー: {key}, use_max_prompts: {use_max_prompts}, use_min_prompts: {use_min_prompts}, プロンプト数: {len(prompts)}, position: {position}")
 
                 # ランダムな数のプロンプトを取得
                 num_prompts = random.randint(use_min_prompts, use_max_prompts)
                 selected_prompts = random.sample(prompts, min(num_prompts, len(prompts)))
 
                 # 選択結果をログに出力
-                logging.info(f"カテゴリー: {key}, 選択数: {num_prompts}, 選択結果: {selected_prompts}")
+                self.logger.debug(f"カテゴリー: {key}, 選択数: {num_prompts}, 選択結果: {selected_prompts}")
 
                 # 結果を保存
                 prompt_json[key] = selected_prompts
@@ -466,7 +469,7 @@ class AutoImageGenerator:
                 # 位置指定がある場合は、対応するリストに追加
                 if position in positioned_prompts:
                     positioned_prompts[position].extend(selected_prompts)
-                    logging.info(f"カテゴリー: {key} のプロンプトを位置 {position} に配置します")
+                    self.logger.debug(f"カテゴリー: {key} のプロンプトを位置 {position} に配置します")
                 else:
                     # 位置指定がない場合は通常通り追加
                     combined_prompt.extend(selected_prompts)
@@ -480,7 +483,7 @@ class AutoImageGenerator:
                 position = value.get("position", None)  # 位置パラメータを取得
 
                 # デバッグログを追加
-                logging.info(f"条件付きカテゴリー: {key}, 条件カテゴリー: {condition_category}, 条件文字列: {condition_contains}, position: {position}")
+                self.logger.debug(f"条件付きカテゴリー: {key}, 条件カテゴリー: {condition_category}, 条件文字列: {condition_contains}, position: {position}")
 
                 # 条件をチェック
                 should_include = False
@@ -491,7 +494,7 @@ class AutoImageGenerator:
                         for contains_str in condition_contains:
                             if contains_str in prompt:
                                 should_include = True
-                                logging.info(f"条件一致: プロンプト '{prompt}' に '{contains_str}' が含まれています")
+                                self.logger.debug(f"条件一致: プロンプト '{prompt}' に '{contains_str}' が含まれています")
                                 break
                         if should_include:
                             break
@@ -507,7 +510,7 @@ class AutoImageGenerator:
                     selected_prompts = random.sample(prompts, min(num_prompts, len(prompts)))
 
                     # 選択結果をログに出力
-                    logging.info(f"条件付きカテゴリー: {key}, 条件満たす: True, 選択数: {num_prompts}, 選択結果: {selected_prompts}")
+                    self.logger.debug(f"条件付きカテゴリー: {key}, 条件満たす: True, 選択数: {num_prompts}, 選択結果: {selected_prompts}")
 
                     # 結果を保存
                     prompt_json[key] = selected_prompts
@@ -516,20 +519,20 @@ class AutoImageGenerator:
                     # 位置指定がある場合は、対応するリストに追加
                     if position in positioned_prompts:
                         positioned_prompts[position].extend(selected_prompts)
-                        logging.info(f"条件付きカテゴリー: {key} のプロンプトを位置 {position} に配置します")
+                        self.logger.debug(f"条件付きカテゴリー: {key} のプロンプトを位置 {position} に配置します")
                     else:
                         # 位置指定がない場合は通常通り追加
                         combined_prompt.extend(selected_prompts)
                 else:
-                    logging.info(f"条件付きカテゴリー: {key}, 条件満たす: False")
+                    self.logger.debug(f"条件付きカテゴリー: {key}, 条件満たす: False")
 
         # 位置指定されたプロンプトを適切な位置に配置
         final_prompt = positioned_prompts["start"] + combined_prompt + positioned_prompts["end"]
 
         # 最終結果をログに出力
-        logging.info(f"generate_random_prompts完了。結果: {json.dumps(prompt_json, indent=2, ensure_ascii=False)[:500]}...")
-        logging.info(f"位置指定プロンプト: start={positioned_prompts['start']}, end={positioned_prompts['end']}")
-        logging.info(f"最終プロンプト順序: {final_prompt}")
+        self.logger.debug(f"generate_random_prompts完了。結果: {json.dumps(prompt_json, indent=2, ensure_ascii=False)[:500]}...")
+        self.logger.debug(f"位置指定プロンプト: start={positioned_prompts['start']}, end={positioned_prompts['end']}")
+        self.logger.debug(f"最終プロンプト順序: {final_prompt}")
 
         return ", ".join(final_prompt), prompt_json
 
@@ -677,11 +680,11 @@ class AutoImageGenerator:
             # 実際のプロンプト情報を別のキーとして追加
             if "prompt" in self.current_png_info:
                 merged_dict["actual_prompt"] = self.current_png_info["prompt"]
-                logging.info(f"実際のプロンプトをJSONに保存します: {self.current_png_info['prompt'][:100]}...")
+                self.logger.debug(f"実際のプロンプトをJSONに保存します: {self.current_png_info['prompt'][:100]}...")
 
             if "negative_prompt" in self.current_png_info:
                 merged_dict["actual_negative_prompt"] = self.current_png_info["negative_prompt"]
-                logging.info(f"実際のネガティブプロンプトをJSONに保存します: {self.current_png_info['negative_prompt'][:100]}...")
+                self.logger.debug(f"実際のネガティブプロンプトをJSONに保存します: {self.current_png_info['negative_prompt'][:100]}...")
 
             # シード値を追加
             if "seed" in self.current_png_info:
@@ -693,13 +696,13 @@ class AutoImageGenerator:
                 lines = self.current_parameters.split('\n')
                 if lines:
                     merged_dict["actual_prompt"] = lines[0].strip()
-                    logging.info(f"代替手段で実際のプロンプトをJSONに保存します: {lines[0].strip()[:100]}...")
+                    self.logger.debug(f"代替手段で実際のプロンプトをJSONに保存します: {lines[0].strip()[:100]}...")
 
                     # Negative promptを探す
                     for i, line in enumerate(lines):
                         if line.startswith("Negative prompt:"):
                             merged_dict["actual_negative_prompt"] = line[len("Negative prompt:"):].strip()
-                            logging.info(f"代替手段で実際のネガティブプロンプトをJSONに保存します: {line[len('Negative prompt:'):].strip()[:100]}...")
+                            self.logger.debug(f"代替手段で実際のネガティブプロンプトをJSONに保存します: {line[len('Negative prompt:'):].strip()[:100]}...")
                             break
 
                     # Seedを探す
@@ -1594,11 +1597,11 @@ class AutoImageGenerator:
             weapon_type = None
             if self.style == "illustration" and self.category == "rpg_icon" and self.subcategory == "weapon":
                 # デバッグログを追加
-                logging.info(f"武器タイプ抽出を開始します。prompt_info: {json.dumps(prompt_info, indent=2, ensure_ascii=False)[:500]}...")
+                self.logger.debug(f"武器タイプ抽出を開始します。prompt_info: {json.dumps(prompt_info, indent=2, ensure_ascii=False)[:500]}...")
 
                 # プロンプトから武器タイプを抽出
                 if "positive_base_prompt_dict" in prompt_info and "Weapon Type" in prompt_info["positive_base_prompt_dict"]:
-                    logging.info(f"positive_base_prompt_dict内のWeapon Type: {json.dumps(prompt_info['positive_base_prompt_dict']['Weapon Type'], indent=2, ensure_ascii=False)}")
+                    self.logger.debug(f"positive_base_prompt_dict内のWeapon Type: {json.dumps(prompt_info['positive_base_prompt_dict']['Weapon Type'], indent=2, ensure_ascii=False)}")
 
                     # 辞書構造を確認して適切にアクセス
                     weapon_type_data = prompt_info["positive_base_prompt_dict"]["Weapon Type"]
@@ -1615,14 +1618,14 @@ class AutoImageGenerator:
                     if weapon_prompts:
                         # 最初の武器タイプを使用
                         weapon_type = weapon_prompts[0].lower()
-                        logging.info(f"抽出された武器タイプ: {weapon_type}")
+                        self.logger.debug(f"抽出された武器タイプ: {weapon_type}")
                     else:
                         logging.warning("武器タイプが見つかりませんでした")
                 else:
                     logging.warning("武器タイプ情報が見つかりませんでした")
 
             # 画像生成開始をログに記録
-            logging.info(f"画像生成開始: {filename}")
+            self.logger.debug(f"画像生成開始: {filename}")
 
             # 画像生成APIを呼び出す
             try:
@@ -1651,7 +1654,7 @@ class AutoImageGenerator:
             # 生成された画像を処理
             for i, image_data in enumerate(r['images']):
                 images_processed_count += 1
-                logging.info(f"透過画像生成時の画像処理回数: {images_processed_count}")
+                self.logger.debug(f"透過画像生成時の画像処理回数: {images_processed_count}")
                 # Base64エンコードされた画像データをデコード
                 image = Image.open(io.BytesIO(base64.b64decode(image_data.split(",", 1)[0])))
 
@@ -1664,16 +1667,16 @@ class AutoImageGenerator:
                         png_payload = {
                             "image": "data:image/png;base64," + image_data
                         }
-                        logging.info("最初の画像からPNGInfoを取得しています...")
-                        logging.info(f"PNGInfo APIエンドポイント: {self.PNGINFO_URL}")
-                        logging.info(f"PNGInfo APIペイロードの長さ: {len(json.dumps(png_payload))}")
+                        self.logger.debug("最初の画像からPNGInfoを取得しています...")
+                        self.logger.debug(f"PNGInfo APIエンドポイント: {self.PNGINFO_URL}")
+                        self.logger.debug(f"PNGInfo APIペイロードの長さ: {len(json.dumps(png_payload))}")
 
                         # リクエスト送信前にデータの先頭部分をログに記録
                         image_data_preview = image_data[:100] + "..." if len(image_data) > 100 else image_data
-                        logging.info(f"画像データプレビュー: {image_data_preview}")
+                        self.logger.debug(f"画像データプレビュー: {image_data_preview}")
 
                         response2 = requests.post(url=self.PNGINFO_URL, json=png_payload)
-                        logging.info(f"PNGInfo APIステータスコード: {response2.status_code}")
+                        self.logger.debug(f"PNGInfo APIステータスコード: {response2.status_code}")
                         response2.raise_for_status()
 
                         # PNGInfoを取得
@@ -1700,14 +1703,14 @@ class AutoImageGenerator:
                                 f"Size: {payload.get('width', 512)}x{payload.get('height', 768)}, "
                                 f"Model: {self.SD_MODEL_CHECKPOINT}"
                             )
-                            logging.info("デフォルトのPNGInfo情報を生成しました")
+                            self.logger.debug("デフォルトのPNGInfo情報を生成しました")
                         else:
-                            logging.info(f"取得したPNGInfo: {info_text[:200]}...")  # 最初の200文字だけログに出力
+                            self.logger.debug(f"取得したPNGInfo: {info_text[:200]}...")  # 最初の200文字だけログに出力
 
                         # パラメータを保存
                         parameters = info_text if info_text else "デフォルトパラメータ（PNGInfoが取得できませんでした）"
                         self.current_parameters = parameters  # 現在のパラメータをクラス変数に保存
-                        logging.info(f"保存したパラメータの長さ: {len(parameters)}")
+                        self.logger.debug(f"保存したパラメータの長さ: {len(parameters)}")
 
                         # PNGInfoが取得できた場合のみ解析を行う
                         if info_text:
@@ -1719,7 +1722,7 @@ class AutoImageGenerator:
                             if lines:
                                 prompt_line = lines[0].strip()
                                 self.current_png_info["prompt"] = prompt_line
-                                logging.info(f"最初の行からプロンプトを抽出しました: {prompt_line[:100]}...")
+                                self.logger.debug(f"最初の行からプロンプトを抽出しました: {prompt_line[:100]}...")
 
                             # 残りの行をパラメータとして解析
                             for line in lines[1:]:
@@ -1733,7 +1736,7 @@ class AutoImageGenerator:
                                     if key.lower() == "seed":
                                         try:
                                             seed_value = int(value)
-                                            logging.info(f"Seed値を抽出しました: {seed_value}")
+                                            self.debug.info(f"Seed値を抽出しました: {seed_value}")
                                         except ValueError:
                                             logging.warning(f"Seed値の変換に失敗しました: {value}")
                     except Exception as e:
@@ -1748,13 +1751,13 @@ class AutoImageGenerator:
                 pnginfo = PngImagePlugin.PngInfo()
                 # 透過画像生成時に3つ目の画像にも1つ目の画像から取得したPNGInfoを適用する
                 if self.IS_TRANSPARENT_BACKGROUND and images_processed_count == 3 and self.current_parameters:
-                    logging.info(f"透過画像に元画像のPNGInfoを適用します。長さ: {len(self.current_parameters)}")
+                    self.logger.debug(f"透過画像に元画像のPNGInfoを適用します。長さ: {len(self.current_parameters)}")
                     pnginfo.add_text("parameters", self.current_parameters)
                 else:
                     if not parameters:
                         logging.warning("PNGInfoに設定するパラメータが空です。")
                         parameters = "自動生成された画像（詳細情報なし）"
-                    logging.info(f"通常の方法でPNGInfoを設定します。長さ: {len(parameters)}")
+                    self.logger.debug(f"通常の方法でPNGInfoを設定します。長さ: {len(parameters)}")
                     pnginfo.add_text("parameters", parameters)
 
                 # 画像ファイルパスを生成
@@ -1769,7 +1772,7 @@ class AutoImageGenerator:
                         # 保存した画像を開いて確認
                         with Image.open(image_path) as saved_image:
                             if 'parameters' in saved_image.info:
-                                logging.info(f"透過画像にPNGInfoが正しく保存されました。長さ: {len(saved_image.info['parameters'])}")
+                                self.logger.debug(f"透過画像にPNGInfoが正しく保存されました。長さ: {len(saved_image.info['parameters'])}")
                             else:
                                 logging.warning("透過画像にPNGInfoが保存されていません")
                     except Exception as e:
@@ -1808,7 +1811,7 @@ class AutoImageGenerator:
             )
 
             # 画像生成完了をログに記録
-            logging.info(f"画像生成完了: {filename}")
+            self.logger.info(f"画像生成完了: {filename}")
 
             # 検証に成功したか最大試行回数に達した場合はループを終了
             return
@@ -1927,7 +1930,7 @@ class AutoImageGenerator:
                 seen.add(prompt)
                 unique_prompts.append(prompt)
             else:
-                logging.info(f"重複プロンプトを削除しました: {prompt}")
+                self.logger.info(f"重複プロンプトを削除しました: {prompt}")
 
         return unique_prompts
 
@@ -2031,7 +2034,7 @@ class AutoImageGenerator:
 
         # 除外されたプロンプトをログに出力
         if excluded_prompts:
-            logging.info(f"品質チェックにより除外されたプロンプト: {', '.join(excluded_prompts)}")
+            self.logger.info(f"品質チェックにより除外されたプロンプト: {', '.join(excluded_prompts)}")
 
         return quality_checked_prompts
 

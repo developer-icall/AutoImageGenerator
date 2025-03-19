@@ -3,6 +3,8 @@ import time
 import json
 import argparse
 import os
+import logging
+from datetime import datetime
 
 # 定数定義
 IMAGE_STYLES = {
@@ -212,6 +214,47 @@ def main():
 
     args = parser.parse_args()
 
+    # ロガーの設定
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.DEBUG if args.debug else logging.INFO)
+
+    # ログディレクトリの作成
+    log_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logs')
+    os.makedirs(log_dir, exist_ok=True)
+
+    # main.pyログ用のサブディレクトリを作成
+    main_log_dir = os.path.join(log_dir, 'main')
+    os.makedirs(main_log_dir, exist_ok=True)
+
+    # ファイル出力用ハンドラ
+    log_file = os.path.join(main_log_dir, f"main_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
+    file_handler = logging.FileHandler(log_file)
+    file_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(funcName)s - %(message)s')
+    file_handler.setFormatter(file_formatter)
+    logger.addHandler(file_handler)
+
+    # コンソール出力用ハンドラ
+    console_handler = logging.StreamHandler()
+    console_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    console_handler.setFormatter(console_formatter)
+    logger.addHandler(console_handler)
+
+    # 起動オプションをログに出力
+    logger.info("=== 起動オプション ===")
+    logger.info(f"スタイル: {args.style}")
+    logger.info(f"カテゴリー: {args.category}")
+    logger.info(f"サブカテゴリー: {args.subcategory if args.subcategory else '未指定'}")
+    logger.info(f"モデル: {args.model if args.model else '自動選択'}")
+    logger.info(f"モデルチェックポイント: {args.model_checkpoint if args.model_checkpoint else '自動選択'}")
+    logger.info(f"ハイレゾ: {args.enable_hr}")
+    logger.info(f"ドライラン: {args.dry_run}")
+    logger.info(f"画像サイズ: {args.width}x{args.height if args.height else '自動'}")
+    logger.info(f"LoRA使用: {args.use_lora}")
+    logger.info(f"LoRA名: {args.lora_name if args.lora_name else '未指定'}")
+    logger.info(f"プロンプトフォルダ: {args.prompts_folder if args.prompts_folder else 'デフォルト'}")
+    logger.info(f"デバッグモード: {args.debug}")
+    logger.info("==================")
+
     # 画像タイプの組み合わせが有効かチェック
     if not validate_image_type(args.style, args.category, args.subcategory):
         sys.exit(1)
@@ -231,6 +274,13 @@ def main():
     # モデルの選択
     if not args.model:
         args.model = get_default_model(args.category, args.use_lora, args.lora_name)
+    else:
+        # --modelオプションが指定された場合、そのモデルを強制的に使用
+        if args.model not in SD_MODEL_CHECKPOINTS:
+            print(f"エラー: 指定されたモデル '{args.model}' は利用できません")
+            print(f"利用可能なモデル: {', '.join(SD_MODEL_CHECKPOINTS.keys())}")
+            sys.exit(1)
+        print(f"指定されたモデル '{args.model}' を使用します")
 
     # モデルチェックポイントの選択
     if not args.model_checkpoint:
@@ -252,18 +302,24 @@ def main():
     generator = AutoImageGenerator(
         image_generate_batch_execute_count=settings.get("image_generate_batch_execute_count", 2),
         another_version_generate_count=settings.get("another_version_generate_count", 12),
+        input_folder="./images/input",
+        output_folder="./images/output",
+        prompts_folder=args.prompts_folder,
+        url="http://localhost:7860",
         sd_model_checkpoint=args.model_checkpoint,
         sd_model_prefix=args.model,
         enable_hr=args.enable_hr.lower() == 'true',
         output_folder_prefix=output_folder_prefix,
-        prompts_folder=args.prompts_folder,
+        is_transparent_background=args.subcategory == "transparent",
+        is_selfie=args.subcategory == "selfie",
         style=args.style,
         category=args.category,
         subcategory=args.subcategory,
-        use_lora=args.use_lora,
-        lora_name=args.lora_name,
         width=args.width,
         height=args.height,
+        use_custom_checkpoint=False,
+        use_lora=args.use_lora,
+        lora_name=args.lora_name,
         dry_run=args.dry_run,
         debug_mode=args.debug
     )
