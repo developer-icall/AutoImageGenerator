@@ -316,7 +316,7 @@ class AutoImageGenerator:
             "animal": ["dog", "cat", "bird", "fish", "other"],
             "background": ["nature", "city", "sea", "sky", "other"],
             "rpg_icon": ["weapon", "monster", "other"],
-            "vehicle": ["car", "ship", "airplane", "other"]
+            "vehicle": ["car", "motorcycle", "ship", "airplane", "other"]
         }
 
         # ディレクトリ構造を作成
