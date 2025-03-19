@@ -98,6 +98,7 @@
   - `sd_xl_base_1.0`: SDXL Base 1.0モデル（LoRA使用時）
   - `landscapeRealistic`: 背景画像用モデル（landscapeRealistic_v20WarmColor.safetensors）
   - `kawaiiRealisticAnime`: イラストテイスト画像用モデル（kawaiiRealisticAnime_a06.safetensors）
+  - `kohakuXLBeta`: イラストテイスト画像用モデル（kohakuXLBeta_beta7.safetensors）
 
 - **--enable-hr**: ハイレゾ画像生成の有効/無効
   - `true`: 有効（デフォルト）
@@ -242,6 +243,26 @@ python main.py --style illustration --category male --subcategory selfie --model
 
 # イラストテイストの男性の透過背景画像を生成（kawaiiRealisticAnimeモデルを指定）
 python main.py --style illustration --category male --subcategory transparent --model kawaiiRealisticAnime
+
+# kohakuXLBetaモデルを使用した画像生成の例
+
+# イラストテイストの女性の通常画像を生成（kohakuXLBetaモデルを指定）
+python main.py --style illustration --category female --subcategory normal --model kohakuXLBeta
+
+# イラストテイストの女性のセルフィー画像を生成（kohakuXLBetaモデルを指定）
+python main.py --style illustration --category female --subcategory selfie --model kohakuXLBeta
+
+# イラストテイストの女性の透過背景画像を生成（kohakuXLBetaモデルを指定）
+python main.py --style illustration --category female --subcategory transparent --model kohakuXLBeta
+
+# イラストテイストの男性の通常画像を生成（kohakuXLBetaモデルを指定）
+python main.py --style illustration --category male --subcategory normal --model kohakuXLBeta
+
+# イラストテイストの男性のセルフィー画像を生成（kohakuXLBetaモデルを指定）
+python main.py --style illustration --category male --subcategory selfie --model kohakuXLBeta
+
+# イラストテイストの男性の透過背景画像を生成（kohakuXLBetaモデルを指定）
+python main.py --style illustration --category male --subcategory transparent --model kohakuXLBeta
 
 # バイク画像生成の例
 

@@ -98,5 +98,47 @@ class TestMain(unittest.TestCase):
             "kawaiiRealisticAnime_a06.safetensors"
         )
 
+    def test_validate_image_type_kohakuXLBeta(self):
+        """kohakuXLBetaモデルの画像タイプバリデーションテスト"""
+        # 有効な組み合わせ
+        self.assertTrue(validate_image_type("illustration", "female", "normal"))
+        self.assertTrue(validate_image_type("illustration", "female", "transparent"))
+        self.assertTrue(validate_image_type("illustration", "female", "selfie"))
+        self.assertTrue(validate_image_type("illustration", "male", "normal"))
+        self.assertTrue(validate_image_type("illustration", "male", "transparent"))
+        self.assertTrue(validate_image_type("illustration", "male", "selfie"))
+
+        # 無効な組み合わせ
+        self.assertFalse(validate_image_type("illustration", "female", "invalid"))
+        self.assertFalse(validate_image_type("illustration", "male", "invalid"))
+        self.assertFalse(validate_image_type("realistic", "female", "normal"))  # スタイルが異なる
+
+    def test_image_styles_kohakuXLBeta(self):
+        """IMAGE_STYLESのkohakuXLBetaモデル設定テスト"""
+        # illustration/femaleの設定を確認
+        self.assertIn("female", IMAGE_STYLES["illustration"])
+        self.assertIn("models", IMAGE_STYLES["illustration"]["female"])
+        self.assertIn("types", IMAGE_STYLES["illustration"]["female"])
+
+        # kohakuXLBetaがモデルに含まれているか確認
+        self.assertIn("kohakuXLBeta", IMAGE_STYLES["illustration"]["female"]["models"])
+        self.assertIn("kohakuXLBeta", IMAGE_STYLES["illustration"]["male"]["models"])
+
+        # サブカテゴリーが正しく設定されているか確認
+        self.assertIn("normal", IMAGE_STYLES["illustration"]["female"]["types"])
+        self.assertIn("transparent", IMAGE_STYLES["illustration"]["female"]["types"])
+        self.assertIn("selfie", IMAGE_STYLES["illustration"]["female"]["types"])
+
+    def test_model_checkpoints_kohakuXLBeta(self):
+        """SD_MODEL_CHECKPOINTSのkohakuXLBetaモデル設定テスト"""
+        # kohakuXLBetaがSD_MODEL_CHECKPOINTSに含まれているか確認
+        self.assertIn("kohakuXLBeta", SD_MODEL_CHECKPOINTS)
+
+        # kohakuXLBetaの設定が正しいか確認
+        self.assertEqual(
+            SD_MODEL_CHECKPOINTS["kohakuXLBeta"],
+            "kohakuXLBeta_beta7.safetensors"
+        )
+
 if __name__ == '__main__':
     unittest.main()

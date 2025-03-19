@@ -112,6 +112,7 @@ python -m pip install --upgrade pip
     - [Stable Diffusion XL Base 1.0 | Hugging Face](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/blob/main/sd_xl_base_1.0.safetensors)
     - [Landscape Realistic | Stable Diffusion Checkpoint | Civitai](https://civitai.com/models/85137?modelVersionId=148587)
     - [Kawaii Realistic Anime Mix | Stable Diffusion Checkpoint | Civitai](https://civitai.com/models/104100/kawaii-realistic-anime-mix)
+    - [Kohaku XL beta | Stable Diffusion Checkpoint | Civitai](https://civitai.com/models/162577?modelVersionId=192804)
 3. Stable Diffusion Web UI Docker のインストールフォルダ以下にある `data\models\Stable-diffusion` フォルダ内にダウンロードしたモデルファイルを配置
     - 例: `C:\Users\k.hongou\Dev\stable-diffusion-webui-docker\data\models\Stable-diffusion`
         - beautifulRealistic_v60.safetensors
@@ -124,6 +125,7 @@ python -m pip install --upgrade pip
         - sd_xl_base_1.0.safetensors
         - landscapeRealistic_v20WarmColor.safetensors
         - kawaiiRealisticAnime_a06.safetensors
+        - kohakuXLBeta_beta7.safetensors
 
 ### 必要なLoRAのインストール
 
