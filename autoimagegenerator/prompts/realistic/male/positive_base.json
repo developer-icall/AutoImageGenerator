@@ -3,7 +3,7 @@
     "prompts": [
       "no beard, (1 man:1.5), (8k, RAW photo, best quality, masterpiece:1.2), male focus, handsome, (looking at viewer:1.4), ultra detailed, ultra high res, (realistic, photo realistic:1.4), high detail RAW color photo"
     ],
-    "use max prompts": 1,
+    "use_max_prompts": 1,
     "use min prompts": 1
   },
   "Women Type": {
@@ -19,7 +19,7 @@
       "Male Athletes in Korean",
       "Korean male fashion models"
     ],
-    "use max prompts": 1,
+    "use_max_prompts": 1,
     "use min prompts": 1
   },
   "Body Type": {
@@ -27,7 +27,7 @@
       "abdominal muscles that are thick and fat :1.1",
       "macho body shape"
     ],
-    "use max prompts": 0,
+    "use_max_prompts": 0,
     "use min prompts": 0
   },
   "age": {
@@ -38,7 +38,7 @@
       "(40 years old:1.2)",
       "(50 years old:1.2)"
     ],
-    "use max prompts": 1,
+    "use_max_prompts": 1,
     "use min prompts": 0
   },
   "Hair Type": {
@@ -60,7 +60,7 @@
       "spiky hairstyle",
       "sideburns hair"
     ],
-    "use max prompts": 1,
+    "use_max_prompts": 1,
     "use min prompts": 1
   },
   "Hair Color": {
@@ -105,7 +105,7 @@
       "colored inner hair",
       "two-tone hair"
     ],
-    "use max prompts": 1,
+    "use_max_prompts": 1,
     "use min prompts": 1
   }
 }

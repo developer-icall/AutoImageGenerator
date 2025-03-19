@@ -92,7 +92,7 @@ class TestImageTypeModelSelection(unittest.TestCase):
         )
 
         # モデル選択結果を検証
-        self.assertEqual(generator.model, "brav7")
+        self.assertEqual(generator.model, "petPhotography")
 
     def test_illustration_rpg_icon_model_selection(self):
         """イラストRPGアイコン画像のモデル選択テスト"""
@@ -105,7 +105,7 @@ class TestImageTypeModelSelection(unittest.TestCase):
         )
 
         # モデル選択結果を検証
-        self.assertEqual(generator.model, "rpg_icon")
+        self.assertEqual(generator.model, "photoRealRPG")
 
     def test_illustration_female_model_selection(self):
         """イラスト女性画像のモデル選択テスト"""

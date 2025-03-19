@@ -1,0 +1,101 @@
+{
+    "Base Positive Prompt": {
+        "prompts": [
+          "(8k, RAW photo, best quality, masterpiece:1.2), (realistic:1.3), (photorealistic:1.3), (detailed:1.2), (sharp focus:1.2)",
+          "(8k, best quality, masterpiece:1.2), (realistic:1.3), (photorealistic:1.3), (sharp focus:1.2), (detailed:1.2)"
+        ],
+        "use_max_prompts": 1,
+        "use_min_prompts": 1
+    },
+    "Vehicle Type": {
+        "use_max_prompts": 1,
+        "use_min_prompts": 1,
+        "prompts": [
+            "motorcycle",
+            "sports bike",
+            "cruiser motorcycle",
+            "touring motorcycle",
+            "adventure motorcycle",
+            "street bike",
+            "cafe racer",
+            "dirt bike",
+            "dual sport motorcycle",
+            "scooter"
+        ]
+    },
+    "Brand": {
+        "use_max_prompts": 1,
+        "use_min_prompts": 1,
+        "prompts": [
+            "Kawasaki",
+            "Honda",
+            "Yamaha",
+            "Suzuki",
+            "BMW",
+            "Ducati",
+            "Harley-Davidson",
+            "Triumph",
+            "KTM",
+            "Indian"
+        ]
+    },
+    "Style": {
+        "use_max_prompts": 2,
+        "use_min_prompts": 1,
+        "prompts": [
+            "modern",
+            "classic",
+            "vintage",
+            "retro",
+            "sleek",
+            "aggressive",
+            "elegant",
+            "sporty",
+            "rugged",
+            "minimalist"
+        ]
+    },
+    "Details": {
+        "use_max_prompts": 3,
+        "use_min_prompts": 1,
+        "prompts": [
+            "chrome accents",
+            "leather seat",
+            "custom paint job",
+            "polished metal",
+            "aerodynamic design",
+            "dual exhaust",
+            "LED lights",
+            "windshield",
+            "saddlebags",
+            "custom wheels"
+        ]
+    },
+    "Rider": {
+        "use_max_prompts": 1,
+        "use_min_prompts": 0,
+        "prompts": [
+            "rider on motorcycle",
+            "motorcyclist",
+            "biker",
+            "motorcycle rider",
+            "person on motorcycle"
+        ]
+    },
+    "Rider Gear": {
+        "use_max_prompts": 2,
+        "use_min_prompts": 1,
+        "prompts": [
+            "full motorcycle gear",
+            "leather jacket",
+            "motorcycle boots",
+            "motorcycle gloves",
+            "full face helmet",
+            "protective gear",
+            "racing suit",
+            "armored jacket",
+            "riding pants",
+            "protective armor"
+        ]
+    }
+}

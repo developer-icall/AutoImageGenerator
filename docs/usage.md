@@ -83,8 +83,8 @@
     - `car`: 車
     - `ship`: 船
     - `airplane`: 飛行機
+    - `motorcycle`: バイク
     - `other`: その他
-  - その他のカテゴリーについては仕様書を参照
 
 - **--model**: 使用するモデル（デフォルトはカテゴリーに応じて自動選択）
   - `brav6`: Beautiful Realistic Asians v6
@@ -108,6 +108,9 @@
 
 - **--lora-name**: 使用するLoRAの名前
   - `cars-000008`: 車のLoRA
+  - `KawasakiNinja300`: リアルなバイク画像生成用LoRA
+  - `waifu_on_Motorcycle_v2`: イラスト調のバイク画像生成用LoRA
+  - `cybervehiclev4`: サイバーパンク調のバイク画像生成用LoRA
 
 ## 使用例
 
@@ -218,3 +221,17 @@ python main.py --style realistic --category background --subcategory sky --model
 
 # リアルテイストの家背景画像を生成（landscapeRealisticモデルを指定）
 python main.py --style realistic --category background --subcategory house --model landscapeRealistic
+
+# バイク画像生成の例
+
+# リアル調のバイク画像を生成（KawasakiNinja300 LoRAを使用）
+python main.py --style realistic --category vehicle --subcategory motorcycle --use-lora --lora-name KawasakiNinja300
+
+# イラスト調のバイク画像を生成（waifu_on_Motorcycle_v2 LoRAを使用）
+python main.py --style illustration --category vehicle --subcategory motorcycle --use-lora --lora-name waifu_on_Motorcycle_v2
+
+# サイバーパンク調のバイク画像を生成（cybervehiclev4 LoRAを使用）
+python main.py --style realistic --category vehicle --subcategory motorcycle --use-lora --lora-name cybervehiclev4
+
+# ドライランモードでプロンプトのみを確認
+python main.py --style realistic --category vehicle --subcategory motorcycle --use-lora --lora-name KawasakiNinja300 --dry-run

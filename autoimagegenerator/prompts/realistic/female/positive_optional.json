@@ -53,7 +53,7 @@
       "winter coat",
       "wool coat"
     ],
-    "use max prompts": 1,
+    "use_max_prompts": 1,
     "use min prompts": 1
   },
   "Accessory": {
@@ -78,22 +78,22 @@
       "piercing",
       "piercing"
     ],
-    "use max prompts": 1,
+    "use_max_prompts": 1,
     "use min prompts": 0
   },
   "Camera Settings": {
     "prompts": ["(depth of field, blurry:1.4)", "f/ 1. 8"],
-    "use max prompts": 1,
+    "use_max_prompts": 1,
     "use min prompts": 0
   },
   "Place": {
     "prompts": ["room", "street", "at luxury hotel", "Park"],
-    "use max prompts": 0,
+    "use_max_prompts": 0,
     "use min prompts": 0
   },
   "lighting": {
     "prompts": ["Sunlight"],
-    "use max prompts": 1,
+    "use_max_prompts": 1,
     "use min prompts": 0
   },
   "composition": {
@@ -106,7 +106,7 @@
       "from above",
       "Three-Quarter Length shot"
     ],
-    "use max prompts": 1,
+    "use_max_prompts": 1,
     "use min prompts": 0
   }
 }

@@ -60,6 +60,28 @@
 2. プロンプト設定を確認してください
    - negative.jsonに背景を除外するプロンプトが含まれているか確認
 
+## LoRA関連のエラー
+
+### Script 'Additional Networks for Generating' not found
+
+**エラーメッセージ**
+```
+422 Client Error: Unprocessable Entity for url: http://localhost:7860/sdapi/v1/txt2img
+detail: "Script 'Additional Networks for Generating' not found"
+```
+
+**原因**
+- Stable Diffusion Web UIに「Additional Networks」拡張機能がインストールされていない
+- 拡張機能が正しく有効化されていない
+- Web UIの再起動が必要
+
+**解決方法**
+1. Web UIの「Extensions」タブで「Additional Networks」をインストール
+2. Web UIを再起動して拡張機能を有効化
+3. 「Settings」タブで「Additional Networks」が有効になっていることを確認
+
+詳細な手順は[インストール手順](installation.md#additional-networksloraに必要)を参照してください。
+
 ## その他の問題
 
 上記に該当しない問題が発生した場合は、以下の手順で対応してください：

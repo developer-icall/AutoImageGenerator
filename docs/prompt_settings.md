@@ -22,6 +22,15 @@ autoimagegenerator/prompts/
 - **category**: カテゴリー（例: female, male, animal）
 - **subcategory**: サブカテゴリー（必要に応じて）
 
+- 各フォルダに以下ファイルは必須です
+  - positive_base.json
+  - positive_optional.json
+  - positive_pose.json
+  - positive_selfie.json
+  - negative.json
+  - cancel_seeds.json
+  - positive_cancel_pair.json
+
 ## 2. プロンプト設定ファイルの基本構造
 
 すべてのプロンプト設定ファイルは以下の基本構造に従います：

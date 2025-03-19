@@ -1,0 +1,67 @@
+{
+    "Pose": {
+        "use_max_prompts": 1,
+        "use_min_prompts": 1,
+        "prompts": [
+            "rider sitting on motorcycle",
+            "motorcyclist standing next to bike",
+            "rider mounting motorcycle",
+            "motorcyclist dismounting motorcycle",
+            "rider leaning on motorcycle",
+            "motorcyclist checking bike",
+            "rider adjusting mirrors",
+            "motorcyclist inspecting tires",
+            "rider starting motorcycle",
+            "motorcyclist parking bike",
+            "rider walking beside motorcycle",
+            "motorcyclist cleaning bike",
+            "rider refueling motorcycle",
+            "motorcyclist performing maintenance",
+            "rider securing helmet"
+        ]
+    },
+    "Angle": {
+        "use_max_prompts": 1,
+        "use_min_prompts": 1,
+        "prompts": [
+            "front view",
+            "side view",
+            "three-quarter view",
+            "back view",
+            "low angle",
+            "high angle",
+            "eye level",
+            "dramatic angle",
+            "profile shot",
+            "dynamic angle"
+        ]
+    },
+    "Composition": {
+        "use_max_prompts": 2,
+        "use_min_prompts": 1,
+        "prompts": [
+            "centered composition",
+            "rule of thirds",
+            "dramatic perspective",
+            "wide shot",
+            "close-up shot",
+            "detail shot",
+            "full body shot",
+            "panoramic view"
+        ]
+    },
+    "Camera Settings": {
+        "use_max_prompts": 2,
+        "use_min_prompts": 0,
+        "prompts": [
+            "shallow depth of field",
+            "motion blur",
+            "sharp focus",
+            "bokeh effect",
+            "high contrast",
+            "HDR",
+            "long exposure",
+            "high speed photography"
+        ]
+    }
+}

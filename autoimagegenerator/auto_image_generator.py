@@ -37,10 +37,14 @@ class AutoImageGenerator:
         height=None,
         use_custom_checkpoint=False,
         use_lora=False,
-        lora_name=None
+        lora_name=None,
+        dry_run=False
     ):
         # 設定ファイルの読み込み
         self.settings = self._load_settings()
+
+        # ドライランモードの設定
+        self.dry_run = dry_run
 
         # モデル切り替えが実行済みかどうかを管理するフラグを追加
         self._model_switch_executed = False
@@ -182,7 +186,7 @@ class AutoImageGenerator:
 
         # 共通のpayload設定を定義
         self.COMMON_PAYLOAD_SETTINGS = {
-            "steps": 60,
+            "steps": 50,
             "width": self.width,
             "height": self.height,
             "cfg_scale": 7,
@@ -434,8 +438,8 @@ class AutoImageGenerator:
                 if "condition" in value:
                     continue
 
-                use_max_prompts = value.get("use max prompts", value.get("use_max_prompts", 0))
-                use_min_prompts = value.get("use min prompts", value.get("use_min_prompts", 0))
+                use_max_prompts = value.get("use_max_prompts", 0)
+                use_min_prompts = value.get("use_min_prompts", 0)
                 prompts = value.get("prompts", [])
                 position = value.get("position", None)  # 位置パラメータを取得
 
@@ -488,8 +492,8 @@ class AutoImageGenerator:
 
                 # 条件が満たされた場合のみプロンプトを追加
                 if should_include:
-                    use_max_prompts = value.get("use max prompts", value.get("use_max_prompts", 0))
-                    use_min_prompts = value.get("use min prompts", value.get("use_min_prompts", 0))
+                    use_max_prompts = value.get("use_max_prompts", 0)
+                    use_min_prompts = value.get("use_min_prompts", 0)
                     prompts = value.get("prompts", [])
 
                     # ランダムな数のプロンプトを取得
@@ -854,11 +858,14 @@ class AutoImageGenerator:
                 else:
                     return self.SD_MODEL_PREFIX
             elif self.category == "animal":
-                # 動物の場合はyayoiMixを使用
-                if self.SD_MODEL_PREFIX == "petPhotography":
-                    return "petPhotography"  # petPhotographyが指定されている場合はそれを使用
-                else:
-                    return "yayoiMix"
+                # 動物の場合はpetPhotographyを使用
+                return "petPhotography"
+            elif self.category == "vehicle":
+                # 乗り物の場合はsd_xl_base_1.0を使用
+                return "sd_xl_base_1.0"
+            elif self.category == "background":
+                # 背景の場合はlandscapeRealisticを使用
+                return "landscapeRealistic"
 
         # イラスト風画像の場合
         elif self.style == "illustration":
@@ -883,11 +890,11 @@ class AutoImageGenerator:
                 # イラスト系の動物モデル
                 return "animagineXL"
             elif self.category == "background":
-                # 背景用モデル（将来的に追加予定）
-                return "brav7"  # 仮のモデル名
+                # 背景用モデル
+                return "landscapeRealistic"
             elif self.category == "vehicle":
-                # 乗り物用モデル（将来的に追加予定）
-                return "brav7"  # 仮のモデル名
+                # 乗り物用モデル
+                return "sd_xl_base_1.0"
             elif self.category == "other":
                 # その他のカテゴリ（将来的に追加予定）
                 return "brav7"  # 仮のモデル名
@@ -984,23 +991,33 @@ class AutoImageGenerator:
         )
 
     def run(self):
-        """画像生成処理を実行する"""
-        # プロンプトファイルを読み込む
-        self._load_prompt_files()
+        """画像生成を実行"""
+        try:
+            # プロンプトを生成
+            prompts = self.generate_prompts()
 
-        # 画像生成バッチを実行
-        total_batches = self.IMAGE_GENERATE_BATCH_EXECUTE_COUNT
-        logging.info(f"画像生成バッチを開始します。合計バッチ数: {total_batches}")
+            # ドライランモードの場合は、プロンプトの生成のみを行う
+            if self.dry_run:
+                self.logger.info("ドライランモード: プロンプトの生成のみを行います")
+                return prompts
 
-        for i in range(total_batches):
-            # 現在のバッチ番号をログに表示
-            current_batch = i + 1
-            logging.info(f"画像生成バッチ進捗: {current_batch}/{total_batches} ({(current_batch/total_batches)*100:.1f}%)")
+            # 画像生成の実行
+            total_batches = self.IMAGE_GENERATE_BATCH_EXECUTE_COUNT
+            logging.info(f"画像生成バッチを開始します。合計バッチ数: {total_batches}")
 
-            # 画像生成処理を実行
-            self._generate_images(current_batch, total_batches)
+            for i in range(total_batches):
+                # 現在のバッチ番号をログに表示
+                current_batch = i + 1
+                logging.info(f"画像生成バッチ進捗: {current_batch}/{total_batches} ({(current_batch/total_batches)*100:.1f}%)")
 
-        logging.info(f"画像生成バッチが完了しました。合計バッチ数: {total_batches}")
+                # 画像生成処理を実行
+                self._generate_images(current_batch, total_batches)
+
+            logging.info(f"画像生成バッチが完了しました。合計バッチ数: {total_batches}")
+
+        except Exception as e:
+            self.logger.error(f"エラーが発生しました: {e}")
+            raise
 
     def generate_prompts(self, reuse_positive_base=None, reuse_positive_base_dict=None):
         """
@@ -1204,8 +1221,8 @@ class AutoImageGenerator:
         for category, category_data in data.items():
             prompts = category_data.get("prompts", [])
             # キー名を修正（アンダースコアからスペースに変更）
-            use_max_prompts = category_data.get("use max prompts", category_data.get("use_max_prompts", 0))
-            use_min_prompts = category_data.get("use min prompts", category_data.get("use_min_prompts", 0))
+            use_max_prompts = category_data.get("use_max_prompts", 0)
+            use_min_prompts = category_data.get("use_min_prompts", 0)
 
             # 選択するプロンプト数を決定
             if use_max_prompts == 0:
@@ -1347,27 +1364,23 @@ class AutoImageGenerator:
         return final_prompts
 
     def _generate_images(self, current_batch, total_batches):
-        """画像生成処理を実行する内部メソッド"""
-        # プロンプトを生成
+        """
+        画像の生成を行います。生成された画像は、指定された出力フォルダに保存されます。
+
+        Args:
+            current_batch (int): 現在のバッチ番号
+            total_batches (int): 総バッチ数
+
+        Returns:
+            None
+        """
+        # プロンプトの生成
         positive_prompt, negative_prompt, seed, prompt_info = self._create_prompts()
 
-        # ベースプロンプト情報を取得（別バージョンの画像生成時に再利用）
-        # 後方互換性のためにキーが存在しない場合のフォールバック処理を追加
-        reusable_base_prompts = prompt_info.get("reusable_base_prompts", [])
-        reusable_base_prompt_dict = prompt_info.get("reusable_base_prompt_dict", {})
-
-        # 古いバージョンとの互換性のため、キーが存在しない場合は空のリスト/辞書を使用
-        if not reusable_base_prompts and "positive_base_prompt_dict" in prompt_info:
-            # positive_base_prompt_dictから値を抽出してリストに変換
-            for prompts_list in prompt_info["positive_base_prompt_dict"].values():
-                reusable_base_prompts.extend(prompts_list)
-            reusable_base_prompt_dict = prompt_info["positive_base_prompt_dict"]
-            self.logger.info("後方互換性のためにpositive_base_prompt_dictからベースプロンプト情報を抽出しました")
-
-        # ログ出力
+        # プロンプトとモデル情報をログに出力
         self.logger.info(f"画像生成: ポジティブプロンプト={positive_prompt}")
         self.logger.info(f"画像生成: ネガティブプロンプト={negative_prompt}")
-        self.logger.info(f"画像生成: シード値={seed}")
+        self.logger.info(f"画像生成: Seed値={seed}")
         self.logger.info(f"画像生成: モデルチェックポイント={self.SD_MODEL_CHECKPOINT}")
         self.logger.info(f"画像生成: モデル名（JSONに記録）={os.path.splitext(self.SD_MODEL_CHECKPOINT)[0]}")
         self.logger.info(f"画像生成: カスタムチェックポイント使用={self.USE_CUSTOM_CHECKPOINT}")
@@ -1409,6 +1422,36 @@ class AutoImageGenerator:
         payload["width"] = self.width
         payload["height"] = self.height
 
+        # LoRAを使用する場合、LoRAの設定を追加
+        if self.USE_LORA and self.LORA_NAME:
+            self.logger.info(f"LoRA {self.LORA_NAME} を使用します")
+            try:
+                from main import LORA_SETTINGS
+                if self.LORA_NAME in LORA_SETTINGS:
+                    lora_settings = LORA_SETTINGS[self.LORA_NAME]
+                    lora_weight = lora_settings.get("weight", 0.7)  # デフォルト値は0.7
+                    # LoRAの設定をalwayson_scriptsに追加
+                    payload["alwayson_scripts"] = {
+                        "Additional Networks for Generating": {
+                            "args": [
+                                True,  # enabled
+                                "LoRA",  # モジュールタイプ
+                                [
+                                    [
+                                        f"{self.LORA_NAME}.safetensors",  # モデル名
+                                        lora_weight,  # 重み
+                                        0  # モデルのチャネル
+                                    ]
+                                ]
+                            ]
+                        }
+                    }
+                    self.logger.info(f"LoRA設定を追加しました: {self.LORA_NAME}, 重み: {lora_weight}")
+                else:
+                    self.logger.warning(f"警告: 指定されたLoRA '{self.LORA_NAME}' の設定が見つかりません")
+            except ImportError as e:
+                self.logger.warning(f"警告: LoRA設定の取得中にエラーが発生しました: {e}")
+
         # 透過背景の場合は設定を変更
         if self.IS_TRANSPARENT_BACKGROUND:
             try:
@@ -1431,6 +1474,10 @@ class AutoImageGenerator:
 
             # オリジナル画像のSeed値を保存
             original_seed = seed
+
+            # 再利用するベースプロンプトを取得
+            reusable_base_prompts = prompt_info.get("reusable_base_prompts", [])
+            reusable_base_prompt_dict = prompt_info.get("reusable_base_prompt_dict", {})
 
             # 別バージョンの画像を生成
             for i in range(1, self.ANOTHER_VERSION_GENERATE_COUNT + 1):
@@ -1640,7 +1687,7 @@ class AutoImageGenerator:
                             info_text = (
                                 f"{positive_prompt}\n"
                                 f"Negative prompt: {negative_prompt}\n"
-                                f"Steps: {payload.get('steps', 60)}, "
+                                f"Steps: {payload.get('steps', 50)}, "
                                 f"Sampler: {payload.get('sampler_name', 'DPM++ 2M')}, "
                                 f"CFG scale: {payload.get('cfg_scale', 7)}, "
                                 f"Seed: {seed}, "
@@ -1767,6 +1814,16 @@ class AutoImageGenerator:
     def _set_image_size_by_type(self):
         """画像タイプに基づいて画像サイズを設定する"""
         try:
+            # LoRAを使用している場合、LoRAの設定から画像サイズを取得
+            if self.USE_LORA and self.LORA_NAME:
+                lora_settings = self.settings.get("lora_settings", {}).get(self.LORA_NAME, {})
+                if lora_settings and "image_size" in lora_settings:
+                    image_size = lora_settings["image_size"]
+                    self.width = image_size.get("width", 768)
+                    self.height = image_size.get("height", 512)
+                    self.logger.info(f"LoRA {self.LORA_NAME} の設定に基づいて画像サイズを設定: {self.width}x{self.height}")
+                    return
+
             # settings.jsonから画像サイズを取得
             if self.style in self.settings.get("default_image_sizes", {}):
                 style_settings = self.settings["default_image_sizes"][self.style]

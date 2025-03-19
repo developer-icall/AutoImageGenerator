@@ -1,0 +1,69 @@
+{
+    "scooter": [
+        "aggressive styling",
+        "high performance",
+        "racing setup"
+    ],
+    "dirt bike": [
+        "chrome accents",
+        "in a showroom",
+        "on city streets",
+        "on a highway"
+    ],
+    "in a showroom": [
+        "in the rain",
+        "in the snow",
+        "on a race track",
+        "on a mountain road",
+        "on a highway",
+        "on a dirt trail"
+    ],
+    "in a garage": [
+        "at sunset",
+        "natural lighting",
+        "golden hour lighting",
+        "blue hour lighting"
+    ],
+    "at night": [
+        "natural lighting",
+        "golden hour lighting",
+        "blue hour lighting"
+    ],
+    "cafe racer": [
+        "off-road setup",
+        "touring setup",
+        "saddlebags"
+    ],
+    "anime style": [
+        "photorealistic",
+        "realistic",
+        "photograph",
+        "photo",
+        "realistic style",
+        "photorealistic style"
+    ],
+    "manga style": [
+        "photorealistic",
+        "realistic",
+        "photograph",
+        "photo",
+        "realistic style",
+        "photorealistic style"
+    ],
+    "2d illustration": [
+        "3d render",
+        "cgi",
+        "photorealistic",
+        "realistic",
+        "photograph",
+        "photo"
+    ],
+    "2.5d illustration": [
+        "3d render",
+        "cgi",
+        "photorealistic",
+        "realistic",
+        "photograph",
+        "photo"
+    ]
+}

@@ -1,0 +1,130 @@
+{
+    "Color": {
+        "use_max_prompts": 2,
+        "use_min_prompts": 0,
+        "prompts": [
+            "vibrant colors",
+            "pastel colors",
+            "neon colors",
+            "muted colors",
+            "monochrome",
+            "gradient colors",
+            "colorful design",
+            "bold color scheme",
+            "artistic color palette",
+            "stylized colors"
+        ]
+    },
+    "Environment": {
+        "use_max_prompts": 2,
+        "use_min_prompts": 1,
+        "prompts": [
+            "in a showroom",
+            "on a mountain road",
+            "on a highway",
+            "in a garage",
+            "at a motorcycle show",
+            "in an urban setting",
+            "on a race track",
+            "in a workshop",
+            "at a dealership",
+            "in a parking lot"
+        ]
+    },
+    "Lighting": {
+        "use_max_prompts": 2,
+        "use_min_prompts": 0,
+        "prompts": [
+            "anime lighting",
+            "manga shading",
+            "illustration lighting",
+            "dramatic lighting",
+            "cel shading",
+            "artistic lighting",
+            "stylized shadows",
+            "digital art lighting",
+            "concept art lighting",
+            "illustration effects"
+        ]
+    },
+    "Time of Day": {
+        "use_max_prompts": 1,
+        "use_min_prompts": 0,
+        "prompts": [
+            "during daytime",
+            "at sunset",
+            "at sunrise",
+            "during golden hour",
+            "during blue hour",
+            "at night",
+            "under studio lighting",
+            "in natural light",
+            "under spotlights",
+            "in ambient lighting"
+        ]
+    },
+    "Weather": {
+        "use_max_prompts": 1,
+        "use_min_prompts": 0,
+        "prompts": [
+            "clear sky",
+            "cloudy",
+            "overcast",
+            "after rain",
+            "sunny day",
+            "misty morning",
+            "foggy conditions",
+            "partly cloudy",
+            "bright daylight",
+            "moody atmosphere"
+        ]
+    },
+    "Vehicle Details": {
+        "use_max_prompts": 2,
+        "use_min_prompts": 0,
+        "prompts": [
+            "detailed anime motorcycle",
+            "manga style details",
+            "illustrated motorcycle parts",
+            "stylized motorcycle design",
+            "artistic motorcycle details",
+            "concept art motorcycle",
+            "digital art motorcycle",
+            "illustration motorcycle",
+            "anime motorcycle design",
+            "manga motorcycle details"
+        ]
+    },
+    "Rider Pose": {
+        "use_max_prompts": 1,
+        "use_min_prompts": 0,
+        "prompts": [
+            "anime riding pose",
+            "manga action pose",
+            "illustrated motorcycle pose",
+            "stylized riding position",
+            "artistic motorcycle pose",
+            "concept art pose",
+            "digital art pose",
+            "illustration pose",
+            "anime action scene",
+            "manga dynamic pose"
+        ]
+    },
+    "Scene": {
+        "use_max_prompts": 1,
+        "use_min_prompts": 0,
+        "prompts": [
+            "anime scene",
+            "manga panel",
+            "illustrated scene",
+            "stylized composition",
+            "artistic composition",
+            "concept art scene",
+            "digital art scene",
+            "illustration scene",
+            "anime background",
+            "manga background"
+        ]
+    }
+}

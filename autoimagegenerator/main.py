@@ -20,7 +20,7 @@ IMAGE_STYLES = {
             "models": ["yayoiMix", "petPhotography"]  # petPhotographyモデルを追加
         },
         "vehicle": {
-            "types": ["car", "ship", "airplane", "other"],
+            "types": ["car", "ship", "airplane", "motorcycle", "other"],
             "models": ["sd_xl_base_1.0"]  # SDXL Base 1.0モデルを追加
         },
         "background": {
@@ -42,15 +42,15 @@ IMAGE_STYLES = {
             "models": ["animagineXL"]  # animagineXL40_v4Optモデルを追加
         },
         "background": {
-            "types": ["nature", "city", "sea", "sky", "other"],
-            "models": []  # 未確定
+            "types": ["nature", "city", "sea", "sky", "other", "house"],
+            "models": ["landscapeRealistic"]  # landscapeRealisticモデルを設定
         },
         "rpg_icon": {
             "types": ["weapon", "monster", "other"],
             "models": ["photoRealRPG", "RPGIcon"]
         },
         "vehicle": {
-            "types": ["car", "ship", "airplane", "other"],
+            "types": ["car", "ship", "airplane", "motorcycle", "other"],
             "models": ["sd_xl_base_1.0"]  # SDXL Base 1.0モデルを追加
         },
         "other": {
@@ -79,18 +79,27 @@ LORA_SETTINGS = {
         "model": "sd_xl_base_1.0",
         "weight": 0.7,
         "trigger_word": "aw0k car"
+    },
+    "KawasakiNinja300": {
+        "model": "sd_xl_base_1.0",
+        "weight": 0.8,
+        "trigger_word": "kawasakininja300, motorcycle, realistic"
+    },
+    "waifu_on_Motorcycle_v2": {
+        "model": "sd_xl_base_1.0",
+        "weight": 0.7,
+        "trigger_word": "waifu on motorcycle, illustration, anime style"
+    },
+    "cybervehiclev4": {
+        "model": "sd_xl_base_1.0",
+        "weight": 0.75,
+        "trigger_word": "cyberpunk vehicle, futuristic motorcycle"
     }
 }
 
 SD_MODEL_SCRITPS = {
 
 }
-
-OUTPUT_FOLDER_MEN_PREFIX = "-men"
-
-OUTPUT_FOLDER_TRANSPARENT_BACKGROUND_PREFIX = "-transparent"
-
-OUTPUT_FOLDER_SELFIE_PREFIX = "-selfie"
 
 # settings.json から設定を読み込む
 try:
@@ -138,7 +147,7 @@ def validate_image_type(style, category, subcategory):
 
 def get_output_folder_prefix(args):
     """出力フォルダのプレフィックスを生成"""
-    prefix = f"/{args.style}/{args.category}"
+    prefix = f"{args.style}/{args.category}"
     if args.subcategory:
         prefix += f"/{args.subcategory}"
     return prefix
@@ -189,135 +198,81 @@ def main():
     parser.add_argument('--dry-run', action='store_true',
                         help='実際の画像生成を行わず、プロンプトの生成だけを行う')
     parser.add_argument('--width', type=int,
-                        help='画像の幅 (デフォルトは画像タイプに応じて自動設定)')
+                        help='生成する画像の幅 (デフォルト: settings.jsonの設定に従う)')
     parser.add_argument('--height', type=int,
-                        help='画像の高さ (デフォルトは画像タイプに応じて自動設定)')
+                        help='生成する画像の高さ (デフォルト: settings.jsonの設定に従う)')
     parser.add_argument('--use-lora', action='store_true',
-                        help='LoRAを使用して画像を生成する')
-    parser.add_argument('--lora-name',
-                        help='使用するLoRAの名前 (例: cars-000008)')
+                        help='LoRAを使用するかどうか')
+    parser.add_argument('--lora-name', choices=list(LORA_SETTINGS.keys()),
+                        help='使用するLoRAの名前 (例: KawasakiNinja300, waifu_on_Motorcycle_v2, cybervehiclev4)')
+    parser.add_argument('--prompts-folder',
+                        help='プロンプトフォルダのパス (デフォルト: autoimagegenerator/prompts)')
 
     args = parser.parse_args()
 
-    # 画像タイプの組み合わせをバリデーション
+    # 画像タイプの組み合わせが有効かチェック
     if not validate_image_type(args.style, args.category, args.subcategory):
-        print("エラー: 無効な画像タイプの組み合わせです")
         sys.exit(1)
+
+    # LoRAの使用チェック
+    if args.use_lora:
+        if not args.lora_name:
+            print("エラー: --use-loraが指定されていますが、--lora-nameが指定されていません")
+            sys.exit(1)
+        if args.lora_name not in LORA_SETTINGS:
+            print(f"エラー: 指定されたLoRA '{args.lora_name}' は設定に存在しません")
+            print(f"利用可能なLoRA: {', '.join(LORA_SETTINGS.keys())}")
+            sys.exit(1)
+        if args.model and args.model != LORA_SETTINGS[args.lora_name]["model"]:
+            print(f"警告: 指定されたモデル '{args.model}' はLoRA '{args.lora_name}' の推奨モデル '{LORA_SETTINGS[args.lora_name]['model']}' と異なります")
 
     # モデルの選択
     if not args.model:
-        # カテゴリーに応じてデフォルトモデルを選択
-        model = get_default_model(args.category, args.use_lora, args.lora_name)
-    else:
-        model = args.model
-
-    # モデルの存在確認
-    if model not in SD_MODEL_CHECKPOINTS:
-        print(f"エラー: 指定されたモデル '{model}' は存在しません")
-        sys.exit(1)
-
-    # LoRAを使用する場合、LoRAの設定を確認
-    if args.use_lora:
-        if not args.lora_name:
-            print("エラー: LoRAを使用する場合は、--lora-nameオプションでLoRAの名前を指定してください")
-            sys.exit(1)
-        if args.lora_name not in LORA_SETTINGS:
-            print(f"エラー: 指定されたLoRA '{args.lora_name}' は存在しません")
-            sys.exit(1)
-        if LORA_SETTINGS[args.lora_name]["model"] != model:
-            print(f"警告: 指定されたモデル '{model}' は、LoRA '{args.lora_name}' の推奨モデル '{LORA_SETTINGS[args.lora_name]['model']}' と異なります")
+        args.model = get_default_model(args.category, args.use_lora, args.lora_name)
 
     # モデルチェックポイントの選択
-    if args.model_checkpoint:
-        # モデルチェックポイントが直接指定された場合は、それを使用
-        model_checkpoint = args.model_checkpoint
-        print(f"指定されたモデルチェックポイント '{model_checkpoint}' を使用します")
-    else:
-        # モデル名に対応するチェックポイントを使用
-        model_checkpoint = SD_MODEL_CHECKPOINTS[model]
-
-    # ドライランモードの場合は、必要なモジュールのインポートをスキップ
-    if args.dry_run:
-        try:
-            from auto_image_generator import AutoImageGenerator
-        except ImportError as e:
-            print(f"警告: {e}")
-            print("ドライランモードでは一部の機能が制限されます")
-
-            # 引数の表示
-            print("\n--- 指定された引数 ---")
-            print(f"スタイル: {args.style}")
-            print(f"カテゴリー: {args.category}")
-            print(f"サブカテゴリー: {args.subcategory}")
-            print(f"モデル: {model}")
-            print(f"モデルチェックポイント: {model_checkpoint}")
-            print(f"ハイレゾ画像生成: {args.enable_hr}")
-            print("----------------------\n")
-
-            print("ドライランモードで実行しました。実際の画像生成は行われません。")
-            sys.exit(0)
-    else:
-        # 通常モードでは必要なモジュールをインポート
-        try:
-            from auto_image_generator import AutoImageGenerator
-        except ImportError as e:
-            print(f"エラー: {e}")
-            print("必要なモジュールがインストールされていません。")
-            print("pip install requests pillow tqdm を実行してください。")
+    if not args.model_checkpoint:
+        if args.model in SD_MODEL_CHECKPOINTS:
+            args.model_checkpoint = SD_MODEL_CHECKPOINTS[args.model]
+        else:
+            print(f"エラー: モデル '{args.model}' のチェックポイントが見つかりません")
             sys.exit(1)
 
-    # 透過背景の判定
-    is_transparent = args.subcategory == "transparent"
+    # プロンプトフォルダのパスを設定
+    if not args.prompts_folder:
+        args.prompts_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'prompts')
 
-    # セルフィーの判定
-    is_selfie = args.subcategory == "selfie"
-
-    # 出力フォルダのプレフィックスを生成
+    # 出力フォルダのプレフィックスを設定
     output_folder_prefix = get_output_folder_prefix(args)
 
-    # 処理の開始時間を記録
-    start_time = time.time()
-
-    # AutoImageGenerator インスタンスを作成
-    auto_image_generator = AutoImageGenerator(
+    # AutoImageGeneratorのインスタンスを作成
+    from auto_image_generator import AutoImageGenerator
+    generator = AutoImageGenerator(
         image_generate_batch_execute_count=settings.get("image_generate_batch_execute_count", 2),
         another_version_generate_count=settings.get("another_version_generate_count", 12),
-        input_folder="./images/input",
-        output_folder="./images/output",
-        prompts_folder="./prompts",
-        url="http://localhost:7860",
-        sd_model_checkpoint=model_checkpoint,
-        sd_model_prefix=model,
+        sd_model_checkpoint=args.model_checkpoint,
+        sd_model_prefix=args.model,
         enable_hr=args.enable_hr.lower() == 'true',
         output_folder_prefix=output_folder_prefix,
-        is_transparent_background=is_transparent,
-        is_selfie=is_selfie,
+        prompts_folder=args.prompts_folder,
         style=args.style,
         category=args.category,
         subcategory=args.subcategory,
+        use_lora=args.use_lora,
+        lora_name=args.lora_name,
         width=args.width,
         height=args.height,
-        use_custom_checkpoint=bool(args.model_checkpoint),
-        use_lora=args.use_lora,
-        lora_name=args.lora_name
+        dry_run=args.dry_run
     )
 
     # 画像生成の実行
     if args.dry_run:
-        # ドライラン（プロンプトの生成だけを行う）
-        print("ドライラン: 実際の画像生成は行いません")
-        prompts = auto_image_generator.generate_prompts()
-        print("生成されるプロンプト:")
-        print(f"ポジティブプロンプト: {prompts['positive_prompt']}")
-        print(f"ネガティブプロンプト: {prompts['negative_prompt']}")
+        print("ドライランモード: プロンプトの生成のみを行います")
+        prompts = generator.generate_prompts()
+        print("生成されたプロンプト:")
+        print(json.dumps(prompts, indent=2, ensure_ascii=False))
     else:
-        # 実際の画像生成を実行
-        auto_image_generator.run()
-
-    # 処理の終了時間を記録と表示
-    end_time = time.time()
-    elapsed_time = end_time - start_time
-    print(f"処理にかかった時間: {elapsed_time}秒")
+        generator.run()
 
 if __name__ == "__main__":
     main()

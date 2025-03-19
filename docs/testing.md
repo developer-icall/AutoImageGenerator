@@ -108,6 +108,49 @@ AutoImageGeneratorには、異なるパターンでの画像生成を自動的�
 }
 ```
 
+## バイク画像生成のテストパターン
+
+バイク画像生成のテストでは、以下のパターンが追加でテストされます：
+
+1. リアル調のバイク画像（KawasakiNinja300 LoRA使用）
+2. イラスト調のバイク画像（waifu_on_Motorcycle_v2 LoRA使用）
+3. サイバーパンク調のバイク画像（cybervehiclev4 LoRA使用）
+
+これらのテストパターンは、`test_patterns` 配列に以下のように追加されます：
+
+```json
+{
+    "name": "realistic_vehicle_motorcycle_kawasaki",
+    "style": "realistic",
+    "category": "vehicle",
+    "subcategory": "motorcycle",
+    "model": "sd_xl_base_1.0",
+    "use_lora": true,
+    "lora_name": "KawasakiNinja300",
+    "enable_hr": true
+},
+{
+    "name": "illustration_vehicle_motorcycle_waifu",
+    "style": "illustration",
+    "category": "vehicle",
+    "subcategory": "motorcycle",
+    "model": "sd_xl_base_1.0",
+    "use_lora": true,
+    "lora_name": "waifu_on_Motorcycle_v2",
+    "enable_hr": true
+},
+{
+    "name": "realistic_vehicle_motorcycle_cyber",
+    "style": "realistic",
+    "category": "vehicle",
+    "subcategory": "motorcycle",
+    "model": "sd_xl_base_1.0",
+    "use_lora": true,
+    "lora_name": "cybervehiclev4",
+    "enable_hr": true
+}
+```
+
 ## テスト結果の確認
 
 テスト実行後、以下の場所にテスト結果が保存されます：
@@ -134,4 +177,10 @@ tests/output/images/realistic/background/nature/
 tests/output/images/realistic/background/sea/
 tests/output/images/realistic/background/sky/
 tests/output/images/realistic/background/house/
+```
+
+また、バイク画像のテスト結果は以下のようなパスに保存されます：
+```
+tests/output/images/realistic/vehicle/motorcycle/
+tests/output/images/illustration/vehicle/motorcycle/
 ```

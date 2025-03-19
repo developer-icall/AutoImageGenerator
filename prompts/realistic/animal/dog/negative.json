@@ -1,9 +1,0 @@
-{
-  "Base Negative Prompt": {
-    "prompts": [
-      "((deformed)), ((disfigured)), ((poor details)), ((bad anatomy)), ((bad proportions)), ((poorly drawn)), ((extra limbs)), ((mutation)), ((mutated)), ((ugly)), ((disgusting)), ((blurry)), ((grainy)), ((human)), ((person)), ((people))"
-    ],
-    "use_max_prompts": 1,
-    "use_min_prompts": 1
-  }
-}

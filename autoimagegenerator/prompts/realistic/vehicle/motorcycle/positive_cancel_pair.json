@@ -1,0 +1,37 @@
+{
+    "scooter": [
+        "aggressive styling",
+        "high performance",
+        "racing setup"
+    ],
+    "dirt bike": [
+        "chrome accents",
+        "in a showroom",
+        "on city streets",
+        "on a highway"
+    ],
+    "in a showroom": [
+        "in the rain",
+        "in the snow",
+        "on a race track",
+        "on a mountain road",
+        "on a highway",
+        "on a dirt trail"
+    ],
+    "in a garage": [
+        "at sunset",
+        "natural lighting",
+        "golden hour lighting",
+        "blue hour lighting"
+    ],
+    "at night": [
+        "natural lighting",
+        "golden hour lighting",
+        "blue hour lighting"
+    ],
+    "cafe racer": [
+        "off-road setup",
+        "touring setup",
+        "saddlebags"
+    ]
+}

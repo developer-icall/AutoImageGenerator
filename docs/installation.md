@@ -112,3 +112,35 @@ python -m pip install --upgrade pip
 
 - 以下を参考にインストールしてください
     - https://www.perplexity.ai/search/stable-diffusion-web-ui-he-abg-bVWNoK55SCiEBdeBtUzk8w#0
+
+## 必要な拡張機能のインストール
+
+### Additional Networks（LoRA使用時に必要）
+
+1. Stable Diffusion Web UIを起動します
+
+2. 「Extensions」タブを開きます
+
+3. 「Install from URL」タブを開きます
+
+4. 以下のURLを入力して「Install」ボタンをクリックします：
+    ```
+    https://github.com/kohya-ss/sd-webui-additional-networks
+    ```
+
+5. インストール完了後、Web UIを再起動して拡張機能を有効化します
+
+6. 「Settings」タブで以下の設定を確認します：
+   - 「Additional Networks」セクションが存在すること
+   - 「Enable」がチェックされていること
+
+7. 「Additional Networks」タブが表示されていることを確認します
+   - タブが表示されない場合は、Web UIを再度再起動してください
+
+### トラブルシューティング
+
+LoRA使用時に「Script 'Additional Networks for Generating' not found」エラーが発生した場合：
+1. Web UIが正常に起動していることを確認
+2. 「Extensions」タブで「Additional Networks」が正しくインストールされていることを確認
+3. Web UIを再起動して拡張機能を再読み込み
+4. 問題が解決しない場合は、拡張機能を一度アンインストールして再インストール

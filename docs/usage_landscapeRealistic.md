@@ -47,6 +47,15 @@ python main.py --style illustration --category background --subcategory city
 
 # イラスト風の自然背景の生成
 python main.py --style illustration --category background --subcategory nature
+
+# イラスト風の海の背景の生成
+python main.py --style illustration --category background --subcategory sea
+
+# イラスト風の空の背景の生成
+python main.py --style illustration --category background --subcategory sky
+
+# イラスト風の家の背景の生成
+python main.py --style illustration --category background --subcategory house
 ```
 
 ## 詳細オプション
