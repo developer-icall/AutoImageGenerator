@@ -1,6 +1,6 @@
 {
     "Color": {
-        "use_max_prompts": 2,
+        "use_max_prompts": 1,
         "use_min_prompts": 0,
         "prompts": [
             "vibrant colors",
@@ -16,8 +16,8 @@
         ]
     },
     "Environment": {
-        "use_max_prompts": 2,
-        "use_min_prompts": 1,
+        "use_max_prompts": 1,
+        "use_min_prompts": 0,
         "prompts": [
             "in a showroom",
             "on a mountain road",
@@ -32,7 +32,7 @@
         ]
     },
     "Lighting": {
-        "use_max_prompts": 2,
+        "use_max_prompts": 1,
         "use_min_prompts": 0,
         "prompts": [
             "anime lighting",
@@ -80,7 +80,7 @@
         ]
     },
     "Vehicle Details": {
-        "use_max_prompts": 2,
+        "use_max_prompts": 1,
         "use_min_prompts": 0,
         "prompts": [
             "detailed anime motorcycle",

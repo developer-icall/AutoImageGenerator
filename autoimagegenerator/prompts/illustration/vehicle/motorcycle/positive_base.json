@@ -24,8 +24,8 @@
         ]
     },
     "Style": {
-        "use_max_prompts": 2,
-        "use_min_prompts": 1,
+        "use_max_prompts": 1,
+        "use_min_prompts": 0,
         "prompts": [
             "anime style",
             "manga style",
@@ -40,8 +40,8 @@
         ]
     },
     "Details": {
-        "use_max_prompts": 3,
-        "use_min_prompts": 1,
+        "use_max_prompts": 1,
+        "use_min_prompts": 0,
         "prompts": [
             "detailed design",
             "mechanical details",
@@ -67,8 +67,8 @@
         ]
     },
     "Rider Gear": {
-        "use_max_prompts": 2,
-        "use_min_prompts": 1,
+        "use_max_prompts": 1,
+        "use_min_prompts": 0,
         "prompts": [
             "full motorcycle gear",
             "leather jacket",
