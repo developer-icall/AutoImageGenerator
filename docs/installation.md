@@ -103,10 +103,41 @@ python -m pip install --upgrade pip
 
 1. 以下から Brav6 および Brav7 のモデルをダウンロード
     - [Beautiful Realistic Asians - v7 | Stable Diffusion Checkpoint | Civitai](https://civitai.com/models/25494/brabeautiful-realistic-asians-v2)
-2. Stable Diffusion Web UI Docker のインストールフォルダ以下にある `data\models\Stable-diffusion` フォルダ内にダウンロードしたモデルファイルを配置
+2. 以下から追加モデルをダウンロード
+    - [Photo Real V1.5 | Stable Diffusion Checkpoint | Civitai](https://civitai.com/models/97373/photo-real-v15)
+    - [Awesome RPG Icon 2000 | Stable Diffusion Checkpoint | Civitai](https://civitai.com/models/14483/awesome-rpg-icon-2000)
+    - [Animagine XL 4.0 | Stable Diffusion Checkpoint | Civitai](https://civitai.com/models/1188071/animagine-xl-40)
+    - [YayoiMix | Stable Diffusion Checkpoint | Civitai](https://civitai.com/models/83096/yayoimix)
+    - [Pet Photography Album of Animals | Stable Diffusion Checkpoint | Civitai](https://civitai.com/models/267871/pet-photography-album-of-animals-cats-and-dogs)
+    - [Stable Diffusion XL Base 1.0 | Hugging Face](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/blob/main/sd_xl_base_1.0.safetensors)
+    - [Landscape Realistic | Stable Diffusion Checkpoint | Civitai](https://civitai.com/models/85137?modelVersionId=148587)
+    - [Kawaii Realistic Anime Mix | Stable Diffusion Checkpoint | Civitai](https://civitai.com/models/104100/kawaii-realistic-anime-mix)
+3. Stable Diffusion Web UI Docker のインストールフォルダ以下にある `data\models\Stable-diffusion` フォルダ内にダウンロードしたモデルファイルを配置
     - 例: `C:\Users\k.hongou\Dev\stable-diffusion-webui-docker\data\models\Stable-diffusion`
         - beautifulRealistic_v60.safetensors
         - beautifulRealistic_v7.safetensors
+        - photoRealV15_photorealv21.safetensors
+        - RPGIcon.safetensors
+        - animagineXL40_v4Opt.safetensors
+        - yayoiMix_v25.safetensors
+        - petPhotographyAlbumOf_v10HomeEdition.safetensors
+        - sd_xl_base_1.0.safetensors
+        - landscapeRealistic_v20WarmColor.safetensors
+        - kawaiiRealisticAnime_a06.safetensors
+
+### 必要なLoRAのインストール
+
+1. 以下からLoRAモデルをダウンロード
+    - [JDM Cars XL | LoRA | Civitai](https://civitai.com/models/257037/jdm-cars-xl)
+    - [Kawasaki Ninja 300 | LoRA | Civitai](https://civitai.com/models/183116/kawasaki-ninja-300)
+    - [Waifu on Motorcycle | LoRA | Civitai](https://civitai.com/models/24864/waifu-on-motorcycle)
+    - [Cyberpunk Vehicles | LoRA | Civitai](https://civitai.com/models/116165/cyberpunk-vehicles)
+2. Stable Diffusion Web UI Docker のインストールフォルダ以下にある `data\models\Lora` フォルダ内にダウンロードしたLoRAファイルを配置
+    - 例: `C:\Users\k.hongou\Dev\stable-diffusion-webui-docker\data\models\Lora`
+        - cars-000008.safetensors
+        - KawasakiNinja300.safetensors
+        - waifu_on_Motorcycle_v2.safetensors
+        - cybervehiclev4.safetensors
 
 ### 背景透過写真を生成するために必要なモジュールのインストール
 
