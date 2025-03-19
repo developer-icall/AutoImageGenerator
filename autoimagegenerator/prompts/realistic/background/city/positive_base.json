@@ -33,11 +33,10 @@
       "art deco buildings",
       "victorian buildings",
       "asian architecture",
-      "european architecture",
-      "middle eastern architecture"
+      "european architecture"
     ],
-    "use_max_prompts": 2,
-    "use_min_prompts": 1
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
   },
   "City Features": {
     "prompts": [
@@ -64,7 +63,7 @@
       "rooftop view",
       "city panorama"
     ],
-    "use_max_prompts": 2,
-    "use_min_prompts": 1
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
   }
 }

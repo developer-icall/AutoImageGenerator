@@ -53,7 +53,6 @@
       "fantasy flat roof",
       "magical tiled roof",
       "anime thatched roof",
-      "fantasy metal roof",
       "magical gabled roof",
       "anime chimney",
       "fantasy fireplace",
@@ -73,7 +72,7 @@
       "anime impossible architecture",
       "fantasy crystalline features"
     ],
-    "use_max_prompts": 2,
+    "use_max_prompts": 1,
     "use_min_prompts": 1
   },
   "Surroundings": {
@@ -112,7 +111,7 @@
       "fantasy magical creatures",
       "magical glowing plants"
     ],
-    "use_max_prompts": 2,
+    "use_max_prompts": 1,
     "use_min_prompts": 1
   }
 }

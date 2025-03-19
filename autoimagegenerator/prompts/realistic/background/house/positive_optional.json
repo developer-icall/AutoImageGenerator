@@ -28,12 +28,11 @@
       "slate roof",
       "cedar shingles",
       "terracotta tiles",
-      "metal roofing",
       "marble features",
       "granite elements",
       "copper accents"
     ],
-    "use_max_prompts": 2,
+    "use_max_prompts": 1,
     "use_min_prompts": 0
   },
   "Property Details": {
@@ -54,7 +53,7 @@
       "blooming garden",
       "water feature"
     ],
-    "use_max_prompts": 2,
+    "use_max_prompts": 1,
     "use_min_prompts": 0
   }
 }

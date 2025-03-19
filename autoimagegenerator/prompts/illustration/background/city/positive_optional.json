@@ -32,7 +32,7 @@
       "fantasy rooftop gardens",
       "anime-style transportation"
     ],
-    "use_max_prompts": 2,
+    "use_max_prompts": 1,
     "use_min_prompts": 0
   },
   "Urban Setting": {
@@ -48,8 +48,7 @@
       "anime shopping area",
       "fantasy industrial zone",
       "magical port area",
-      "anime train station district",
-      "fantasy ethnic quarter"
+      "anime train station district"
     ],
     "use_max_prompts": 1,
     "use_min_prompts": 0

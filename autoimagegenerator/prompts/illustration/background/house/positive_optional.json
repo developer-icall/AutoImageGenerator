@@ -32,7 +32,7 @@
       "fantasy gleaming surfaces",
       "magical ice construction"
     ],
-    "use_max_prompts": 2,
+    "use_max_prompts": 1,
     "use_min_prompts": 0
   },
   "Property Details": {
@@ -53,7 +53,7 @@
       "fantasy blooming magical garden",
       "magical floating water feature"
     ],
-    "use_max_prompts": 2,
+    "use_max_prompts": 1,
     "use_min_prompts": 0
   }
 }

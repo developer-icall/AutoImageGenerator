@@ -30,7 +30,7 @@
       "with magic effects",
       "with electric sparks"
     ],
-    "use_max_prompts": 2,
+    "use_max_prompts": 1,
     "use_min_prompts": 0
   },
   "Camera Settings": {
@@ -62,7 +62,7 @@
       "with animated decals",
       "with light trails"
     ],
-    "use_max_prompts": 2,
+    "use_max_prompts": 1,
     "use_min_prompts": 0
   }
 }

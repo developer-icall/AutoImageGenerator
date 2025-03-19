@@ -38,7 +38,7 @@
       "fantasy oriental architecture",
       "cartoon-style buildings"
     ],
-    "use_max_prompts": 2,
+    "use_max_prompts": 1,
     "use_min_prompts": 1
   },
   "City Features": {
@@ -61,7 +61,7 @@
       "magical city panorama",
       "fantasy urban park"
     ],
-    "use_max_prompts": 2,
+    "use_max_prompts": 1,
     "use_min_prompts": 1
   }
 }

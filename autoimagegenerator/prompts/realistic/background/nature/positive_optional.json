@@ -51,7 +51,7 @@
       "exotic plants",
       "ancient trees"
     ],
-    "use_max_prompts": 2,
+    "use_max_prompts": 1,
     "use_min_prompts": 0
   }
 }
