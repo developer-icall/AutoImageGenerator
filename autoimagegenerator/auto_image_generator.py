@@ -1086,11 +1086,11 @@ class AutoImageGenerator:
             # 指定されたベースプロンプトを再利用
             positive_base_prompts = reuse_positive_base
             positive_base_prompt_dict = reuse_positive_base_dict
-            self.logger.info("ベースプロンプトを再利用します")
+            self.logger.debug("ベースプロンプトを再利用します")
         else:
             # 新しいベースプロンプトを生成
             # 一貫性のために、generate_random_promptsのみを使用
-            self.logger.info("新しいベースプロンプトを生成します")
+            self.logger.debug("新しいベースプロンプトを生成します")
             positive_base_prompt_str, positive_base_prompt_dict = self.generate_random_prompts(self.DATA_POSITIVE_BASE)
             positive_base_prompts = positive_base_prompt_str.split(", ") if positive_base_prompt_str else []
             self.logger.info(f"生成されたベースプロンプト: {positive_base_prompts}")
@@ -1099,27 +1099,27 @@ class AutoImageGenerator:
         # ポーズプロンプトを生成（セルフィーの場合はセルフィー用プロンプトを使用）
         if self.IS_SELFIE:
             # 一貫性のために、generate_random_promptsのみを使用
-            self.logger.info("セルフィー用プロンプトを生成します")
+            self.logger.debug("セルフィー用プロンプトを生成します")
             positive_pose_prompt_str, positive_pose_prompt_dict = self.generate_random_prompts(self.DATA_POSITIVE_SELFIE)
             positive_pose_prompts = positive_pose_prompt_str.split(", ") if positive_pose_prompt_str else []
             self.logger.debug(f"生成されたセルフィープロンプト: {positive_pose_prompts}")
         else:
             # 一貫性のために、generate_random_promptsのみを使用
-            self.logger.info("ポーズプロンプトを生成します")
+            self.logger.debug("ポーズプロンプトを生成します")
             positive_pose_prompt_str, positive_pose_prompt_dict = self.generate_random_prompts(self.DATA_POSITIVE_POSE)
             positive_pose_prompts = positive_pose_prompt_str.split(", ") if positive_pose_prompt_str else []
             self.logger.debug(f"生成されたポーズプロンプト: {positive_pose_prompts}")
 
         # オプショナルプロンプトを生成
         # 一貫性のために、generate_random_promptsのみを使用
-        self.logger.info("オプショナルプロンプトを生成します")
+        self.logger.debug("オプショナルプロンプトを生成します")
         positive_optional_prompt_str, positive_optional_prompt_dict = self.generate_random_prompts(self.DATA_POSITIVE_OPTIONAL)
         positive_optional_prompts = positive_optional_prompt_str.split(", ") if positive_optional_prompt_str else []
         self.logger.debug(f"生成されたオプショナルプロンプト: {positive_optional_prompts}")
 
         # ネガティブプロンプトを生成
         # 一貫性のために、generate_random_promptsのみを使用
-        self.logger.info("ネガティブプロンプトを生成します")
+        self.logger.debug("ネガティブプロンプトを生成します")
         negative_prompt_str, negative_prompt_dict = self.generate_random_prompts(self.DATA_NEGATIVE)
         negative_prompts = negative_prompt_str.split(", ") if negative_prompt_str else []
 
@@ -1128,7 +1128,7 @@ class AutoImageGenerator:
         self.logger.debug(f"互換性チェック前の元のプロンプト: {original_positive_prompts}")
 
         # プロンプトの組み合わせをチェックし、相性の悪い組み合わせを除外
-        self.logger.info("プロンプトの互換性チェックを実行します")
+        self.logger.debug("プロンプトの互換性チェックを実行します")
         positive_prompts = self._check_prompt_compatibility(original_positive_prompts)
         self.logger.debug(f"互換性チェック後のプロンプト: {positive_prompts}")
 
@@ -1164,7 +1164,7 @@ class AutoImageGenerator:
 
         # デバッグログを追加
         self.logger.info(f"_create_prompts完了。最終的なプロンプト情報生成完了")
-        self.logger.debug(f"最終的なポジティブプロンプト: {positive_prompt}")
+        self.logger.info(f"最終的なポジティブプロンプト: {positive_prompt}")
         self.logger.debug(f"最終的なネガティブプロンプト: {negative_prompt}")
 
         # 特にWeapon Typeの情報をログに出力
