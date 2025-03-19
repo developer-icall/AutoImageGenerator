@@ -1002,6 +1002,9 @@ class AutoImageGenerator:
     def run(self):
         """画像生成を実行"""
         try:
+            # 全体の処理開始時間を記録
+            total_start_time = time.time()
+
             # プロンプトを生成
             prompts = self.generate_prompts()
 
@@ -1022,7 +1025,10 @@ class AutoImageGenerator:
                 # 画像生成処理を実行
                 self._generate_images(current_batch, total_batches)
 
-            self.logger.info(f"画像生成バッチが完了しました。合計バッチ数: {total_batches}")
+            # 全体の処理所要時間を計算
+            total_end_time = time.time()
+            total_elapsed_time = total_end_time - total_start_time
+            self.logger.info(f"画像生成バッチが完了しました。合計バッチ数: {total_batches} (総所要時間: {total_elapsed_time:.2f}秒)")
 
         except Exception as e:
             self.logger.error(f"エラーが発生しました: {e}")
@@ -1383,6 +1389,9 @@ class AutoImageGenerator:
         Returns:
             None
         """
+        # バッチ処理開始時間を記録
+        batch_start_time = time.time()
+
         # プロンプトの生成
         positive_prompt, negative_prompt, seed, prompt_info = self._create_prompts()
 
@@ -1418,6 +1427,7 @@ class AutoImageGenerator:
 
         # フォルダが存在しない場合は作成
         os.makedirs(output_folder_path, exist_ok=True)
+        created_folder_path = output_folder_path  # エラー時のフォルダ削除用に保存
 
         # 画像生成のためのペイロードを作成
         payload = {
@@ -1527,6 +1537,11 @@ class AutoImageGenerator:
                 filename = f"{str(i+1).zfill(5)}"
                 self._generate_single_image(version_payload, output_folder_path, filename, result_images, version_prompt_info)
 
+            # バッチ処理の所要時間を計算
+            batch_end_time = time.time()
+            batch_elapsed_time = batch_end_time - batch_start_time
+            self.logger.info(f"バッチ {current_batch}/{total_batches} の処理が完了しました (所要時間: {batch_elapsed_time:.2f}秒)")
+
             return result_images
 
         except requests.exceptions.HTTPError as e:
@@ -1627,6 +1642,9 @@ class AutoImageGenerator:
             # 画像生成開始をログに記録
             self.logger.debug(f"画像生成開始: {filename}")
 
+            # 画像生成開始時間を記録
+            start_time = time.time()
+
             # 画像生成APIを呼び出す
             try:
                 # 正しいエンドポイントを使用
@@ -1649,7 +1667,7 @@ class AutoImageGenerator:
             images_processed_count = 0
             seed_value = 0
             parameters = ""
-            self.current_parameters = ""  # 現在のパラメータをクラス変数に保存
+            self.current_parameters = ""
 
             # 生成された画像を処理
             for i, image_data in enumerate(r['images']):
@@ -1739,6 +1757,7 @@ class AutoImageGenerator:
                                             self.debug.info(f"Seed値を抽出しました: {seed_value}")
                                         except ValueError:
                                             logging.warning(f"Seed値の変換に失敗しました: {value}")
+
                     except Exception as e:
                         logging.error(f"PNG情報の取得中にエラーが発生しました: {e}")
 
@@ -1811,7 +1830,9 @@ class AutoImageGenerator:
             )
 
             # 画像生成完了をログに記録
-            self.logger.info(f"画像生成完了: {filename}")
+            end_time = time.time()
+            elapsed_time = end_time - start_time
+            self.logger.info(f"画像生成完了: {filename} (所要時間: {elapsed_time:.2f}秒)")
 
             # 検証に成功したか最大試行回数に達した場合はループを終了
             return
