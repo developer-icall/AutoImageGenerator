@@ -1,2 +1,63 @@
 {
+  "fantasy forest": [
+    "realistic woods",
+    "photographic forest",
+    "documentary nature",
+    "urban setting",
+    "city landscape"
+  ],
+  "anime mountains": [
+    "realistic peaks",
+    "photorealistic mountain range",
+    "documentary landscape",
+    "urban cityscape"
+  ],
+  "cartoon waterfall": [
+    "realistic cascade",
+    "photographic waterfall",
+    "documentary nature",
+    "urban setting"
+  ],
+  "illustrated meadow": [
+    "photorealistic field",
+    "documentary style landscape",
+    "urban environment",
+    "cityscape"
+  ],
+  "painted landscape": [
+    "photographic nature",
+    "documentary landscape",
+    "urban setting",
+    "city view"
+  ],
+  "magical forest": [
+    "realistic woodland",
+    "documentary nature",
+    "urban environment",
+    "city setting"
+  ],
+  "whimsical garden": [
+    "realistic flora",
+    "documentary garden",
+    "urban park",
+    "city garden"
+  ],
+  "stylized wilderness": [
+    "photorealistic wild land",
+    "documentary nature",
+    "urban landscape",
+    "city environment"
+  ],
+  "vibrant nature": [
+    "monochrome landscape",
+    "black and white scene",
+    "urban landscape",
+    "city streets"
+  ],
+  "fantasy landscape": [
+    "realistic terrain",
+    "documentary landscape",
+    "urban setting",
+    "cityscape"
+  ]
 }

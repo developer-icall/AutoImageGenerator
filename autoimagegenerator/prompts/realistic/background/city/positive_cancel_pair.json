@@ -1,2 +1,68 @@
 {
+  "skyscrapers": [
+    "rural",
+    "countryside",
+    "mountain peak",
+    "forest interior",
+    "untouched wilderness",
+    "secluded beach"
+  ],
+  "busy street": [
+    "abandoned",
+    "deserted",
+    "ghosttown",
+    "empty roads",
+    "no people"
+  ],
+  "downtown": [
+    "rural farm",
+    "wilderness",
+    "desert",
+    "ocean view",
+    "dense forest"
+  ],
+  "urban landscape": [
+    "natural landscape",
+    "rural countryside",
+    "remote wilderness",
+    "pristine nature"
+  ],
+  "city lights": [
+    "daylight",
+    "sunrise",
+    "sunset",
+    "power outage",
+    "rural setting"
+  ],
+  "traffic": [
+    "empty street",
+    "abandoned",
+    "ghosttown",
+    "quiet neighborhood",
+    "no cars"
+  ],
+  "city park": [
+    "wilderness",
+    "untouched nature",
+    "dense forest",
+    "mountain range"
+  ],
+  "city skyline": [
+    "rural horizon",
+    "flat landscape",
+    "natural horizon",
+    "untouched wilderness"
+  ],
+  "busy intersection": [
+    "quiet country road",
+    "empty streets",
+    "rural path",
+    "abandoned"
+  ],
+  "modern architecture": [
+    "ancient ruins",
+    "medieval buildings",
+    "ancient temple",
+    "historical district"
+  ]
 }

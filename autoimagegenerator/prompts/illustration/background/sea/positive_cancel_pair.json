@@ -1,2 +1,63 @@
 {
+  "anime ocean": [
+    "realistic sea",
+    "photographic ocean",
+    "documentary marine scene",
+    "urban landscape",
+    "city view"
+  ],
+  "fantasy beach": [
+    "realistic shore",
+    "photographic beach",
+    "documentary coastal scene",
+    "urban setting"
+  ],
+  "cartoon waves": [
+    "realistic water",
+    "photographic waves",
+    "documentary marine scene",
+    "urban landscape"
+  ],
+  "illustrated coral reef": [
+    "photorealistic underwater scene",
+    "documentary marine life",
+    "urban setting",
+    "city landscape"
+  ],
+  "magical underwater scene": [
+    "realistic underwater view",
+    "documentary marine environment",
+    "urban landscape",
+    "city setting"
+  ],
+  "vibrant seascape": [
+    "monochrome ocean",
+    "black and white sea",
+    "urban view",
+    "city landscape"
+  ],
+  "painted harbor": [
+    "photorealistic port",
+    "documentary harbor scene",
+    "urban cityscape",
+    "city center"
+  ],
+  "stylized coastline": [
+    "realistic shore",
+    "photographic coast",
+    "documentary beach",
+    "urban landscape"
+  ],
+  "whimsical island": [
+    "realistic island",
+    "photographic isle",
+    "documentary land mass",
+    "urban setting"
+  ],
+  "anime tropical beach": [
+    "realistic tropical shore",
+    "photographic beach",
+    "documentary coastal scene",
+    "urban landscape"
+  ]
 }

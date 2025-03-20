@@ -1,2 +1,65 @@
 {
+  "colorful cityscape": [
+    "monochrome village",
+    "rural farm",
+    "natural landscape",
+    "wilderness",
+    "desert scene"
+  ],
+  "futuristic city": [
+    "ancient village",
+    "medieval town",
+    "historical settlement",
+    "rural countryside",
+    "natural setting"
+  ],
+  "anime city": [
+    "realistic urban landscape",
+    "photorealistic cityscape",
+    "documentary style",
+    "hyperrealistic city"
+  ],
+  "cyberpunk city": [
+    "pastoral village",
+    "rustic town",
+    "natural setting",
+    "countryside",
+    "historical district"
+  ],
+  "fantasy metropolis": [
+    "realistic urban landscape",
+    "modern city",
+    "real world architecture",
+    "documentary style"
+  ],
+  "cartoon skyscrapers": [
+    "realistic buildings",
+    "photorealistic architecture",
+    "natural landscape",
+    "countryside"
+  ],
+  "illustrated street": [
+    "photorealistic road",
+    "real city photo",
+    "documentary style",
+    "hyperrealistic street"
+  ],
+  "manga city background": [
+    "western comic style",
+    "realistic cityscape",
+    "photographic urban view",
+    "documentary urban setting"
+  ],
+  "stylized urban landscape": [
+    "realistic city view",
+    "photorealistic urban scene",
+    "documentary cityscape",
+    "natural landscape"
+  ],
+  "vibrant city": [
+    "muted rural scene",
+    "monochrome landscape",
+    "natural wilderness",
+    "desaturated countryside"
+  ]
 }
