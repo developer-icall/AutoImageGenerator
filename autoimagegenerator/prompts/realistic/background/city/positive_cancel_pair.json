@@ -64,5 +64,21 @@
     "medieval buildings",
     "ancient temple",
     "historical district"
+  ],
+  "asian architecture": [
+    "ancient ruins",
+    "medieval buildings",
+    "ancient temple",
+    "historical district",
+    "government district",
+    "skyscrapers",
+    "city skyline",
+    "busy intersection",
+    "busy street",
+    "downtown",
+    "urban landscape",
+    "city lights",
+    "traffic",
+    "city park"
   ]
 }
