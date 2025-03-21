@@ -1,4 +1,60 @@
 {
+  "Dog Action": {
+    "prompts": [
+      "sitting",
+      "standing",
+      "walking",
+      "running",
+      "playing",
+      "fetching",
+      "digging",
+      "swimming",
+      "sleeping",
+      "resting",
+      "panting",
+      "barking",
+      "howling",
+      "eating",
+      "drinking",
+      "chewing toy",
+      "carrying stick",
+      "carrying ball",
+      "chasing",
+      "herding",
+      "guarding",
+      "hunting",
+      "tracking",
+      "sniffing",
+      "begging",
+      "shaking",
+      "rolling over",
+      "giving paw"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  },
+  "Art Style": {
+    "prompts": [
+      "anime style",
+      "cartoon style",
+      "watercolor style",
+      "digital art",
+      "oil painting style",
+      "pencil sketch style",
+      "fantasy art style",
+      "children's book illustration style",
+      "comic book style",
+      "pixel art style",
+      "stained glass style",
+      "woodcut style",
+      "pop art style",
+      "art nouveau style",
+      "impressionist style",
+      "ukiyo-e style"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  },
   "Environment": {
     "prompts": [
       "in house",

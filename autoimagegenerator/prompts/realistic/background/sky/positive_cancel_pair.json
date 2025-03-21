@@ -56,7 +56,12 @@
     "bright sunlight",
     "indoor scene",
     "underground",
-    "new moon"
+    "new moon",
+    "bright sun",
+    "setting sun",
+    "rising sun",
+    "dusk sky",
+    "sun"
   ],
   "dramatic clouds": [
     "clear sky",
@@ -70,6 +75,21 @@
     "cloudless sky",
     "indoor scene",
     "underground",
-    "sunny day"
+    "sunny day",
+    "full moon",
+    "crescent moon",
+    "new moon",
+    "sun"
+  ],
+  "lightning strike": [
+    "clear day",
+    "cloudless sky",
+    "indoor scene",
+    "underground",
+    "sunny day",
+    "full moon",
+    "crescent moon",
+    "new moon",
+    "sun"
   ]
 }

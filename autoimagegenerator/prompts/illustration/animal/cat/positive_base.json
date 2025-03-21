@@ -78,60 +78,7 @@
       "bicolor pattern",
       "tricolor pattern"
     ],
-    "use_max_prompts": 1,
-    "use_min_prompts": 0
-  },
-  "Cat Action": {
-    "prompts": [
-      "sitting",
-      "standing",
-      "walking",
-      "running",
-      "jumping",
-      "pouncing",
-      "stretching",
-      "sleeping",
-      "grooming",
-      "playing",
-      "hunting",
-      "stalking",
-      "climbing",
-      "hiding",
-      "eating",
-      "drinking",
-      "yawning",
-      "purring",
-      "meowing",
-      "hissing",
-      "scratching",
-      "kneading"
-    ],
     "use_max_prompts": 0,
     "use_min_prompts": 0
-  },
-  "Art Style": {
-    "prompts": [
-      "anime style",
-      "cartoon style",
-      "watercolor style",
-      "digital art",
-      "oil painting style",
-      "pencil sketch style",
-      "vector art style",
-      "realistic illustration",
-      "stylized illustration",
-      "minimalist style",
-      "fantasy art style",
-      "children's book illustration style",
-      "comic book style",
-      "stained glass style",
-      "woodcut style",
-      "pop art style",
-      "art nouveau style",
-      "impressionist style",
-      "ukiyo-e style"
-    ],
-    "use_max_prompts": 1,
-    "use_min_prompts": 1
   }
 }

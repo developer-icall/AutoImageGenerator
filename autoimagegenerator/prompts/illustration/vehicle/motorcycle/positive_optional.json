@@ -1,4 +1,20 @@
 {
+    "Details": {
+        "use_max_prompts": 1,
+        "use_min_prompts": 0,
+        "prompts": [
+            "chrome accents",
+            "leather seat",
+            "custom paint job",
+            "polished metal",
+            "aerodynamic design",
+            "dual exhaust",
+            "LED lights",
+            "windshield",
+            "saddlebags",
+            "custom wheels"
+        ]
+    },
     "Color": {
         "use_max_prompts": 1,
         "use_min_prompts": 0,

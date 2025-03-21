@@ -14,9 +14,8 @@
       "concept art",
       "game art",
       "cartoon style",
-      "comic style",
-      "cel shaded",
-      "vector art"
+      "comic style"
+
     ],
     "use_max_prompts": 1,
     "use_min_prompts": 1,
