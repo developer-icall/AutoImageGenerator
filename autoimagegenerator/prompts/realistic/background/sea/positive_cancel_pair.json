@@ -1,0 +1,72 @@
+{
+  "ocean view": [
+    "mountain view",
+    "desert landscape",
+    "urban setting",
+    "forest interior",
+    "city skyline"
+  ],
+  "beach": [
+    "mountain peak",
+    "urban street",
+    "dense forest",
+    "city center",
+    "industrial area"
+  ],
+  "waves": [
+    "desert",
+    "mountains",
+    "dry land",
+    "city streets",
+    "urban landscape"
+  ],
+  "coastline": [
+    "inland",
+    "mountain ridge",
+    "city center",
+    "downtown",
+    "dense forest"
+  ],
+  "blue ocean": [
+    "arid desert",
+    "snowy landscape",
+    "city streets",
+    "urban jungle",
+    "dense forest"
+  ],
+  "tropical beach": [
+    "snowy landscape",
+    "arctic scene",
+    "urban setting",
+    "industrial zone",
+    "city center"
+  ],
+  "rocky shore": [
+    "sandy desert",
+    "urban landscape",
+    "city streets",
+    "downtown",
+    "pristine beach"
+  ],
+  "lighthouse": [
+    "city center",
+    "dense forest",
+    "desert",
+    "urban jungle",
+    "shopping district"
+  ],
+  "seaside": [
+    "mountain top",
+    "urban setting",
+    "city center",
+    "dense forest",
+    "desert landscape"
+  ],
+  "harbor": [
+    "mountain peak",
+    "desert",
+    "deep forest",
+    "urban center",
+    "countryside"
+  ]
+}

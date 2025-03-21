@@ -1,0 +1,9 @@
+{
+    "Base Negative Prompt": {
+        "use_max_prompts": 1,
+        "use_min_prompts": 1,
+        "prompts": [
+            "bad quality, poor quality, low quality, distorted, deformed, ugly, bad anatomy, bad proportions, duplicate, watermark, text, logo, signature, face visible, exposed face, unhelmeted rider, naked rider, inappropriate content, nsfw, photorealistic, realistic, photograph, photo"
+        ]
+    }
+}

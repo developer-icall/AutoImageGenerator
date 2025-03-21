@@ -1,0 +1,9 @@
+{
+  "City Negative Elements": {
+    "prompts": [
+      "worst quality, low quality, normal quality, blurry, distorted, ugly composition, deformed structures, unrealistic architecture, badly designed buildings, text, watermark, signature, people, portraits, photorealistic, 3d render, poor anatomy, wrong proportions, amateur drawing, bad perspective"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  }
+}

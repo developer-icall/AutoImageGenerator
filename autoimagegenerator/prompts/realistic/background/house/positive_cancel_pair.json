@@ -1,0 +1,72 @@
+{
+  "modern house": [
+    "ancient ruins",
+    "medieval castle",
+    "historical building",
+    "vintage architecture",
+    "traditional japanese house"
+  ],
+  "cottage": [
+    "skyscraper",
+    "high-rise building",
+    "urban apartment",
+    "modern office building",
+    "industrial facility"
+  ],
+  "mansion": [
+    "tiny house",
+    "small apartment",
+    "minimalist living",
+    "compact space",
+    "studio apartment"
+  ],
+  "traditional home": [
+    "futuristic architecture",
+    "ultra modern design",
+    "industrial style",
+    "spaceship interior",
+    "high-tech building"
+  ],
+  "cozy interior": [
+    "grand hall",
+    "industrial warehouse",
+    "spacious empty room",
+    "abandoned building",
+    "minimalist design"
+  ],
+  "log cabin": [
+    "glass skyscraper",
+    "modern apartment",
+    "industrial loft",
+    "office building",
+    "urban highrise"
+  ],
+  "suburban house": [
+    "city apartment",
+    "downtown loft",
+    "urban highrise",
+    "industrial complex",
+    "wilderness cabin"
+  ],
+  "country home": [
+    "urban apartment",
+    "city penthouse",
+    "downtown condo",
+    "industrial loft",
+    "skyscraper"
+  ],
+  "garden house": [
+    "desert dwelling",
+    "arctic home",
+    "underwater habitat",
+    "space station",
+    "industrial facility"
+  ],
+  "luxury villa": [
+    "modest apartment",
+    "tiny house",
+    "minimal living space",
+    "compact dwelling",
+    "industrial space"
+  ]
+}

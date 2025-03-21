@@ -1,0 +1,57 @@
+{
+  "Base Positive Prompt": {
+    "prompts": [
+      "(best quality, masterpiece:1.2), (illustration:1.3), (digital art:1.3), (detailed:1.2), (sharp focus:1.2)",
+      "(masterpiece:1.2), (illustration:1.3), (digital art:1.3), (sharp focus:1.2), (detailed:1.2)"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  },
+  "Art Style": {
+    "prompts": [
+      "anime style",
+      "manga style",
+      "concept art",
+      "game art",
+      "cartoon style",
+      "comic style",
+      "cel shaded",
+      "vector art"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1,
+    "position": "start"
+  },
+  "Car Type": {
+    "prompts": [
+      "sports car",
+      "racing car",
+      "futuristic car",
+      "fantasy car",
+      "cyberpunk car",
+      "steampunk car",
+      "hover car",
+      "concept car",
+      "muscle car",
+      "supercar"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  },
+  "Car Color": {
+    "prompts": [
+      "vibrant red car",
+      "electric blue car",
+      "metallic black car",
+      "pearl white car",
+      "chrome silver car",
+      "neon yellow car",
+      "emerald green car",
+      "candy orange car",
+      "iridescent car",
+      "color shifting car"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  }
+}

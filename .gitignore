@@ -70,3 +70,5 @@ autoimagegenerator/tests/temp_test_settings.json
 # ドキュメント関連
 docs/**/*.tmp
 docs/**/*.bak
+
+**/temp/**

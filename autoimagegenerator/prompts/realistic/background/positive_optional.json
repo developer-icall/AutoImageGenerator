@@ -1,0 +1,80 @@
+{
+  "Weather": {
+    "prompts": [
+      "clear sky",
+      "partly cloudy",
+      "cloudy sky",
+      "overcast sky",
+      "foggy atmosphere",
+      "misty atmosphere",
+      "rainy weather",
+      "after rain",
+      "snowy scene",
+      "sunny day"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  },
+  "Season": {
+    "prompts": [
+      "spring season",
+      "summer season",
+      "autumn season",
+      "winter season",
+      "cherry blossom season",
+      "autumn foliage",
+      "winter wonderland",
+      "lush greenery"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  },
+  "Time of Day": {
+    "prompts": [
+      "morning",
+      "midday",
+      "afternoon",
+      "evening",
+      "sunset",
+      "sunrise",
+      "twilight",
+      "night",
+      "midnight",
+      "golden hour",
+      "blue hour"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  },
+  "Mood": {
+    "prompts": [
+      "peaceful atmosphere",
+      "serene environment",
+      "tranquil scene",
+      "dramatic landscape",
+      "vibrant colors",
+      "nostalgic feeling",
+      "majestic scene",
+      "atmospheric",
+      "warm tones",
+      "cool tones"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  },
+  "Special Effects": {
+    "prompts": [
+      "lens flare",
+      "sun rays",
+      "god rays",
+      "backlit scene",
+      "silhouette effect",
+      "reflection in water",
+      "mist rising",
+      "dew drops",
+      "natural bokeh"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  }
+}

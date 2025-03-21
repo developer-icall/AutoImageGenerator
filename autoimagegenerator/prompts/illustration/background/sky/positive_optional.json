@@ -1,0 +1,62 @@
+{
+  "Sky Atmosphere": {
+    "prompts": [
+      "anime majestic sky",
+      "fantasy endless heavens",
+      "magical celestial view",
+      "anime heavenly atmosphere",
+      "fantasy dynamic skyscape",
+      "magical atmospheric beauty",
+      "anime stunning firmament",
+      "fantasy ethereal sky",
+      "magical luminous sky"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  },
+  "Sky Colors": {
+    "prompts": [
+      "anime blue gradient",
+      "fantasy fiery sunset colors",
+      "magical pastel dawn colors",
+      "anime golden sunset",
+      "fantasy pink and purple hues",
+      "magical crimson sunset",
+      "anime amber glow",
+      "fantasy azure blue",
+      "magical violet twilight",
+      "anime peach colored sky",
+      "fantasy lavender sky",
+      "magical indigo night",
+      "anime silver moonlight",
+      "fantasy copper tones",
+      "magical multicolored fantasy sky"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  },
+  "Celestial Objects": {
+    "prompts": [
+      "anime stylized sun",
+      "fantasy setting sun",
+      "magical rising sun",
+      "anime stylized full moon",
+      "fantasy crescent moon",
+      "magical twinkling stars",
+      "anime bright star",
+      "fantasy visible planets",
+      "magical fantasy constellation",
+      "anime shooting star",
+      "fantasy comet tail",
+      "magical styled constellations",
+      "anime milky way",
+      "fantasy galaxy view",
+      "magical celestial bodies",
+      "anime fantasy planets",
+      "fantasy multiple moons",
+      "magical cartoon sun"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  }
+}

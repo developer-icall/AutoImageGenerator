@@ -1,21 +1,21 @@
 {
   "Base Positive Prompt": {
     "prompts": [
-      "(best quality, masterpiece:1.2), (1girl:1.3), (looking at viewer:1.4), (illustration:1.4)"
+      "(best quality), (1girl:1.3), (looking at viewer:1.4), (illustration:1.4)"
     ],
-    "use max prompts": 1,
-    "use min prompts": 1
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
   },
   "Women Type": {
     "prompts": [
       "famous japanese idol",
-      "japanese cute girl, (24 years old:1.2)",
+      "japanese cute girl",
       "japanese kawaii",
       "japanese cool beauty",
       "japanese fashion model"
     ],
-    "use max prompts": 1,
-    "use min prompts": 1
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
   },
   "Body Type": {
     "prompts": [
@@ -28,8 +28,8 @@
       "Showcasing cleavage",
       "Emphasize the cleavage"
     ],
-    "use max prompts": 0,
-    "use min prompts": 0
+    "use_max_prompts": 0,
+    "use_min_prompts": 0
   },
   "age": {
     "prompts": [
@@ -39,8 +39,8 @@
       "(25 years old:1.2)",
       "(28 years old:1.2)"
     ],
-    "use max prompts": 0,
-    "use min prompts": 0
+    "use_max_prompts": 0,
+    "use_min_prompts": 0
   },
   "Hair Type": {
     "prompts": [
@@ -52,7 +52,7 @@
       "low ponytail",
       "curly hair",
       "perm hair",
-      "twintails, (24 years old)",
+      "twintails",
       "ponytail",
       "side ponytail",
       "bob cut",
@@ -64,12 +64,10 @@
       "flipped hair",
       "shiny hair",
       "messy hair",
-      "spiked hair",
       "straight hair",
       "drill hair",
       "natural wave hair",
-      "sauvage hair",
-      "low twintails, (24 years old)",
+      "low twintails",
       "french braid hair",
       "hair bun",
       "shaggy hair",
@@ -79,8 +77,8 @@
       "short hair",
       "Pixie Cut"
     ],
-    "use max prompts": 1,
-    "use min prompts": 1
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
   },
   "Hair Color": {
     "prompts": [
@@ -137,11 +135,11 @@
       "black hair",
       "black hair",
       "black hair, cloth color is white or gray",
-      "black hair, cloth color is white or gray or black",
-      "black hair, cloth color is white or gray or black",
+      "black hair",
+      "black hair",
       "jet black hair, cloth color is white or gray",
-      "jet black hair, cloth color is white or gray or black",
-      "jet black hair, cloth color is white or gray or black",
+      "jet black hair",
+      "jet black hair",
       "jet black hair",
       "sheer beige hair",
       "sheer beige hair",
@@ -155,11 +153,11 @@
       "ash hair",
       "blonde hair",
       "two-tone hair",
-      "red hair, cloth color is white or gray or black",
+      "red hair",
       "platinum hair",
       "pink hair, (white inner hair:1.3, cloth color is gray or black: 1.2)"
     ],
-    "use max prompts": 1,
-    "use min prompts": 1
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
   }
 }

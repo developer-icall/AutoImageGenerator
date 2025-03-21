@@ -1,0 +1,55 @@
+{
+  "Marine Atmosphere": {
+    "prompts": [
+      "tropical paradise",
+      "serene coastline",
+      "wild shores",
+      "pristine beach",
+      "secluded cove",
+      "exotic island",
+      "rocky seashore",
+      "dramatic coastal cliffs",
+      "windswept coast",
+      "maritime landscape"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  },
+  "Water Colors": {
+    "prompts": [
+      "azure waters",
+      "crystal blue water",
+      "turquoise sea",
+      "emerald green water",
+      "deep blue ocean",
+      "teal waters",
+      "aquamarine sea",
+      "indigo depths",
+      "sapphire waters",
+      "clear waters"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  },
+  "Coastal Details": {
+    "prompts": [
+      "sea foam",
+      "wave patterns",
+      "ripples on water",
+      "smooth pebbles",
+      "coral fragments",
+      "seashells",
+      "starfish",
+      "driftwood",
+      "coastal rocks",
+      "sea glass",
+      "rock pools",
+      "coastal flora",
+      "sand patterns",
+      "wet sand reflections",
+      "shoreline details"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  }
+}

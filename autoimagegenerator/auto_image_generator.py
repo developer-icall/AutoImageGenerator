@@ -14,9 +14,6 @@ import glob
 import math
 import shutil
 
-# 武器検証機能をインポート
-from weapon_validator import WeaponValidator
-
 class AutoImageGenerator:
 
     def __init__(
@@ -39,13 +36,28 @@ class AutoImageGenerator:
         width=None,
         height=None,
         use_custom_checkpoint=False,
-        enable_weapon_validation=False,  # 武器検証を実行するかどうかのオプション（デフォルトはFalse）
-        max_validation_attempts=3  # 武器検証失敗時の最大再生成回数
+        use_lora=False,
+        lora_name=None,
+        dry_run=False,
+        debug_mode=False
     ):
+        # 設定ファイルの読み込み
+        self.settings = self._load_settings()
+
+        # ドライランモードの設定
+        self.dry_run = dry_run
+
+        # デバッグモードの設定
+        self.debug_mode = debug_mode
+
         # モデル切り替えが実行済みかどうかを管理するフラグを追加
         self._model_switch_executed = False
         # 現在使用中のモデルを記録
         self._current_model = None
+
+        # LoRAの設定
+        self.USE_LORA = use_lora
+        self.LORA_NAME = lora_name
 
         # 画像タイプの設定を追加
         self.style = style
@@ -122,7 +134,7 @@ class AutoImageGenerator:
 
         # ロガーの設定
         self.logger = logging.getLogger(__name__)
-        self.logger.setLevel(logging.DEBUG)  # INFOからDEBUGに変更
+        self.logger.setLevel(logging.DEBUG if self.debug_mode else logging.INFO)
         if not self.logger.handlers:
             # コンソール出力用ハンドラ
             console_handler = logging.StreamHandler()
@@ -146,16 +158,18 @@ class AutoImageGenerator:
             self.logger.addHandler(file_handler)
 
             self.logger.info(f"ログファイルを作成しました: {log_file}")
+            if self.debug_mode:
+                self.logger.info("デバッグモードが有効です")
 
         # 画像タイプに応じたフォルダ構造を作成
         self._create_output_directories()
 
         # 画像タイプに基づいて適切なモデルを選択
-        # カスタムチェックポイントが指定されている場合は、モデル選択をスキップ
+        # カスタムチェックポイントが指定されている場合のみモデルを上書き
         if self.USE_CUSTOM_CHECKPOINT:
             self.model = self.SD_MODEL_PREFIX
             self.logger.info(f"カスタムチェックポイント {self.SD_MODEL_CHECKPOINT} を使用します")
-        else:
+        elif not self.SD_MODEL_PREFIX:  # モデルが指定されていない場合のみ自動選択
             self.model = self._select_model_by_image_type()
             # 選択されたモデルに基づいてSD_MODEL_CHECKPOINTを更新
             if self.model != self.SD_MODEL_PREFIX:
@@ -170,15 +184,18 @@ class AutoImageGenerator:
                 except (ImportError, KeyError) as e:
                     self.logger.warning(f"警告: モデルチェックポイントの取得中にエラーが発生しました: {e}")
                     self.logger.info(f"デフォルトモデル {self.SD_MODEL_CHECKPOINT} を使用します")
+        else:
+            self.model = self.SD_MODEL_PREFIX
+            self.logger.info(f"指定されたモデル {self.model} ({self.SD_MODEL_CHECKPOINT}) を使用します")
 
         # 画像サイズを設定
-        self.width = width
-        self.height = height
+        self.width = width if width is not None else 768  # デフォルト値を設定
+        self.height = height if height is not None else 768  # デフォルト値を設定
         self._set_image_size_by_type()
 
         # 共通のpayload設定を定義
         self.COMMON_PAYLOAD_SETTINGS = {
-            "steps": 60,
+            "steps": 50,
             "width": self.width,
             "height": self.height,
             "cfg_scale": 7,
@@ -217,6 +234,10 @@ class AutoImageGenerator:
         self.TRANPARENT_PAYLOAD = {
             "script_name": "ABG Remover",
             "script_args": [False, True, False, 0, False]   # 背景除去スクリプトの引数(背景透過画像のみ保存, 自動保存, カスタム背景色使用, 背景色, ランダム背景色使用)
+            # 注意: ABG Removerを使用すると、3つの画像が生成されます:
+            # 1つ目：元の画像（PNGInfo付き）
+            # 2つ目：マスク画像
+            # 3つ目：透過背景画像（実際に使用する画像）
         }
         self.DATA_POSITIVE_BASE = None
         self.DATA_POSITIVE_OPTIONAL = None
@@ -255,8 +276,16 @@ class AutoImageGenerator:
                 self.DATA_POSITIVE_POSE = json.load(file)
             with open(os.path.join(self.PROMPT_PATH, self.POSITIVE_PROMPT_OPTIONAL_FILENAME), 'r', encoding='utf-8') as file:
                 self.DATA_POSITIVE_OPTIONAL = json.load(file)
-            with open(os.path.join(self.PROMPT_PATH, self.POSITIVE_PROMPT_SELFIE_FILENAME), 'r', encoding='utf-8') as file:
-                self.DATA_POSITIVE_SELFIE = json.load(file)
+
+            # 動物カテゴリーの場合はセルフィープロンプトをスキップ
+            if self.category != "animal":
+                with open(os.path.join(self.PROMPT_PATH, self.POSITIVE_PROMPT_SELFIE_FILENAME), 'r', encoding='utf-8') as file:
+                    self.DATA_POSITIVE_SELFIE = json.load(file)
+            else:
+                # 動物カテゴリーの場合は空の辞書を設定
+                self.DATA_POSITIVE_SELFIE = {}
+                self.logger.info("動物カテゴリーのため、セルフィープロンプトをスキップします")
+
             with open(os.path.join(self.PROMPT_PATH, self.NEGATIVE_PROMPT_FILENAME), 'r', encoding='utf-8') as file:
                 self.DATA_NEGATIVE = json.load(file)
             with open(os.path.join(self.PROMPT_PATH, self.POSITIVE_PROMPT_CANCEL_PAIR_FILENAME), 'r', encoding='utf-8') as file:
@@ -269,13 +298,6 @@ class AutoImageGenerator:
 
         # Seed の桁数が少ない場合生成される画像の質が低い可能性が高いため、生成をキャンセルする閾値として設定
         self.CANCEL_MIN_SEED_VALUE = 999999999
-
-        # 武器検証の設定
-        self.enable_weapon_validation = enable_weapon_validation  # 武器検証を有効にするフラグ
-        self.max_validation_attempts = max_validation_attempts  # 検証失敗時の最大再生成回数
-
-        # 武器検証用のインスタンスを初期化（武器検証が有効な場合のみ）
-        self.weapon_validator = WeaponValidator(url) if enable_weapon_validation else None
 
     def _create_output_directories(self):
         """
@@ -297,7 +319,7 @@ class AutoImageGenerator:
             "animal": ["dog", "cat", "bird", "fish", "other"],
             "background": ["nature", "city", "sea", "sky", "other"],
             "rpg_icon": ["weapon", "monster", "other"],
-            "vehicle": ["car", "ship", "airplane", "other"]
+            "vehicle": ["car", "motorcycle", "ship", "airplane", "other"]
         }
 
         # ディレクトリ構造を作成
@@ -413,7 +435,7 @@ class AutoImageGenerator:
         }
 
         # デバッグログを追加
-        logging.info(f"generate_random_prompts開始。データキー: {list(data.keys())}")
+        self.logger.debug(f"generate_random_prompts開始。データキー: {list(data.keys())}")
 
         # 最初にすべてのカテゴリーのプロンプトを収集
         all_selected_prompts = {}
@@ -425,20 +447,20 @@ class AutoImageGenerator:
                 if "condition" in value:
                     continue
 
-                use_max_prompts = value.get("use max prompts", value.get("use_max_prompts", 0))
-                use_min_prompts = value.get("use min prompts", value.get("use_min_prompts", 0))
+                use_max_prompts = value.get("use_max_prompts", 0)
+                use_min_prompts = value.get("use_min_prompts", 0)
                 prompts = value.get("prompts", [])
                 position = value.get("position", None)  # 位置パラメータを取得
 
                 # デバッグログを追加
-                logging.info(f"カテゴリー: {key}, use_max_prompts: {use_max_prompts}, use_min_prompts: {use_min_prompts}, プロンプト数: {len(prompts)}, position: {position}")
+                self.logger.debug(f"カテゴリー: {key}, use_max_prompts: {use_max_prompts}, use_min_prompts: {use_min_prompts}, プロンプト数: {len(prompts)}, position: {position}")
 
                 # ランダムな数のプロンプトを取得
                 num_prompts = random.randint(use_min_prompts, use_max_prompts)
                 selected_prompts = random.sample(prompts, min(num_prompts, len(prompts)))
 
                 # 選択結果をログに出力
-                logging.info(f"カテゴリー: {key}, 選択数: {num_prompts}, 選択結果: {selected_prompts}")
+                self.logger.debug(f"カテゴリー: {key}, 選択数: {num_prompts}, 選択結果: {selected_prompts}")
 
                 # 結果を保存
                 prompt_json[key] = selected_prompts
@@ -447,7 +469,7 @@ class AutoImageGenerator:
                 # 位置指定がある場合は、対応するリストに追加
                 if position in positioned_prompts:
                     positioned_prompts[position].extend(selected_prompts)
-                    logging.info(f"カテゴリー: {key} のプロンプトを位置 {position} に配置します")
+                    self.logger.debug(f"カテゴリー: {key} のプロンプトを位置 {position} に配置します")
                 else:
                     # 位置指定がない場合は通常通り追加
                     combined_prompt.extend(selected_prompts)
@@ -461,7 +483,7 @@ class AutoImageGenerator:
                 position = value.get("position", None)  # 位置パラメータを取得
 
                 # デバッグログを追加
-                logging.info(f"条件付きカテゴリー: {key}, 条件カテゴリー: {condition_category}, 条件文字列: {condition_contains}, position: {position}")
+                self.logger.debug(f"条件付きカテゴリー: {key}, 条件カテゴリー: {condition_category}, 条件文字列: {condition_contains}, position: {position}")
 
                 # 条件をチェック
                 should_include = False
@@ -472,15 +494,15 @@ class AutoImageGenerator:
                         for contains_str in condition_contains:
                             if contains_str in prompt:
                                 should_include = True
-                                logging.info(f"条件一致: プロンプト '{prompt}' に '{contains_str}' が含まれています")
+                                self.logger.debug(f"条件一致: プロンプト '{prompt}' に '{contains_str}' が含まれています")
                                 break
                         if should_include:
                             break
 
                 # 条件が満たされた場合のみプロンプトを追加
                 if should_include:
-                    use_max_prompts = value.get("use max prompts", value.get("use_max_prompts", 0))
-                    use_min_prompts = value.get("use min prompts", value.get("use_min_prompts", 0))
+                    use_max_prompts = value.get("use_max_prompts", 0)
+                    use_min_prompts = value.get("use_min_prompts", 0)
                     prompts = value.get("prompts", [])
 
                     # ランダムな数のプロンプトを取得
@@ -488,7 +510,7 @@ class AutoImageGenerator:
                     selected_prompts = random.sample(prompts, min(num_prompts, len(prompts)))
 
                     # 選択結果をログに出力
-                    logging.info(f"条件付きカテゴリー: {key}, 条件満たす: True, 選択数: {num_prompts}, 選択結果: {selected_prompts}")
+                    self.logger.debug(f"条件付きカテゴリー: {key}, 条件満たす: True, 選択数: {num_prompts}, 選択結果: {selected_prompts}")
 
                     # 結果を保存
                     prompt_json[key] = selected_prompts
@@ -497,20 +519,20 @@ class AutoImageGenerator:
                     # 位置指定がある場合は、対応するリストに追加
                     if position in positioned_prompts:
                         positioned_prompts[position].extend(selected_prompts)
-                        logging.info(f"条件付きカテゴリー: {key} のプロンプトを位置 {position} に配置します")
+                        self.logger.debug(f"条件付きカテゴリー: {key} のプロンプトを位置 {position} に配置します")
                     else:
                         # 位置指定がない場合は通常通り追加
                         combined_prompt.extend(selected_prompts)
                 else:
-                    logging.info(f"条件付きカテゴリー: {key}, 条件満たす: False")
+                    self.logger.debug(f"条件付きカテゴリー: {key}, 条件満たす: False")
 
         # 位置指定されたプロンプトを適切な位置に配置
         final_prompt = positioned_prompts["start"] + combined_prompt + positioned_prompts["end"]
 
         # 最終結果をログに出力
-        logging.info(f"generate_random_prompts完了。結果: {json.dumps(prompt_json, indent=2, ensure_ascii=False)[:500]}...")
-        logging.info(f"位置指定プロンプト: start={positioned_prompts['start']}, end={positioned_prompts['end']}")
-        logging.info(f"最終プロンプト順序: {final_prompt}")
+        self.logger.debug(f"generate_random_prompts完了。結果: {json.dumps(prompt_json, indent=2, ensure_ascii=False)[:500]}...")
+        self.logger.debug(f"位置指定プロンプト: start={positioned_prompts['start']}, end={positioned_prompts['end']}")
+        self.logger.debug(f"最終プロンプト順序: {final_prompt}")
 
         return ", ".join(final_prompt), prompt_json
 
@@ -622,7 +644,7 @@ class AutoImageGenerator:
             positive_optional_prompt_dict (dict): オプショナルプロンプト辞書
             negative_prompt_dict (dict): ネガティブプロンプト辞書
             folder_path (str): 保存先フォルダパス
-            filename (str): ファイル名
+            filename (str): ファイル名（拡張子なし）
             cancel_prompts (list): キャンセルされたプロンプトのリスト
 
         Returns:
@@ -658,11 +680,11 @@ class AutoImageGenerator:
             # 実際のプロンプト情報を別のキーとして追加
             if "prompt" in self.current_png_info:
                 merged_dict["actual_prompt"] = self.current_png_info["prompt"]
-                logging.info(f"実際のプロンプトをJSONに保存します: {self.current_png_info['prompt'][:100]}...")
+                self.logger.debug(f"実際のプロンプトをJSONに保存します: {self.current_png_info['prompt'][:100]}...")
 
             if "negative_prompt" in self.current_png_info:
                 merged_dict["actual_negative_prompt"] = self.current_png_info["negative_prompt"]
-                logging.info(f"実際のネガティブプロンプトをJSONに保存します: {self.current_png_info['negative_prompt'][:100]}...")
+                self.logger.debug(f"実際のネガティブプロンプトをJSONに保存します: {self.current_png_info['negative_prompt'][:100]}...")
 
             # シード値を追加
             if "seed" in self.current_png_info:
@@ -674,13 +696,13 @@ class AutoImageGenerator:
                 lines = self.current_parameters.split('\n')
                 if lines:
                     merged_dict["actual_prompt"] = lines[0].strip()
-                    logging.info(f"代替手段で実際のプロンプトをJSONに保存します: {lines[0].strip()[:100]}...")
+                    self.logger.debug(f"代替手段で実際のプロンプトをJSONに保存します: {lines[0].strip()[:100]}...")
 
                     # Negative promptを探す
                     for i, line in enumerate(lines):
                         if line.startswith("Negative prompt:"):
                             merged_dict["actual_negative_prompt"] = line[len("Negative prompt:"):].strip()
-                            logging.info(f"代替手段で実際のネガティブプロンプトをJSONに保存します: {line[len('Negative prompt:'):].strip()[:100]}...")
+                            self.logger.debug(f"代替手段で実際のネガティブプロンプトをJSONに保存します: {line[len('Negative prompt:'):].strip()[:100]}...")
                             break
 
                     # Seedを探す
@@ -690,8 +712,8 @@ class AutoImageGenerator:
 
         # プロンプトをJSONファイルに保存
         json_filename = os.path.normpath(os.path.join(folder_path, filename + ".json"))
-        with open(json_filename, 'w') as json_file:
-            json.dump(merged_dict, json_file, indent=4)
+        with open(json_filename, 'w', encoding='utf-8') as json_file:
+            json.dump(merged_dict, json_file, indent=4, ensure_ascii=False)
 
         return {}
 
@@ -709,7 +731,7 @@ class AutoImageGenerator:
         transparent_image = transparent_image.resize(background_image.size)
 
         try:
-        # 透過画像を背景画像に合成
+            # 透過画像を背景画像に合成
             result_image = Image.alpha_composite(background_image, transparent_image)
         except ValueError as e:
             # エラーが発生した場合はログに記録し、背景画像をそのまま返す
@@ -845,8 +867,14 @@ class AutoImageGenerator:
                 else:
                     return self.SD_MODEL_PREFIX
             elif self.category == "animal":
-                # 動物の場合はyayoiMixを使用
-                return "yayoiMix"
+                # 動物の場合はpetPhotographyを使用
+                return "petPhotography"
+            elif self.category == "vehicle":
+                # 乗り物の場合はsd_xl_base_1.0を使用
+                return "sd_xl_base_1.0"
+            elif self.category == "background":
+                # 背景の場合はlandscapeRealisticを使用
+                return "landscapeRealistic"
 
         # イラスト風画像の場合
         elif self.style == "illustration":
@@ -871,11 +899,11 @@ class AutoImageGenerator:
                 # イラスト系の動物モデル
                 return "animagineXL"
             elif self.category == "background":
-                # 背景用モデル（将来的に追加予定）
-                return "brav7"  # 仮のモデル名
+                # 背景用モデル
+                return "landscapeRealistic"
             elif self.category == "vehicle":
-                # 乗り物用モデル（将来的に追加予定）
-                return "brav7"  # 仮のモデル名
+                # 乗り物用モデル
+                return "sd_xl_base_1.0"
             elif self.category == "other":
                 # その他のカテゴリ（将来的に追加予定）
                 return "brav7"  # 仮のモデル名
@@ -972,23 +1000,39 @@ class AutoImageGenerator:
         )
 
     def run(self):
-        """画像生成処理を実行する"""
-        # プロンプトファイルを読み込む
-        self._load_prompt_files()
+        """画像生成を実行"""
+        try:
+            # 全体の処理開始時間を記録
+            total_start_time = time.time()
 
-        # 画像生成バッチを実行
-        total_batches = self.IMAGE_GENERATE_BATCH_EXECUTE_COUNT
-        logging.info(f"画像生成バッチを開始します。合計バッチ数: {total_batches}")
+            # プロンプトを生成
+            prompts = self.generate_prompts()
 
-        for i in range(total_batches):
-            # 現在のバッチ番号をログに表示
-            current_batch = i + 1
-            logging.info(f"画像生成バッチ進捗: {current_batch}/{total_batches} ({(current_batch/total_batches)*100:.1f}%)")
+            # ドライランモードの場合は、プロンプトの生成のみを行う
+            if self.dry_run:
+                self.logger.info("ドライランモード: プロンプトの生成のみを行います")
+                return prompts
 
-            # 画像生成処理を実行
-            self._generate_images(current_batch, total_batches)
+            # 画像生成の実行
+            total_batches = self.IMAGE_GENERATE_BATCH_EXECUTE_COUNT
+            self.logger.info(f"画像生成バッチを開始します。合計バッチ数: {total_batches}")
 
-        logging.info(f"画像生成バッチが完了しました。合計バッチ数: {total_batches}")
+            for i in range(total_batches):
+                # 現在のバッチ番号をログに表示
+                current_batch = i + 1
+                self.logger.info(f"画像生成バッチ進捗: {current_batch}/{total_batches} ({(current_batch/total_batches)*100:.1f}%)")
+
+                # 画像生成処理を実行
+                self._generate_images(current_batch, total_batches)
+
+            # 全体の処理所要時間を計算
+            total_end_time = time.time()
+            total_elapsed_time = total_end_time - total_start_time
+            self.logger.info(f"画像生成バッチが完了しました。合計バッチ数: {total_batches} (総所要時間: {total_elapsed_time:.2f}秒)")
+
+        except Exception as e:
+            self.logger.error(f"エラーが発生しました: {e}")
+            raise
 
     def generate_prompts(self, reuse_positive_base=None, reuse_positive_base_dict=None):
         """
@@ -1032,7 +1076,8 @@ class AutoImageGenerator:
                 prompt_infoには生成されたプロンプト情報と、再利用可能なベースプロンプト情報が含まれる
         """
         # デバッグログを追加
-        logging.info(f"_create_prompts開始。reuse_positive_base: {reuse_positive_base is not None}, reuse_positive_base_dict: {reuse_positive_base_dict is not None}")
+        self.logger.info(f"_create_prompts開始。reuse_positive_base: {reuse_positive_base is not None}, reuse_positive_base_dict: {reuse_positive_base_dict is not None}")
+        self.logger.debug(f"現在のDATA_POSITIVE_CANCEL_PAIR: {self.DATA_POSITIVE_CANCEL_PAIR}")
 
         # ランダムなシード値を生成
         seed = random.randint(0, 4294967295)
@@ -1040,57 +1085,63 @@ class AutoImageGenerator:
         # キャンセル対象のシード値かチェック、または閾値よりも小さい場合は再生成
         while str(seed) in self.DATA_CANCEL_SEEDS or seed <= self.CANCEL_MIN_SEED_VALUE:
             seed = random.randint(0, 4294967295)
-            logging.info(f"キャンセル対象または閾値以下のシード値のため再生成します: {seed}")
+            self.logger.info(f"キャンセル対象または閾値以下のシード値のため再生成します: {seed}")
 
         # ベースプロンプトを生成または再利用
         if reuse_positive_base is not None and reuse_positive_base_dict is not None:
             # 指定されたベースプロンプトを再利用
             positive_base_prompts = reuse_positive_base
             positive_base_prompt_dict = reuse_positive_base_dict
-            logging.info("ベースプロンプトを再利用します")
+            self.logger.debug("ベースプロンプトを再利用します")
         else:
             # 新しいベースプロンプトを生成
             # 一貫性のために、generate_random_promptsのみを使用
-            logging.info("新しいベースプロンプトを生成します")
+            self.logger.debug("新しいベースプロンプトを生成します")
             positive_base_prompt_str, positive_base_prompt_dict = self.generate_random_prompts(self.DATA_POSITIVE_BASE)
             positive_base_prompts = positive_base_prompt_str.split(", ") if positive_base_prompt_str else []
-            logging.info(f"生成されたベースプロンプト: {positive_base_prompts}")
-            logging.info(f"生成されたベースプロンプト辞書: {json.dumps(positive_base_prompt_dict, indent=2, ensure_ascii=False)[:500]}...")
+            self.logger.info(f"生成されたベースプロンプト: {positive_base_prompts}")
+            self.logger.debug(f"生成されたベースプロンプト辞書: {json.dumps(positive_base_prompt_dict, indent=2, ensure_ascii=False)[:500]}...")
 
         # ポーズプロンプトを生成（セルフィーの場合はセルフィー用プロンプトを使用）
         if self.IS_SELFIE:
             # 一貫性のために、generate_random_promptsのみを使用
-            logging.info("セルフィー用プロンプトを生成します")
+            self.logger.debug("セルフィー用プロンプトを生成します")
             positive_pose_prompt_str, positive_pose_prompt_dict = self.generate_random_prompts(self.DATA_POSITIVE_SELFIE)
             positive_pose_prompts = positive_pose_prompt_str.split(", ") if positive_pose_prompt_str else []
+            self.logger.debug(f"生成されたセルフィープロンプト: {positive_pose_prompts}")
         else:
             # 一貫性のために、generate_random_promptsのみを使用
-            logging.info("ポーズプロンプトを生成します")
+            self.logger.debug("ポーズプロンプトを生成します")
             positive_pose_prompt_str, positive_pose_prompt_dict = self.generate_random_prompts(self.DATA_POSITIVE_POSE)
             positive_pose_prompts = positive_pose_prompt_str.split(", ") if positive_pose_prompt_str else []
+            self.logger.debug(f"生成されたポーズプロンプト: {positive_pose_prompts}")
 
         # オプショナルプロンプトを生成
         # 一貫性のために、generate_random_promptsのみを使用
-        logging.info("オプショナルプロンプトを生成します")
+        self.logger.debug("オプショナルプロンプトを生成します")
         positive_optional_prompt_str, positive_optional_prompt_dict = self.generate_random_prompts(self.DATA_POSITIVE_OPTIONAL)
         positive_optional_prompts = positive_optional_prompt_str.split(", ") if positive_optional_prompt_str else []
+        self.logger.debug(f"生成されたオプショナルプロンプト: {positive_optional_prompts}")
 
         # ネガティブプロンプトを生成
         # 一貫性のために、generate_random_promptsのみを使用
-        logging.info("ネガティブプロンプトを生成します")
+        self.logger.debug("ネガティブプロンプトを生成します")
         negative_prompt_str, negative_prompt_dict = self.generate_random_prompts(self.DATA_NEGATIVE)
         negative_prompts = negative_prompt_str.split(", ") if negative_prompt_str else []
 
         # 元のプロンプトリストを保存（互換性チェック前）
         original_positive_prompts = positive_base_prompts + positive_pose_prompts + positive_optional_prompts
+        self.logger.debug(f"互換性チェック前の元のプロンプト: {original_positive_prompts}")
 
         # プロンプトの組み合わせをチェックし、相性の悪い組み合わせを除外
+        self.logger.debug("プロンプトの互換性チェックを実行します")
         positive_prompts = self._check_prompt_compatibility(original_positive_prompts)
+        self.logger.debug(f"互換性チェック後のプロンプト: {positive_prompts}")
 
         # 除外されたプロンプトを特定
         excluded_prompts = [p for p in original_positive_prompts if p not in positive_prompts]
         if excluded_prompts:
-            logging.info(f"互換性チェックにより除外されたプロンプト: {', '.join(excluded_prompts)}")
+            self.logger.info(f"互換性チェックにより除外されたプロンプト: {', '.join(excluded_prompts)}")
 
             # 除外されたプロンプトに基づいて、各カテゴリの辞書を更新
             self._update_prompt_dict_based_on_exclusions(positive_base_prompt_dict, excluded_prompts)
@@ -1118,11 +1169,29 @@ class AutoImageGenerator:
         }
 
         # デバッグログを追加
-        logging.info(f"_create_prompts完了。最終的なプロンプト情報: {json.dumps(prompt_info, indent=2, ensure_ascii=False)[:500]}...")
+        self.logger.info(f"_create_prompts完了。最終的なプロンプト情報生成完了")
+        self.logger.info(f"最終的なポジティブプロンプト: {positive_prompt}")
+        self.logger.debug(f"最終的なネガティブプロンプト: {negative_prompt}")
 
         # 特にWeapon Typeの情報をログに出力
         if "Weapon Type" in positive_base_prompt_dict:
-            logging.info(f"Weapon Type情報: {json.dumps(positive_base_prompt_dict['Weapon Type'], indent=2, ensure_ascii=False)}")
+            self.logger.info(f"Weapon Type情報: {json.dumps(positive_base_prompt_dict['Weapon Type'], indent=2, ensure_ascii=False)}")
+
+        # LoRAを使用する場合、トリガーワードを追加
+        if self.USE_LORA and self.LORA_NAME:
+            try:
+                from main import LORA_SETTINGS
+                if self.LORA_NAME in LORA_SETTINGS:
+                    lora_settings = LORA_SETTINGS[self.LORA_NAME]
+                    trigger_word = lora_settings.get("trigger_word", "")
+                    if trigger_word:
+                        # トリガーワードを直接プロンプトリストに追加
+                        positive_prompts.insert(0, trigger_word)  # 先頭に追加
+                        # 最終的なプロンプトを更新
+                        positive_prompt = ", ".join(positive_prompts)
+                        self.logger.info(f"LoRAトリガーワード '{trigger_word}' を追加しました")
+            except ImportError as e:
+                self.logger.warning(f"警告: LoRA設定の取得中にエラーが発生しました: {e}")
 
         return positive_prompt, negative_prompt, seed, prompt_info
 
@@ -1137,6 +1206,8 @@ class AutoImageGenerator:
         if not excluded_prompts:
             return  # 除外するプロンプトがない場合は何もしない
 
+        self.logger.debug(f"プロンプト辞書の更新開始。除外対象プロンプト: {excluded_prompts}")
+
         # 各カテゴリについて処理
         for category, category_data in list(prompt_dict.items()):
             if isinstance(category_data, list):
@@ -1149,12 +1220,14 @@ class AutoImageGenerator:
                 # 変更があった場合はログに出力
                 if len(prompt_dict[category]) != len(original_prompts):
                     removed_prompts = [p for p in original_prompts if p in excluded_prompts]
-                    logging.info(f"カテゴリ '{category}' から以下のプロンプトを除外しました: {', '.join(removed_prompts)}")
+                    self.logger.info(f"カテゴリ '{category}' から以下のプロンプトを除外しました: {', '.join(removed_prompts)}")
 
                 # 空のリストになった場合は、カテゴリ自体を削除
                 if not prompt_dict[category]:
                     del prompt_dict[category]
-                    logging.info(f"カテゴリ '{category}' が空になったため削除しました")
+                    self.logger.info(f"カテゴリ '{category}' が空になったため削除しました")
+
+        self.logger.debug(f"プロンプト辞書の更新完了")
 
     def _generate_random_prompts_from_data(self, data):
         """データからランダムなプロンプトを生成する"""
@@ -1163,8 +1236,8 @@ class AutoImageGenerator:
         for category, category_data in data.items():
             prompts = category_data.get("prompts", [])
             # キー名を修正（アンダースコアからスペースに変更）
-            use_max_prompts = category_data.get("use max prompts", category_data.get("use_max_prompts", 0))
-            use_min_prompts = category_data.get("use min prompts", category_data.get("use_min_prompts", 0))
+            use_max_prompts = category_data.get("use_max_prompts", 0)
+            use_min_prompts = category_data.get("use_min_prompts", 0)
 
             # 選択するプロンプト数を決定
             if use_max_prompts == 0:
@@ -1184,6 +1257,87 @@ class AutoImageGenerator:
 
         return selected_prompts
 
+    def _apply_prompt_cancel_pairs(self, prompts):
+        """
+        positive_cancel_pair.jsonで定義された相性の悪いプロンプトの組み合わせを適用する
+
+        Args:
+            prompts (list): チェックするプロンプトのリスト
+
+        Returns:
+            list: 相性の悪いプロンプトが除外されたプロンプトのリスト
+        """
+        self.logger.debug(f"=== 相性の悪いプロンプトの組み合わせを適用開始 ===")
+        self.logger.debug(f"入力プロンプト: {prompts}")
+        self.logger.debug(f"DATA_POSITIVE_CANCEL_PAIR: {self.DATA_POSITIVE_CANCEL_PAIR}")
+
+        if not prompts or not hasattr(self, 'DATA_POSITIVE_CANCEL_PAIR') or not self.DATA_POSITIVE_CANCEL_PAIR:
+            self.logger.debug("プロンプトが空か、キャンセルペア設定がないため、変更なしで終了します")
+            return prompts
+
+        # 元のプロンプトリストをコピー
+        filtered_prompts = prompts.copy()
+        removed_prompts = []
+
+        # プロンプトリスト内に含まれるキーワードを検索
+        matched_keys = []
+        for prompt in prompts:
+            prompt_lower = prompt.lower()
+            self.logger.debug(f"プロンプトをチェック: {prompt} (lower: {prompt_lower})")
+
+            # キーワードとしてプロンプトが定義されている場合
+            for key in self.DATA_POSITIVE_CANCEL_PAIR:
+                # 完全一致または単語の始まりの部分が一致する場合
+                key_lower = key.lower()
+                if prompt_lower == key_lower or prompt_lower.startswith(key_lower + " "):
+                    self.logger.debug(f"キャンセルキーとマッチしました: {key}")
+                    matched_keys.append(key)
+                    break
+
+        # 見つかったキーに基づいて、対応するキャンセル対象のプロンプトを除外
+        for key in matched_keys:
+            cancel_list = self.DATA_POSITIVE_CANCEL_PAIR[key]
+            self.logger.debug(f"キー '{key}' に対するキャンセル対象リスト: {cancel_list}")
+
+            # 削除対象のプロンプトをリストから探して削除
+            for cancel_pattern in cancel_list:
+                self.logger.debug(f"キャンセル対象パターン: {cancel_pattern}")
+
+                cancel_pattern_lower = cancel_pattern.lower()
+                for p in filtered_prompts.copy():
+                    p_lower = p.lower()
+
+                    # 様々なマッチングパターンをチェック
+                    is_match = False
+
+                    # 1. 完全一致
+                    if p_lower == cancel_pattern_lower:
+                        is_match = True
+                    # 2. 単語の始まりの部分一致 (例: "looking at viewer" は "(looking at viewer:1.4)" にマッチ)
+                    elif cancel_pattern_lower in p_lower:
+                        # 括弧内のパラメータを考慮して部分一致を確認
+                        # 例: "(looking at viewer" は "(looking at viewer:1.4)" にマッチする
+                        base_pattern = cancel_pattern_lower.rstrip(")").strip()
+                        if base_pattern in p_lower:
+                            is_match = True
+
+                    if is_match:
+                        filtered_prompts.remove(p)
+                        removed_prompts.append(p)
+                        self.logger.info(f"相性の悪いプロンプト組み合わせのため削除: '{key}'と'{p}'")
+                        self.logger.debug(f"プロンプト '{p}' を削除しました (パターン: {cancel_pattern})")
+
+        # 除外されたプロンプトの数をログに出力
+        excluded_count = len(removed_prompts)
+        if excluded_count > 0:
+            self.logger.info(f"相性チェックにより{excluded_count}個のプロンプトが除外されました: {', '.join(removed_prompts)}")
+        else:
+            self.logger.debug("除外されたプロンプトはありませんでした")
+
+        self.logger.debug(f"フィルタリング後のプロンプト: {filtered_prompts}")
+        self.logger.debug(f"=== 相性の悪いプロンプトの組み合わせを適用終了 ===")
+        return filtered_prompts
+
     def _check_prompt_compatibility(self, prompts):
         """
         プロンプトの互換性をチェックし、最適化されたプロンプトリストを返す
@@ -1194,57 +1348,67 @@ class AutoImageGenerator:
         Returns:
             list: 最適化されたプロンプトのリスト
         """
+        self.logger.debug(f"プロンプト互換性チェック開始: {prompts}")
         if not prompts:
+            self.logger.debug("プロンプトが空のため、空のリストを返します")
             return []
 
         # 重複を除去
         unique_prompts = self._remove_duplicate_prompts(prompts)
+        self.logger.debug(f"重複除去後のプロンプト: {unique_prompts}")
+
+        # positive_cancel_pairを適用
+        self.logger.debug("positive_cancel_pairを適用します")
+        compatible_prompts = self._apply_prompt_cancel_pairs(unique_prompts)
+        self.logger.debug(f"positive_cancel_pair適用後のプロンプト: {compatible_prompts}")
 
         # プロンプトの最適化
-        optimized_prompts = self._optimize_prompts(unique_prompts)
+        optimized_prompts = self._optimize_prompts(compatible_prompts)
+        self.logger.debug(f"最適化後のプロンプト: {optimized_prompts}")
 
         # プロンプトの品質チェック
         final_prompts = self._check_prompt_quality(optimized_prompts)
+        self.logger.debug(f"品質チェック後の最終プロンプト: {final_prompts}")
 
         # 除外されたプロンプトの数をログに出力
         excluded_count = len(prompts) - len(final_prompts)
         if excluded_count > 0:
-            logging.info(f"互換性チェックにより{excluded_count}個のプロンプトが除外されました")
+            self.logger.info(f"互換性チェックにより{excluded_count}個のプロンプトが除外されました")
 
+        self.logger.debug(f"プロンプト互換性チェック終了")
         return final_prompts
 
     def _generate_images(self, current_batch, total_batches):
-        """画像生成処理を実行する内部メソッド"""
-        # プロンプトを生成
+        """
+        画像の生成を行います。生成された画像は、指定された出力フォルダに保存されます。
+
+        Args:
+            current_batch (int): 現在のバッチ番号
+            total_batches (int): 総バッチ数
+
+        Returns:
+            None
+        """
+        # バッチ処理開始時間を記録
+        batch_start_time = time.time()
+
+        # プロンプトの生成
         positive_prompt, negative_prompt, seed, prompt_info = self._create_prompts()
 
-        # ベースプロンプト情報を取得（別バージョンの画像生成時に再利用）
-        # 後方互換性のためにキーが存在しない場合のフォールバック処理を追加
-        reusable_base_prompts = prompt_info.get("reusable_base_prompts", [])
-        reusable_base_prompt_dict = prompt_info.get("reusable_base_prompt_dict", {})
-
-        # 古いバージョンとの互換性のため、キーが存在しない場合は空のリスト/辞書を使用
-        if not reusable_base_prompts and "positive_base_prompt_dict" in prompt_info:
-            # positive_base_prompt_dictから値を抽出してリストに変換
-            for prompts_list in prompt_info["positive_base_prompt_dict"].values():
-                reusable_base_prompts.extend(prompts_list)
-            reusable_base_prompt_dict = prompt_info["positive_base_prompt_dict"]
-            logging.info("後方互換性のためにpositive_base_prompt_dictからベースプロンプト情報を抽出しました")
-
-        # ログ出力
-        logging.info(f"画像生成: ポジティブプロンプト={positive_prompt}")
-        logging.info(f"画像生成: ネガティブプロンプト={negative_prompt}")
-        logging.info(f"画像生成: シード値={seed}")
-        logging.info(f"画像生成: モデルチェックポイント={self.SD_MODEL_CHECKPOINT}")
-        logging.info(f"画像生成: モデル名（JSONに記録）={os.path.splitext(self.SD_MODEL_CHECKPOINT)[0]}")
-        logging.info(f"画像生成: カスタムチェックポイント使用={self.USE_CUSTOM_CHECKPOINT}")
+        # プロンプトとモデル情報をログに出力
+        self.logger.info(f"画像生成: ポジティブプロンプト={positive_prompt}")
+        self.logger.info(f"画像生成: ネガティブプロンプト={negative_prompt}")
+        self.logger.info(f"画像生成: Seed値={seed}")
+        self.logger.info(f"画像生成: モデルチェックポイント={self.SD_MODEL_CHECKPOINT}")
+        self.logger.info(f"画像生成: モデル名（JSONに記録）={os.path.splitext(self.SD_MODEL_CHECKPOINT)[0]}")
+        self.logger.info(f"画像生成: カスタムチェックポイント使用={self.USE_CUSTOM_CHECKPOINT}")
 
         # バッチ進捗情報をログに出力
-        logging.info(f"バッチ {current_batch}/{total_batches} の画像生成を開始します")
+        self.logger.info(f"バッチ {current_batch}/{total_batches} の画像生成を開始します")
 
         # 最初にモデルを切り替え
         if not self.set_model(self.SD_MODEL_CHECKPOINT):
-            logging.error("モデルの切り替えに失敗したため、処理を中止します")
+            self.logger.error("モデルの切り替えに失敗したため、処理を中止します")
             return
 
         # 出力ディレクトリ構造を作成
@@ -1263,6 +1427,7 @@ class AutoImageGenerator:
 
         # フォルダが存在しない場合は作成
         os.makedirs(output_folder_path, exist_ok=True)
+        created_folder_path = output_folder_path  # エラー時のフォルダ削除用に保存
 
         # 画像生成のためのペイロードを作成
         payload = {
@@ -1272,6 +1437,40 @@ class AutoImageGenerator:
             "seed": seed,
         }
 
+        # 最新の画像サイズを使用するように更新
+        payload["width"] = self.width
+        payload["height"] = self.height
+
+        # LoRAを使用する場合、LoRAの設定を追加
+        if self.USE_LORA and self.LORA_NAME:
+            self.logger.info(f"LoRA {self.LORA_NAME} を使用します")
+            try:
+                from main import LORA_SETTINGS
+                if self.LORA_NAME in LORA_SETTINGS:
+                    lora_settings = LORA_SETTINGS[self.LORA_NAME]
+                    lora_weight = lora_settings.get("weight", 0.7)  # デフォルト値は0.7
+                    # LoRAの設定をalwayson_scriptsに追加
+                    payload["alwayson_scripts"] = {
+                        "Additional Networks for Generating": {
+                            "args": [
+                                True,  # enabled
+                                "LoRA",  # モジュールタイプ
+                                [
+                                    [
+                                        f"{self.LORA_NAME}.safetensors",  # モデル名
+                                        lora_weight,  # 重み
+                                        0  # モデルのチャネル
+                                    ]
+                                ]
+                            ]
+                        }
+                    }
+                    self.logger.info(f"LoRA設定を追加しました: {self.LORA_NAME}, 重み: {lora_weight}")
+                else:
+                    self.logger.warning(f"警告: 指定されたLoRA '{self.LORA_NAME}' の設定が見つかりません")
+            except ImportError as e:
+                self.logger.warning(f"警告: LoRA設定の取得中にエラーが発生しました: {e}")
+
         # 透過背景の場合は設定を変更
         if self.IS_TRANSPARENT_BACKGROUND:
             try:
@@ -1279,9 +1478,9 @@ class AutoImageGenerator:
                 payload = {**payload, **self.TRANPARENT_PAYLOAD}
                 # 透過背景用のプロンプトを追加
                 payload["prompt"] = "(no background: 1.3, white background: 1.3), " + payload["prompt"]
-                logging.info(f"透過画像生成モードを有効化しました。使用スクリプト: {self.TRANPARENT_PAYLOAD['script_name']}")
+                self.logger.info(f"透過画像生成モードを有効化しました。使用スクリプト: {self.TRANPARENT_PAYLOAD['script_name']}")
             except Exception as e:
-                logging.error(f"透過画像設定中にエラーが発生しました: {e}")
+                self.logger.error(f"透過画像設定中にエラーが発生しました: {e}")
                 # エラーが発生しても処理を続行
 
         # 結果を格納する辞書
@@ -1289,18 +1488,22 @@ class AutoImageGenerator:
 
         try:
             # オリジナル画像の生成
-            logging.info(f"バッチ {current_batch}/{total_batches} - オリジナル画像 (1/{self.ANOTHER_VERSION_GENERATE_COUNT + 1}) の生成を開始します")
+            self.logger.info(f"バッチ {current_batch}/{total_batches} - オリジナル画像 (1/{self.ANOTHER_VERSION_GENERATE_COUNT + 1}) の生成を開始します")
             self._generate_single_image(payload, output_folder_path, "00001", result_images, prompt_info)
 
             # オリジナル画像のSeed値を保存
             original_seed = seed
+
+            # 再利用するベースプロンプトを取得
+            reusable_base_prompts = prompt_info.get("reusable_base_prompts", [])
+            reusable_base_prompt_dict = prompt_info.get("reusable_base_prompt_dict", {})
 
             # 別バージョンの画像を生成
             for i in range(1, self.ANOTHER_VERSION_GENERATE_COUNT + 1):
                 # 進捗状況をログに出力
                 version_number = i + 1
                 total_versions = self.ANOTHER_VERSION_GENERATE_COUNT + 1
-                logging.info(f"バッチ {current_batch}/{total_batches} - バージョン画像 ({version_number}/{total_versions}) の生成を開始します")
+                self.logger.info(f"バッチ {current_batch}/{total_batches} - バージョン画像 ({version_number}/{total_versions}) の生成を開始します")
 
                 # 別バージョン用のプロンプトを生成（ベースプロンプトを再利用）
                 version_positive_prompt, version_negative_prompt, _, version_prompt_info = self._create_prompts(
@@ -1328,72 +1531,77 @@ class AutoImageGenerator:
                         version_payload = {**version_payload, **self.TRANPARENT_PAYLOAD}
                         version_payload["prompt"] = "(no background: 1.3, white background: 1.3), " + version_payload["prompt"]
                     except Exception as e:
-                        logging.error(f"透過画像設定中にエラーが発生しました: {e}")
+                        self.logger.error(f"透過画像設定中にエラーが発生しました: {e}")
 
                 # 別バージョンの画像を生成
                 filename = f"{str(i+1).zfill(5)}"
                 self._generate_single_image(version_payload, output_folder_path, filename, result_images, version_prompt_info)
 
+            # バッチ処理の所要時間を計算
+            batch_end_time = time.time()
+            batch_elapsed_time = batch_end_time - batch_start_time
+            self.logger.info(f"バッチ {current_batch}/{total_batches} の処理が完了しました (所要時間: {batch_elapsed_time:.2f}秒)")
+
             return result_images
 
         except requests.exceptions.HTTPError as e:
             # HTTPエラーの詳細情報を取得
-            logging.error(f"HTTPエラー: {e}")
+            self.logger.error(f"HTTPエラー: {e}")
             try:
                 # eオブジェクトからresponseを取得
                 response = e.response
                 error_json = response.json()
-                logging.error(f"サーバーからのエラー詳細: {json.dumps(error_json, indent=2, ensure_ascii=False)}")
+                self.logger.error(f"サーバーからのエラー詳細: {json.dumps(error_json, indent=2, ensure_ascii=False)}")
             except (json.JSONDecodeError, NameError, AttributeError):
                 try:
                     # eオブジェクトからresponseを取得できるか確認
                     if hasattr(e, 'response'):
-                        logging.error(f"サーバーからのレスポンス: {e.response.text}")
+                        self.logger.error(f"サーバーからのレスポンス: {e.response.text}")
                     else:
-                        logging.error("レスポンスオブジェクトが存在しません")
+                        self.logger.error("レスポンスオブジェクトが存在しません")
                 except Exception:
-                    logging.error("レスポンスオブジェクトが存在しません")
+                    self.logger.error("レスポンスオブジェクトが存在しません")
             except Exception as json_error:
-                logging.error(f"エラー情報の解析中に例外が発生しました: {json_error}")
+                self.logger.error(f"エラー情報の解析中に例外が発生しました: {json_error}")
 
             # エラー発生時にも作成したフォルダを削除
             if 'created_folder_path' in locals() and created_folder_path and os.path.exists(created_folder_path):
                 import shutil
                 try:
                     shutil.rmtree(created_folder_path)
-                    logging.info(f"エラー発生のため、フォルダを削除しました: {created_folder_path}")
+                    self.logger.info(f"エラー発生のため、フォルダを削除しました: {created_folder_path}")
                 except Exception as e2:
-                    logging.error(f"フォルダの削除中にエラーが発生しました: {e2}")
+                    self.logger.error(f"フォルダの削除中にエラーが発生しました: {e2}")
 
         except requests.exceptions.RequestException as e:
-            logging.error(f"API呼び出し中にエラーが発生しました: {e}")
+            self.logger.error(f"API呼び出し中にエラーが発生しました: {e}")
 
             # リクエストの内容を表示
             try:
-                logging.info(f"送信したリクエスト: {json.dumps(payload, indent=2, ensure_ascii=False)}")
+                self.logger.info(f"送信したリクエスト: {json.dumps(payload, indent=2, ensure_ascii=False)}")
             except Exception as req_error:
-                logging.error(f"リクエスト情報の表示中にエラーが発生しました: {req_error}")
+                self.logger.error(f"リクエスト情報の表示中にエラーが発生しました: {req_error}")
 
             # エラー発生時にも作成したフォルダを削除
             if 'created_folder_path' in locals() and created_folder_path and os.path.exists(created_folder_path):
                 import shutil
                 try:
                     shutil.rmtree(created_folder_path)
-                    logging.info(f"エラー発生のため、フォルダを削除しました: {created_folder_path}")
+                    self.logger.info(f"エラー発生のため、フォルダを削除しました: {created_folder_path}")
                 except Exception as e2:
-                    logging.error(f"フォルダの削除中にエラーが発生しました: {e2}")
+                    self.logger.error(f"フォルダの削除中にエラーが発生しました: {e2}")
 
         except Exception as e:
-            logging.error(f"画像生成中に予期しないエラーが発生しました: {e}")
+            self.logger.error(f"画像生成中に予期しないエラーが発生しました: {e}")
 
             # エラー発生時にも作成したフォルダを削除
             if 'created_folder_path' in locals() and created_folder_path and os.path.exists(created_folder_path):
                 import shutil
                 try:
                     shutil.rmtree(created_folder_path)
-                    logging.info(f"エラー発生のため、フォルダを削除しました: {created_folder_path}")
+                    self.logger.info(f"エラー発生のため、フォルダを削除しました: {created_folder_path}")
                 except Exception as e2:
-                    logging.error(f"フォルダの削除中にエラーが発生しました: {e2}")
+                    self.logger.error(f"フォルダの削除中にエラーが発生しました: {e2}")
 
         return result_images
 
@@ -1404,11 +1612,11 @@ class AutoImageGenerator:
             weapon_type = None
             if self.style == "illustration" and self.category == "rpg_icon" and self.subcategory == "weapon":
                 # デバッグログを追加
-                logging.info(f"武器タイプ抽出を開始します。prompt_info: {json.dumps(prompt_info, indent=2, ensure_ascii=False)[:500]}...")
+                self.logger.debug(f"武器タイプ抽出を開始します。prompt_info: {json.dumps(prompt_info, indent=2, ensure_ascii=False)[:500]}...")
 
                 # プロンプトから武器タイプを抽出
                 if "positive_base_prompt_dict" in prompt_info and "Weapon Type" in prompt_info["positive_base_prompt_dict"]:
-                    logging.info(f"positive_base_prompt_dict内のWeapon Type: {json.dumps(prompt_info['positive_base_prompt_dict']['Weapon Type'], indent=2, ensure_ascii=False)}")
+                    self.logger.debug(f"positive_base_prompt_dict内のWeapon Type: {json.dumps(prompt_info['positive_base_prompt_dict']['Weapon Type'], indent=2, ensure_ascii=False)}")
 
                     # 辞書構造を確認して適切にアクセス
                     weapon_type_data = prompt_info["positive_base_prompt_dict"]["Weapon Type"]
@@ -1425,74 +1633,105 @@ class AutoImageGenerator:
                     if weapon_prompts:
                         # 最初の武器タイプを使用
                         weapon_type = weapon_prompts[0].lower()
-                        logging.info(f"抽出された武器タイプ: {weapon_type}")
+                        self.logger.debug(f"抽出された武器タイプ: {weapon_type}")
                     else:
                         logging.warning("武器タイプが見つかりませんでした")
                 else:
                     logging.warning("武器タイプ情報が見つかりませんでした")
 
             # 画像生成開始をログに記録
-            logging.info(f"画像生成開始: {filename}")
+            self.logger.debug(f"画像生成開始: {filename}")
 
-            # 武器検証が有効で武器タイプが指定されている場合の処理
-            max_attempts = self.max_validation_attempts if self.enable_weapon_validation and weapon_type else 1
-            validation_attempts = 0
-            is_valid = False
-            validation_message = ""
+            # 画像生成開始時間を記録
+            start_time = time.time()
 
-            # 武器検証のための再試行ループ
-            while validation_attempts < max_attempts and not is_valid:
-                validation_attempts += 1
-                if validation_attempts > 1:
-                    logging.info(f"武器画像の検証に失敗したため、再生成を試みます（試行回数: {validation_attempts}/{max_attempts}）")
-
-                # 画像生成APIを呼び出す
+            # 画像生成APIを呼び出す
+            try:
+                # 正しいエンドポイントを使用
+                response = requests.post(url=self.TXT2IMG_URL, json=payload)
+                response.raise_for_status()
+            except requests.exceptions.HTTPError as e:
+                self.logger.error(f"画像生成中にエラーが発生しました: {e}")
+                self.logger.error(f"HTTPエラー: {e}")
                 try:
-                    # 正しいエンドポイントを使用
-                    response = requests.post(url=self.TXT2IMG_URL, json=payload)
-                    response.raise_for_status()
-                except requests.exceptions.HTTPError as e:
-                    self.logger.error(f"画像生成中にエラーが発生しました: {e}")
-                    self.logger.error(f"HTTPエラー: {e}")
+                    error_detail = response.json()
+                    self.logger.error(f"サーバーからのエラー詳細: {json.dumps(error_detail, indent=2, ensure_ascii=False)}")
+                except:
+                    self.logger.error("サーバーからのエラー詳細を取得できませんでした")
+                raise
+
+            # レスポンスからJSONデータを取得
+            r = response.json()
+
+            # 画像処理用の変数を初期化
+            images_processed_count = 0
+            seed_value = 0
+            parameters = ""
+            self.current_parameters = ""
+
+            # 生成された画像を処理
+            for i, image_data in enumerate(r['images']):
+                images_processed_count += 1
+                self.logger.debug(f"透過画像生成時の画像処理回数: {images_processed_count}")
+                # Base64エンコードされた画像データをデコード
+                image = Image.open(io.BytesIO(base64.b64decode(image_data.split(",", 1)[0])))
+
+                # 透過画像生成時は最初の１つ目の r['images'] にのみ PNG 画像情報があるので、そこから各種値を取得
+                # seed_value == 0 ではなく、最初の画像（images_processed_count == 1）から必ずPNGInfoを取得する
+                if images_processed_count == 1:
                     try:
-                        error_detail = response.json()
-                        self.logger.error(f"サーバーからのエラー詳細: {json.dumps(error_detail, indent=2, ensure_ascii=False)}")
-                    except:
-                        self.logger.error("サーバーからのエラー詳細を取得できませんでした")
-                    raise
+                        # ABG Removerを使用した場合、最初の画像にのみPNGInfoが含まれているため、
+                        # ここで取得したPNGInfoを3つ目の透過画像用に保持する必要がある
+                        png_payload = {
+                            "image": "data:image/png;base64," + image_data
+                        }
+                        self.logger.debug("最初の画像からPNGInfoを取得しています...")
+                        self.logger.debug(f"PNGInfo APIエンドポイント: {self.PNGINFO_URL}")
+                        self.logger.debug(f"PNGInfo APIペイロードの長さ: {len(json.dumps(png_payload))}")
 
-                # レスポンスからJSONデータを取得
-                r = response.json()
+                        # リクエスト送信前にデータの先頭部分をログに記録
+                        image_data_preview = image_data[:100] + "..." if len(image_data) > 100 else image_data
+                        self.logger.debug(f"画像データプレビュー: {image_data_preview}")
 
-                # 画像処理用の変数を初期化
-                images_processed_count = 0
-                seed_value = 0
-                parameters = ""
-                self.current_parameters = ""  # 現在のパラメータをクラス変数に保存
+                        response2 = requests.post(url=self.PNGINFO_URL, json=png_payload)
+                        self.logger.debug(f"PNGInfo APIステータスコード: {response2.status_code}")
+                        response2.raise_for_status()
 
-                # 生成された画像を処理
-                for i, image_data in enumerate(r['images']):
-                    images_processed_count += 1
-                    # Base64エンコードされた画像データをデコード
-                    image = Image.open(io.BytesIO(base64.b64decode(image_data.split(",", 1)[0])))
+                        # PNGInfoを取得
+                        info_text = response2.json().get("info", "")
+                        if not info_text:
+                            logging.error("PNGInfoが空でした！レスポンス全体を確認します。")
+                            logging.error(f"PNGInfo API レスポンス: {json.dumps(response2.json(), indent=2, ensure_ascii=False)}")
 
-                    # 透過画像生成時は最初の１つ目の r['images'] にのみ PNG 画像情報があるので、そこから各種値を取得
-                    if seed_value == 0:
-                        try:
-                            png_payload = {
-                                "image": "data:image/png;base64," + image_data
-                            }
-                            response2 = requests.post(url=self.PNGINFO_URL, json=png_payload)
-                            response2.raise_for_status()
+                            # PNGInfoが空の場合、元のプロンプト情報からデフォルトのPNGInfoを生成
+                            # payloadから直接情報を取得
+                            # 元のプロンプトとネガティブプロンプトを取得
+                            positive_prompt = payload.get("prompt", "")
+                            negative_prompt = payload.get("negative_prompt", "")
+                            seed = payload.get("seed", 0)
 
-                            # PNGInfoを取得
-                            info_text = response2.json().get("info", "")
-                            logging.info(f"取得したPNGInfo: {info_text[:200]}...")  # 最初の200文字だけログに出力
+                            # デフォルトのPNGInfo文字列を生成
+                            info_text = (
+                                f"{positive_prompt}\n"
+                                f"Negative prompt: {negative_prompt}\n"
+                                f"Steps: {payload.get('steps', 50)}, "
+                                f"Sampler: {payload.get('sampler_name', 'DPM++ 2M')}, "
+                                f"CFG scale: {payload.get('cfg_scale', 7)}, "
+                                f"Seed: {seed}, "
+                                f"Size: {payload.get('width', 512)}x{payload.get('height', 768)}, "
+                                f"Model: {self.SD_MODEL_CHECKPOINT}"
+                            )
+                            self.logger.debug("デフォルトのPNGInfo情報を生成しました")
+                        else:
+                            self.logger.debug(f"取得したPNGInfo: {info_text[:200]}...")  # 最初の200文字だけログに出力
 
-                            # パラメータを保存
-                            parameters = info_text
-                            self.current_parameters = info_text  # 現在のパラメータをクラス変数に保存
+                        # パラメータを保存
+                        parameters = info_text if info_text else "デフォルトパラメータ（PNGInfoが取得できませんでした）"
+                        self.current_parameters = parameters  # 現在のパラメータをクラス変数に保存
+                        self.logger.debug(f"保存したパラメータの長さ: {len(parameters)}")
 
+                        # PNGInfoが取得できた場合のみ解析を行う
+                        if info_text:
                             # PNGInfoを解析（先頭に「Prompt:」はない前提）
                             lines = info_text.split('\n')
                             self.current_png_info = {}
@@ -1501,7 +1740,7 @@ class AutoImageGenerator:
                             if lines:
                                 prompt_line = lines[0].strip()
                                 self.current_png_info["prompt"] = prompt_line
-                                logging.info(f"最初の行からプロンプトを抽出しました: {prompt_line[:100]}...")
+                                self.logger.debug(f"最初の行からプロンプトを抽出しました: {prompt_line[:100]}...")
 
                             # 残りの行をパラメータとして解析
                             for line in lines[1:]:
@@ -1515,77 +1754,59 @@ class AutoImageGenerator:
                                     if key.lower() == "seed":
                                         try:
                                             seed_value = int(value)
-                                            logging.info(f"Seed値を抽出しました: {seed_value}")
+                                            self.debug.info(f"Seed値を抽出しました: {seed_value}")
                                         except ValueError:
                                             logging.warning(f"Seed値の変換に失敗しました: {value}")
-                        except Exception as e:
-                            logging.error(f"PNG情報の取得中にエラーが発生しました: {e}")
 
-                    # 透過画像生成時は３つ目の画像のみを保存するため、１つ目と２つ目はスキップ
-                    if self.IS_TRANSPARENT_BACKGROUND and images_processed_count != 3:
-                        continue
+                    except Exception as e:
+                        logging.error(f"PNG情報の取得中にエラーが発生しました: {e}")
 
-                    # 画像のメタデータを設定
-                    pnginfo = PngImagePlugin.PngInfo()
+                # 透過画像生成時は３つ目の画像のみを保存するため、１つ目と２つ目はスキップ
+                # ABG Removerの出力: 1つ目=元画像、2つ目=マスク画像、3つ目=透過背景画像
+                if self.IS_TRANSPARENT_BACKGROUND and images_processed_count != 3:
+                    continue
+
+                # 画像のメタデータを設定
+                pnginfo = PngImagePlugin.PngInfo()
+                # 透過画像生成時に3つ目の画像にも1つ目の画像から取得したPNGInfoを適用する
+                if self.IS_TRANSPARENT_BACKGROUND and images_processed_count == 3 and self.current_parameters:
+                    self.logger.debug(f"透過画像に元画像のPNGInfoを適用します。長さ: {len(self.current_parameters)}")
+                    pnginfo.add_text("parameters", self.current_parameters)
+                else:
+                    if not parameters:
+                        logging.warning("PNGInfoに設定するパラメータが空です。")
+                        parameters = "自動生成された画像（詳細情報なし）"
+                    self.logger.debug(f"通常の方法でPNGInfoを設定します。長さ: {len(parameters)}")
                     pnginfo.add_text("parameters", parameters)
 
-                    # 画像ファイルパスを生成
-                    image_path = os.path.normpath(os.path.join(output_folder_path, filename + self.IMAGE_FILE_EXTENSION))
+                # 画像ファイルパスを生成
+                image_path = os.path.normpath(os.path.join(output_folder_path, filename + self.IMAGE_FILE_EXTENSION))
 
-                    # 画像を保存
-                    image.save(image_path, pnginfo=pnginfo)
+                # 画像を保存
+                image.save(image_path, pnginfo=pnginfo)
 
-                    # 画像をJPG形式でも保存
-                    jpg_file_path = os.path.normpath(os.path.join(output_folder_path, filename + ".jpg"))
-                    image.convert("RGB").save(jpg_file_path, format="JPEG")
-
-                    # 結果を辞書に追加
-                    result_images[filename] = {
-                        "path": image_path,
-                        "seed": seed_value,
-                        "parameters": parameters
-                    }
-
-                    # 武器検証が有効で武器タイプが指定されている場合は検証を実行
-                    if self.enable_weapon_validation and weapon_type:
-                        try:
-                            # 武器画像検証用のAPIを呼び出す
-                            validation_url = f"{self.URL.replace('/sdapi/v1/txt2img', '')}/weapon_validation"
-                            validation_payload = {
-                                "image": "data:image/png;base64," + image_data,
-                                "weapon_type": weapon_type
-                            }
-                            validation_response = requests.post(url=validation_url, json=validation_payload)
-                            validation_response.raise_for_status()
-
-                            # 検証結果を取得
-                            validation_result = validation_response.json()
-                            is_valid = validation_result.get("is_valid", False)
-                            validation_message = validation_result.get("message", "検証結果が不明です")
-
-                            if is_valid:
-                                logging.info(f"武器画像の検証に成功しました: {validation_message}")
-                                break  # 検証に成功したらループを終了
+                # 保存後にPNGInfoが正しく設定されたか確認（デバッグ用）
+                if self.IS_TRANSPARENT_BACKGROUND and images_processed_count == 3:
+                    try:
+                        # 保存した画像を開いて確認
+                        with Image.open(image_path) as saved_image:
+                            if 'parameters' in saved_image.info:
+                                self.logger.debug(f"透過画像にPNGInfoが正しく保存されました。長さ: {len(saved_image.info['parameters'])}")
                             else:
-                                logging.warning(f"武器画像の検証に失敗しました: {validation_message}")
-                                # 検証に失敗した場合は再試行（ループ内で処理）
-                        except Exception as e:
-                            logging.error(f"武器画像の検証中にエラーが発生しました: {e}")
-                            is_valid = False  # エラーが発生した場合は検証失敗とみなす
-                    else:
-                        is_valid = True  # 武器検証が無効または武器タイプが指定されていない場合は常に成功とみなす
-                        validation_message = "武器検証は実行されませんでした"
+                                logging.warning("透過画像にPNGInfoが保存されていません")
+                    except Exception as e:
+                        logging.error(f"保存した透過画像のPNGInfo確認中にエラーが発生しました: {e}")
 
-                # 検証に成功したか最大試行回数に達した場合はループを終了
-                if is_valid or validation_attempts >= max_attempts:
-                    break
+                # 画像をJPG形式でも保存
+                jpg_file_path = os.path.normpath(os.path.join(output_folder_path, filename + ".jpg"))
+                image.convert("RGB").save(jpg_file_path, format="JPEG")
 
-            # 最終的な検証結果をログに出力
-            if self.enable_weapon_validation and weapon_type:
-                if is_valid:
-                    logging.info(f"武器画像の検証に成功しました: {validation_message}")
-                else:
-                    logging.warning(f"武器画像の検証に失敗しましたが、最大試行回数に達したため処理を続行します: {validation_message}")
+                # 結果を辞書に追加
+                result_images[filename] = {
+                    "path": image_path,
+                    "seed": seed_value,
+                    "parameters": parameters
+                }
 
             # 関連画像（サムネイル、サンプル画像など）を生成
             self.generate_related_images(image, output_folder_path, filename, pnginfo)
@@ -1609,7 +1830,9 @@ class AutoImageGenerator:
             )
 
             # 画像生成完了をログに記録
-            logging.info(f"画像生成完了: {filename}")
+            end_time = time.time()
+            elapsed_time = end_time - start_time
+            self.logger.info(f"画像生成完了: {filename} (所要時間: {elapsed_time:.2f}秒)")
 
             # 検証に成功したか最大試行回数に達した場合はループを終了
             return
@@ -1619,67 +1842,38 @@ class AutoImageGenerator:
             raise e
 
     def _set_image_size_by_type(self):
-        """
-        画像タイプに応じて画像サイズを設定する
-        """
-        # 画像サイズが指定されていない場合は、デフォルト値を設定
-        if not self.width or not self.height:
-            # モデルに基づいて画像サイズを設定
-            model_name = self._select_model_by_image_type()
+        """画像タイプに基づいて画像サイズを設定する"""
+        try:
+            # LoRAを使用している場合、LoRAの設定から画像サイズを取得
+            if self.USE_LORA and self.LORA_NAME:
+                lora_settings = self.settings.get("lora_settings", {}).get(self.LORA_NAME, {})
+                if lora_settings and "image_size" in lora_settings:
+                    image_size = lora_settings["image_size"]
+                    self.width = image_size.get("width", 768)
+                    self.height = image_size.get("height", 512)
+                    self.logger.info(f"LoRA {self.LORA_NAME} の設定に基づいて画像サイズを設定: {self.width}x{self.height}")
+                    return
 
-            if model_name == "animagineXL":
-                # animagineXLモデルの場合
-                if self.IS_TRANSPARENT_BACKGROUND:
-                    self.width = 768
-                    self.height = 1024
-                else:
-                    self.width = 768
-                    self.height = 1024
-            elif model_name == "yayoiMix":
-                # yayoiMixモデルの場合
-                if self.IS_TRANSPARENT_BACKGROUND:
-                    self.width = 768
-                    self.height = 1024
-                else:
-                    self.width = 768
-                    self.height = 1024
-            else:
-                # その他のモデルの場合
-                if self.style == "realistic":
-                    if self.category == "female":
-                        if self.IS_TRANSPARENT_BACKGROUND:
-                            self.width = 512
-                            self.height = 768
-                        else:
-                            self.width = 512
-                            self.height = 768
-                    elif self.category == "male":
-                        if self.IS_TRANSPARENT_BACKGROUND:
-                            self.width = 512
-                            self.height = 768
-                        else:
-                            self.width = 512
-                            self.height = 768
-                elif self.style == "illustration":
-                    if self.category == "female":
-                        if self.IS_TRANSPARENT_BACKGROUND:
-                            self.width = 512
-                            self.height = 768
-                        else:
-                            self.width = 512
-                            self.height = 768
-                    elif self.category == "male":
-                        if self.IS_TRANSPARENT_BACKGROUND:
-                            self.width = 512
-                            self.height = 768
-                        else:
-                            self.width = 512
-                            self.height = 768
-                    elif self.category == "rpg_icon":
-                        self.width = 512
-                        self.height = 512
+            # settings.jsonから画像サイズを取得
+            if self.style in self.settings.get("default_image_sizes", {}):
+                style_settings = self.settings["default_image_sizes"][self.style]
+                if self.category in style_settings:
+                    size_settings = style_settings[self.category]
+                    self.width = size_settings.get("width", 512)
+                    self.height = size_settings.get("height", 768)
+                    self.logger.info(f"画像サイズを設定: {self.width}x{self.height}")
+                    return
 
-        logging.info(f"画像サイズを設定しました: {self.width}x{self.height}")
+            # デフォルト値の設定
+            self.width = 512
+            self.height = 768
+            self.logger.info(f"デフォルトの画像サイズを使用: {self.width}x{self.height}")
+
+        except Exception as e:
+            self.logger.error(f"画像サイズの設定中にエラーが発生しました: {e}")
+            # エラーが発生した場合はデフォルト値を使用
+            self.width = 512
+            self.height = 768
 
     def _parse_png_info(self, info_text):
         """
@@ -1757,7 +1951,7 @@ class AutoImageGenerator:
                 seen.add(prompt)
                 unique_prompts.append(prompt)
             else:
-                logging.info(f"重複プロンプトを削除しました: {prompt}")
+                self.logger.info(f"重複プロンプトを削除しました: {prompt}")
 
         return unique_prompts
 
@@ -1861,6 +2055,56 @@ class AutoImageGenerator:
 
         # 除外されたプロンプトをログに出力
         if excluded_prompts:
-            logging.info(f"品質チェックにより除外されたプロンプト: {', '.join(excluded_prompts)}")
+            self.logger.info(f"品質チェックにより除外されたプロンプト: {', '.join(excluded_prompts)}")
 
         return quality_checked_prompts
+
+    def test_prompt_cancel_pair(self):
+        """
+        positive_cancel_pairの処理をテストするメソッド
+
+        Returns:
+            dict: テスト結果を含む辞書
+        """
+        self.logger.info("=== positive_cancel_pairのテスト開始 ===")
+
+        # テスト用プロンプトの作成
+        test_prompts = [
+            "selfie",
+            "(looking at viewer:1.4)",
+            "Some other prompt"
+        ]
+
+        self.logger.info(f"テスト用プロンプト: {test_prompts}")
+        self.logger.info(f"DATA_POSITIVE_CANCEL_PAIR: {self.DATA_POSITIVE_CANCEL_PAIR}")
+
+        # プロンプトの互換性チェック実行
+        filtered_prompts = self._apply_prompt_cancel_pairs(test_prompts.copy())
+        self.logger.info(f"フィルタリング後のプロンプト: {filtered_prompts}")
+
+        # 除外されたプロンプトを特定
+        excluded_prompts = [p for p in test_prompts if p not in filtered_prompts]
+        self.logger.info(f"除外されたプロンプト: {excluded_prompts}")
+
+        # チェックが正常に機能しているかどうかの確認
+        cancel_pair_working = any(p not in filtered_prompts for p in test_prompts if p != "selfie" and p != "Some other prompt")
+        self.logger.info(f"positive_cancel_pair処理が機能しているか: {cancel_pair_working}")
+
+        self.logger.info("=== positive_cancel_pairのテスト終了 ===")
+
+        return {
+            "original_prompts": test_prompts,
+            "filtered_prompts": filtered_prompts,
+            "excluded_prompts": excluded_prompts,
+            "cancel_pair_working": cancel_pair_working
+        }
+
+    def _load_settings(self):
+        """設定ファイルを読み込む"""
+        try:
+            settings_path = os.path.join(os.path.dirname(__file__), "settings.json")
+            with open(settings_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            self.logger.error(f"設定ファイルの読み込みに失敗しました: {e}")
+            return {}

@@ -1,0 +1,34 @@
+{
+    "Selfie": {
+        "use_max_prompts": 1,
+        "use_min_prompts": 1,
+        "prompts": [
+            "selfie with motorcycle",
+            "biker's selfie",
+            "motorcycle selfie",
+            "rider selfie",
+            "selfie on bike",
+            "selfie next to motorcycle",
+            "selfie with helmet",
+            "selfie in gear",
+            "selfie before ride",
+            "selfie after ride"
+        ]
+    },
+    "Selfie Angle": {
+        "use_max_prompts": 1,
+        "use_min_prompts": 1,
+        "prompts": [
+            "first person view",
+            "pov shot",
+            "rider's perspective",
+            "helmet cam view",
+            "motorcycle rider's angle",
+            "handlebar view",
+            "cockpit view",
+            "dashboard view",
+            "mirror view",
+            "over the shoulder view"
+        ]
+    }
+}

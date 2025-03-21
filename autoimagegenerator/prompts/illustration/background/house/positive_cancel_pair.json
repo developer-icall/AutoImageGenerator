@@ -1,0 +1,63 @@
+{
+  "anime house": [
+    "realistic building",
+    "photographic home",
+    "documentary architecture",
+    "urban landscape",
+    "natural scenery"
+  ],
+  "fantasy cottage": [
+    "realistic small house",
+    "photographic cottage",
+    "documentary architecture",
+    "modern building"
+  ],
+  "cartoon mansion": [
+    "realistic luxury home",
+    "photographic estate",
+    "documentary architecture",
+    "urban landscape"
+  ],
+  "illustrated interior": [
+    "photorealistic room",
+    "documentary indoor scene",
+    "realistic interior design",
+    "outdoor setting"
+  ],
+  "magical castle": [
+    "realistic fortress",
+    "photographic castle",
+    "documentary architecture",
+    "modern building"
+  ],
+  "vibrant living room": [
+    "monochrome interior",
+    "black and white room",
+    "grayscale indoor scene",
+    "outdoor setting"
+  ],
+  "painted kitchen": [
+    "photorealistic kitchen",
+    "documentary indoor space",
+    "realistic room",
+    "outdoor setting"
+  ],
+  "stylized bedroom": [
+    "realistic sleeping quarters",
+    "photographic bedroom",
+    "documentary interior",
+    "outdoor setting"
+  ],
+  "whimsical garden house": [
+    "realistic garden structure",
+    "photographic outdoor building",
+    "documentary architecture",
+    "urban landscape"
+  ],
+  "fantasy treehouse": [
+    "realistic elevated structure",
+    "photographic treehouse",
+    "documentary architecture",
+    "urban building"
+  ]
+}

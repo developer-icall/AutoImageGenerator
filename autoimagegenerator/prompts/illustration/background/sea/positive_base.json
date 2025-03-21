@@ -1,0 +1,80 @@
+{
+  "Sea Type": {
+    "prompts": [
+      "anime ocean view",
+      "fantasy open sea",
+      "magical tropical ocean",
+      "anime crystal waters",
+      "fantasy coastal view",
+      "magical shoreline",
+      "anime rocky coast",
+      "fantasy sandy beach",
+      "magical tropical beach",
+      "anime secluded cove",
+      "fantasy bay view",
+      "magical harbor scene",
+      "anime island view",
+      "fantasy archipelago",
+      "magical coral reef",
+      "anime tide pools",
+      "fantasy sea cliffs",
+      "magical seaside",
+      "anime tropical coast",
+      "fantasy tropical islands",
+      "magical lagoon"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  },
+  "Water Condition": {
+    "prompts": [
+      "anime calm waters",
+      "fantasy gentle waves",
+      "magical rolling waves",
+      "anime crashing waves",
+      "fantasy stormy sea",
+      "magical rough waters",
+      "fantasy crystal clear water",
+      "magical turquoise water",
+      "anime deep blue water",
+      "fantasy emerald water",
+      "magical shallow waters",
+      "anime foamy waves",
+      "fantasy rippling surface",
+      "magical glassy surface",
+      "anime sparkling water"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  },
+  "Coastal Features": {
+    "prompts": [
+      "anime white sand beach",
+      "fantasy golden sand beach",
+      "magical black sand beach",
+      "anime pebble beach",
+      "fantasy rocky shore",
+      "magical coastal rocks",
+      "anime sea stacks",
+      "fantasy tide pools",
+      "magical coastal cliffs",
+      "anime sea caves",
+      "fantasy natural arch over water",
+      "magical coral reef",
+      "anime palm trees",
+      "fantasy coastal pines",
+      "magical mangroves",
+      "anime driftwood",
+      "fantasy seashells on shore",
+      "magical lighthouse",
+      "anime pier",
+      "fantasy dock",
+      "magical fishing boats",
+      "anime sailing boats in distance",
+      "fantasy small island",
+      "magical distant islands"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  }
+}

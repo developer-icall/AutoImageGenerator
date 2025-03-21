@@ -1,0 +1,73 @@
+{
+  "dense forest": [
+    "desert",
+    "open plain",
+    "city street",
+    "urban setting",
+    "skyscrapers",
+    "downtown"
+  ],
+  "mountain peak": [
+    "flat terrain",
+    "urban landscape",
+    "city center",
+    "ocean floor",
+    "indoor setting"
+  ],
+  "waterfall": [
+    "desert",
+    "dry landscape",
+    "drought",
+    "arid terrain",
+    "urban setting"
+  ],
+  "lush vegetation": [
+    "arid desert",
+    "drought",
+    "barren landscape",
+    "urban jungle",
+    "concrete jungle"
+  ],
+  "wilderness": [
+    "urban",
+    "city center",
+    "populated area",
+    "industrial zone",
+    "shopping district"
+  ],
+  "natural landscape": [
+    "artificial landscape",
+    "urban setting",
+    "city streets",
+    "industrial complex",
+    "shopping mall"
+  ],
+  "hiking trail": [
+    "busy highway",
+    "urban street",
+    "city center",
+    "shopping district",
+    "industrial zone"
+  ],
+  "meadow": [
+    "urban setting",
+    "concrete jungle",
+    "industrial area",
+    "city street",
+    "indoor scene"
+  ],
+  "pristine nature": [
+    "polluted",
+    "industrial waste",
+    "urban decay",
+    "city life",
+    "concrete jungle"
+  ],
+  "countryside": [
+    "urban landscape",
+    "city center",
+    "downtown",
+    "skyscrapers",
+    "busy intersection"
+  ]
+}

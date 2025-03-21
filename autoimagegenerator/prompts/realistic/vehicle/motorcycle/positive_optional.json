@@ -1,0 +1,118 @@
+{
+    "Color": {
+        "use_max_prompts": 1,
+        "use_min_prompts": 0,
+        "prompts": [
+            "glossy black",
+            "metallic red",
+            "pearl white",
+            "matte black",
+            "chrome finish",
+            "candy blue",
+            "gunmetal gray",
+            "custom paint",
+            "two-tone color scheme",
+            "racing stripes"
+        ]
+    },
+    "Environment": {
+        "use_max_prompts": 1,
+        "use_min_prompts": 0,
+        "prompts": [
+            "in a showroom",
+            "on a mountain road",
+            "on a highway",
+            "in a garage",
+            "at a motorcycle show",
+            "in an urban setting",
+            "on a race track",
+            "in a workshop",
+            "at a dealership",
+            "in a parking lot"
+        ]
+    },
+    "Lighting": {
+        "use_max_prompts": 1,
+        "use_min_prompts": 0,
+        "prompts": [
+            "natural lighting",
+            "studio lighting",
+            "dramatic lighting",
+            "golden hour",
+            "backlit",
+            "spotlights",
+            "soft lighting",
+            "moody lighting",
+            "bright daylight",
+            "evening light"
+        ]
+    },
+    "Time of Day": {
+        "use_max_prompts": 1,
+        "use_min_prompts": 0,
+        "prompts": [
+            "during daytime",
+            "at sunset",
+            "at sunrise",
+            "during golden hour",
+            "during blue hour",
+            "at night",
+            "under studio lighting",
+            "in natural light",
+            "under spotlights",
+            "in ambient lighting"
+        ]
+    },
+    "Weather": {
+        "use_max_prompts": 1,
+        "use_min_prompts": 0,
+        "prompts": [
+            "clear sky",
+            "cloudy",
+            "overcast",
+            "after rain",
+            "sunny day",
+            "misty morning",
+            "foggy conditions",
+            "partly cloudy",
+            "bright daylight",
+            "moody atmosphere"
+        ]
+    },
+    "Vehicle Details": {
+        "use_max_prompts": 1,
+        "use_min_prompts": 0,
+        "prompts": [
+            "detailed motorcycle engine",
+            "intricate motorcycle design",
+            "high-quality motorcycle finish",
+            "professional motorcycle photography",
+            "detailed motorcycle parts",
+            "motorcycle close-up shot"
+        ]
+    },
+    "Rider Pose": {
+        "use_max_prompts": 1,
+        "use_min_prompts": 0,
+        "prompts": [
+            "rider sitting on motorcycle",
+            "motorcyclist standing next to motorcycle",
+            "rider mounting motorcycle",
+            "motorcyclist dismounting motorcycle",
+            "rider leaning into turn",
+            "motorcyclist in riding position"
+        ]
+    },
+    "Scene": {
+        "use_max_prompts": 0,
+        "use_min_prompts": 0,
+        "prompts": [
+            "motorcycle in studio",
+            "motorcycle on showroom floor",
+            "motorcycle in garage",
+            "motorcycle in dealership",
+            "motorcycle in professional photo studio",
+            "motorcycle in well-lit environment"
+        ]
+    }
+}

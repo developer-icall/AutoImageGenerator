@@ -1,0 +1,28 @@
+{
+  "Viewing Angle": {
+    "prompts": [
+      "anime looking up at sky",
+      "fantasy character's sky view",
+      "magical first-person perspective",
+      "anime immersive sky view",
+      "fantasy point-of-view shot",
+      "magical character gazing upward",
+      "anime through character's eyes"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  },
+  "Framing": {
+    "prompts": [
+      "anime framed by tree branches",
+      "fantasy viewed through window",
+      "magical through castle tower",
+      "anime through floating islands",
+      "fantasy through cloud formations",
+      "magical through glowing portal",
+      "anime through anime-style frame"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  }
+}

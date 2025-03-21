@@ -1,0 +1,60 @@
+{
+  "Base Positive Prompt": {
+    "prompts": [
+      "(8k, RAW photo, best quality, masterpiece:1.2), (realistic:1.3), (photorealistic:1.3), (detailed:1.2), (sharp focus:1.2)",
+      "(8k, best quality, masterpiece:1.2), (realistic:1.3), (photorealistic:1.3), (sharp focus:1.2), (detailed:1.2)"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  },
+  "Car Type": {
+    "prompts": [
+      "sports car",
+      "luxury car",
+      "sedan",
+      "SUV",
+      "classic car",
+      "vintage car",
+      "muscle car",
+      "supercar",
+      "hypercar",
+      "convertible"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1,
+    "position": "start"
+  },
+  "Car Brand": {
+    "prompts": [
+      "Ferrari",
+      "Lamborghini",
+      "Porsche",
+      "Mercedes-Benz",
+      "BMW",
+      "Audi",
+      "Toyota",
+      "Honda",
+      "Nissan",
+      "Ford",
+      "Chevrolet"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  },
+  "Car Color": {
+    "prompts": [
+      "red car",
+      "blue car",
+      "black car",
+      "white car",
+      "silver car",
+      "yellow car",
+      "green car",
+      "orange car",
+      "purple car",
+      "metallic car"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  }
+}

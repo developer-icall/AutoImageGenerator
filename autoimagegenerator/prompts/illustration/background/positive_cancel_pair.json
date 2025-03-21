@@ -1,0 +1,72 @@
+{
+  "illustration style": [
+    "photorealistic",
+    "realistic",
+    "hyperrealistic",
+    "documentary style",
+    "photographic quality"
+  ],
+  "cartoon style": [
+    "realistic rendering",
+    "photorealistic detail",
+    "high definition photo",
+    "documentary style",
+    "real-world accuracy"
+  ],
+  "anime background": [
+    "photorealistic scene",
+    "realistic environment",
+    "documentary style",
+    "photographic quality",
+    "real location"
+  ],
+  "stylized art": [
+    "photorealistic detail",
+    "realistic texture",
+    "documentary quality",
+    "photographic style",
+    "real world lighting"
+  ],
+  "fantasy art": [
+    "realistic depiction",
+    "photographic accuracy",
+    "documentary style",
+    "real world setting",
+    "actual location"
+  ],
+  "cel shading": [
+    "realistic shading",
+    "photorealistic shadows",
+    "real lighting effects",
+    "documentary lighting",
+    "photographic gradients"
+  ],
+  "vibrant colors": [
+    "photorealistic colors",
+    "natural color palette",
+    "realistic color grading",
+    "documentary coloring",
+    "real world tones"
+  ],
+  "exaggerated perspective": [
+    "accurate perspective",
+    "realistic viewpoint",
+    "photographic angle",
+    "documentary framing",
+    "real world proportions"
+  ],
+  "simplified details": [
+    "intricate realistic details",
+    "photorealistic textures",
+    "documentary precision",
+    "accurate photographic elements",
+    "real world complexity"
+  ],
+  "whimsical elements": [
+    "realistic elements",
+    "photographic accuracy",
+    "documentary style",
+    "real world objects",
+    "actual features"
+  ]
+}

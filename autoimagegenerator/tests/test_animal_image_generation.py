@@ -27,13 +27,13 @@ class TestAnimalImageGeneration(unittest.TestCase):
         }
 
     @patch('auto_image_generator.AutoImageGenerator._switch_model')
-    @patch('auto_image_generator.AutoImageGenerator._generate_image')
+    @patch('auto_image_generator.AutoImageGenerator._generate_images')
     @patch('auto_image_generator.requests.post')
-    def test_illustration_bird_generation(self, mock_post, mock_generate_image, mock_switch_model):
+    def test_illustration_bird_generation(self, mock_post, mock_generate_images, mock_switch_model):
         """イラストスタイルの鳥画像生成テスト"""
         # モックの設定
         mock_post.return_value.json.return_value = {"images": ["base64_encoded_image"]}
-        mock_generate_image.return_value = {"images": ["base64_encoded_image"]}
+        mock_generate_images.return_value = {"images": ["base64_encoded_image"]}
 
         # テスト対象のインスタンス作成
         generator = AutoImageGenerator(
@@ -48,6 +48,12 @@ class TestAnimalImageGeneration(unittest.TestCase):
             subcategory="bird"
         )
 
+        # モデル切り替えフラグをリセット
+        generator._model_switch_executed = False
+
+        # モデルを切り替え
+        generator.set_model("animagineXL40_v4Opt.safetensors")
+
         # プロンプト生成のテスト
         prompts = generator.generate_prompts()
 
@@ -56,24 +62,23 @@ class TestAnimalImageGeneration(unittest.TestCase):
         self.assertIn("negative_prompt", prompts)
         self.assertIn("bird", prompts["positive_prompt"].lower())
 
-        # 画像生成のテスト（実際には生成せず、モックを使用）
-        with patch.object(generator, '_save_generated_images'):
-            generator.run()
+        # 画像生成のテスト
+        generator.run()
 
         # モデル切り替えが呼ばれたことを確認
         mock_switch_model.assert_called_once()
 
         # 画像生成が呼ばれたことを確認
-        mock_generate_image.assert_called()
+        mock_generate_images.assert_called()
 
     @patch('auto_image_generator.AutoImageGenerator._switch_model')
-    @patch('auto_image_generator.AutoImageGenerator._generate_image')
+    @patch('auto_image_generator.AutoImageGenerator._generate_images')
     @patch('auto_image_generator.requests.post')
-    def test_realistic_bird_generation(self, mock_post, mock_generate_image, mock_switch_model):
+    def test_realistic_bird_generation(self, mock_post, mock_generate_images, mock_switch_model):
         """リアルスタイルの鳥画像生成テスト"""
         # モックの設定
         mock_post.return_value.json.return_value = {"images": ["base64_encoded_image"]}
-        mock_generate_image.return_value = {"images": ["base64_encoded_image"]}
+        mock_generate_images.return_value = {"images": ["base64_encoded_image"]}
 
         # テスト対象のインスタンス作成
         generator = AutoImageGenerator(
@@ -88,6 +93,12 @@ class TestAnimalImageGeneration(unittest.TestCase):
             subcategory="bird"
         )
 
+        # モデル切り替えフラグをリセット
+        generator._model_switch_executed = False
+
+        # モデルを切り替え
+        generator.set_model("yayoiMix_v25.safetensors")
+
         # プロンプト生成のテスト
         prompts = generator.generate_prompts()
 
@@ -97,24 +108,23 @@ class TestAnimalImageGeneration(unittest.TestCase):
         self.assertIn("bird", prompts["positive_prompt"].lower())
         self.assertIn("realistic", prompts["positive_prompt"].lower())
 
-        # 画像生成のテスト（実際には生成せず、モックを使用）
-        with patch.object(generator, '_save_generated_images'):
-            generator.run()
+        # 画像生成のテスト
+        generator.run()
 
         # モデル切り替えが呼ばれたことを確認
         mock_switch_model.assert_called_once()
 
         # 画像生成が呼ばれたことを確認
-        mock_generate_image.assert_called()
+        mock_generate_images.assert_called()
 
     @patch('auto_image_generator.AutoImageGenerator._switch_model')
-    @patch('auto_image_generator.AutoImageGenerator._generate_image')
+    @patch('auto_image_generator.AutoImageGenerator._generate_images')
     @patch('auto_image_generator.requests.post')
-    def test_illustration_cat_generation(self, mock_post, mock_generate_image, mock_switch_model):
+    def test_illustration_cat_generation(self, mock_post, mock_generate_images, mock_switch_model):
         """イラストスタイルの猫画像生成テスト"""
         # モックの設定
         mock_post.return_value.json.return_value = {"images": ["base64_encoded_image"]}
-        mock_generate_image.return_value = {"images": ["base64_encoded_image"]}
+        mock_generate_images.return_value = {"images": ["base64_encoded_image"]}
 
         # テスト対象のインスタンス作成
         generator = AutoImageGenerator(
@@ -129,6 +139,12 @@ class TestAnimalImageGeneration(unittest.TestCase):
             subcategory="cat"
         )
 
+        # モデル切り替えフラグをリセット
+        generator._model_switch_executed = False
+
+        # モデルを切り替え
+        generator.set_model("animagineXL40_v4Opt.safetensors")
+
         # プロンプト生成のテスト
         prompts = generator.generate_prompts()
 
@@ -137,24 +153,23 @@ class TestAnimalImageGeneration(unittest.TestCase):
         self.assertIn("negative_prompt", prompts)
         self.assertIn("cat", prompts["positive_prompt"].lower())
 
-        # 画像生成のテスト（実際には生成せず、モックを使用）
-        with patch.object(generator, '_save_generated_images'):
-            generator.run()
+        # 画像生成のテスト
+        generator.run()
 
         # モデル切り替えが呼ばれたことを確認
         mock_switch_model.assert_called_once()
 
         # 画像生成が呼ばれたことを確認
-        mock_generate_image.assert_called()
+        mock_generate_images.assert_called()
 
     @patch('auto_image_generator.AutoImageGenerator._switch_model')
-    @patch('auto_image_generator.AutoImageGenerator._generate_image')
+    @patch('auto_image_generator.AutoImageGenerator._generate_images')
     @patch('auto_image_generator.requests.post')
-    def test_realistic_cat_generation(self, mock_post, mock_generate_image, mock_switch_model):
+    def test_realistic_cat_generation(self, mock_post, mock_generate_images, mock_switch_model):
         """リアルスタイルの猫画像生成テスト"""
         # モックの設定
         mock_post.return_value.json.return_value = {"images": ["base64_encoded_image"]}
-        mock_generate_image.return_value = {"images": ["base64_encoded_image"]}
+        mock_generate_images.return_value = {"images": ["base64_encoded_image"]}
 
         # テスト対象のインスタンス作成
         generator = AutoImageGenerator(
@@ -169,6 +184,12 @@ class TestAnimalImageGeneration(unittest.TestCase):
             subcategory="cat"
         )
 
+        # モデル切り替えフラグをリセット
+        generator._model_switch_executed = False
+
+        # モデルを切り替え
+        generator.set_model("yayoiMix_v25.safetensors")
+
         # プロンプト生成のテスト
         prompts = generator.generate_prompts()
 
@@ -178,15 +199,14 @@ class TestAnimalImageGeneration(unittest.TestCase):
         self.assertIn("cat", prompts["positive_prompt"].lower())
         self.assertIn("realistic", prompts["positive_prompt"].lower())
 
-        # 画像生成のテスト（実際には生成せず、モックを使用）
-        with patch.object(generator, '_save_generated_images'):
-            generator.run()
+        # 画像生成のテスト
+        generator.run()
 
         # モデル切り替えが呼ばれたことを確認
         mock_switch_model.assert_called_once()
 
         # 画像生成が呼ばれたことを確認
-        mock_generate_image.assert_called()
+        mock_generate_images.assert_called()
 
 if __name__ == '__main__':
     unittest.main()

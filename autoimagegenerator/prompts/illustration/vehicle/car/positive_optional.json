@@ -1,0 +1,68 @@
+{
+  "Environment": {
+    "prompts": [
+      "in a futuristic city",
+      "in a cyberpunk street",
+      "in a fantasy world",
+      "on a floating road",
+      "in space",
+      "in a post-apocalyptic world",
+      "in a neon city",
+      "in a virtual reality",
+      "in a digital world",
+      "in a magical realm",
+      "in a steampunk city",
+      "on a rainbow road"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  },
+  "Effects": {
+    "prompts": [
+      "with energy trails",
+      "with glowing effects",
+      "with speed lines",
+      "with particle effects",
+      "with neon glow",
+      "with holographic effects",
+      "with light streaks",
+      "with aura effects",
+      "with magic effects",
+      "with electric sparks"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  },
+  "Camera Settings": {
+    "prompts": [
+      "dynamic angle",
+      "dramatic perspective",
+      "isometric view",
+      "heroic angle",
+      "fish-eye view",
+      "bird's eye view",
+      "worm's eye view",
+      "dutch angle",
+      "extreme close-up",
+      "panoramic view"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  },
+  "Additional Details": {
+    "prompts": [
+      "with glowing wheels",
+      "with energy exhaust",
+      "with floating parts",
+      "with holographic displays",
+      "with transforming parts",
+      "with crystal accents",
+      "with force field",
+      "with digital patterns",
+      "with animated decals",
+      "with light trails"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  }
+}

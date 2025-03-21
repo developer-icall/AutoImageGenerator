@@ -25,8 +25,8 @@
       "Seductive pose",
       "Seductive pose"
     ],
-    "use max prompts": 1,
-    "use min prompts": 1
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
   },
   "Face": {
     "prompts": [
@@ -45,7 +45,7 @@
       "",
       ""
     ],
-    "use max prompts": 1,
-    "use min prompts": 1
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
   }
 }

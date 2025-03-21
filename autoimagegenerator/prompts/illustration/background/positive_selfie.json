@@ -1,0 +1,28 @@
+{
+  "Viewing Angle": {
+    "prompts": [
+      "personal perspective view",
+      "first-person view",
+      "looking out at the landscape",
+      "immersive view",
+      "point-of-view shot",
+      "character's perspective",
+      "through character's eyes"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  },
+  "Framing": {
+    "prompts": [
+      "framed by stylized elements",
+      "viewed through window frame",
+      "through decorated doorway",
+      "through fantasy arch",
+      "framed by foliage",
+      "through magical portal",
+      "through anime-style frame"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  }
+}

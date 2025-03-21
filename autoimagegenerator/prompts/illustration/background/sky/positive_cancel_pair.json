@@ -1,0 +1,64 @@
+{
+  "anime sky": [
+    "realistic sky",
+    "photographic clouds",
+    "documentary weather",
+    "urban landscape",
+    "indoor scene"
+  ],
+  "fantasy clouds": [
+    "realistic clouds",
+    "photographic sky",
+    "documentary weather",
+    "underground scene",
+    "indoor setting"
+  ],
+  "cartoon sunset": [
+    "photorealistic sunset",
+    "documentary dusk",
+    "realistic evening sky",
+    "indoor scene"
+  ],
+  "illustrated stars": [
+    "realistic night sky",
+    "photographic stars",
+    "documentary astronomy",
+    "indoor setting"
+  ],
+  "magical aurora": [
+    "realistic northern lights",
+    "photographic aurora",
+    "documentary sky phenomenon",
+    "indoor scene"
+  ],
+  "vibrant sky colors": [
+    "monochrome sky",
+    "black and white clouds",
+    "grayscale atmosphere",
+    "indoor scene"
+  ],
+  "painted rainbow": [
+    "photorealistic rainbow",
+    "documentary weather phenomenon",
+    "realistic spectrum",
+    "underground setting"
+  ],
+  "stylized moon": [
+    "realistic lunar surface",
+    "photographic moon",
+    "documentary astronomy",
+    "indoor setting"
+  ],
+  "whimsical weather": [
+    "realistic meteorology",
+    "photographic weather",
+    "documentary atmosphere",
+    "indoor scene"
+  ],
+  "fantasy celestial scene": [
+    "realistic astronomy",
+    "photographic night sky",
+    "documentary space view",
+    "indoor setting"
+  ]
+}

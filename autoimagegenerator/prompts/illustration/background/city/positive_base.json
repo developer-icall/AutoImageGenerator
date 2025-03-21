@@ -1,0 +1,67 @@
+{
+  "City Type": {
+    "prompts": [
+      "anime city",
+      "fantasy metropolis",
+      "futuristic city",
+      "cyberpunk cityscape",
+      "steampunk town",
+      "medieval city",
+      "fantasy town",
+      "magical city",
+      "sci-fi urban landscape",
+      "stylized cityscape",
+      "cartoon urban environment",
+      "illustrated skyline",
+      "anime downtown district",
+      "fantasy urban center",
+      "mystical city"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  },
+  "Architecture Style": {
+    "prompts": [
+      "anime-style architecture",
+      "fantasy buildings",
+      "futuristic structures",
+      "neon-lit skyscrapers",
+      "steampunk architecture",
+      "magical towers",
+      "crystalline buildings",
+      "floating structures",
+      "impossible architecture",
+      "whimsical buildings",
+      "stylized modern architecture",
+      "fantasy gothic architecture",
+      "sci-fi glass towers",
+      "fantasy oriental architecture",
+      "cartoon-style buildings"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  },
+  "City Features": {
+    "prompts": [
+      "fantasy streets",
+      "anime alleyways",
+      "magical plaza",
+      "floating platforms",
+      "fantasy gardens",
+      "magical fountains",
+      "glowing streetlights",
+      "animated market",
+      "fantasy bridge",
+      "levitating train",
+      "magical transportation",
+      "fantasy university",
+      "anime shopping district",
+      "fantasy industrial area",
+      "rooftop garden view",
+      "magical city panorama",
+      "fantasy urban park"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  }
+}

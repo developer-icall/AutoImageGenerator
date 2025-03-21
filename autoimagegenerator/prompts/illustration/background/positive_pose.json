@@ -1,0 +1,33 @@
+{
+  "Viewing Angle": {
+    "prompts": [
+      "high angle view",
+      "low angle view",
+      "eye level view",
+      "bird's eye view",
+      "aerial view",
+      "top-down view",
+      "side view",
+      "distant view",
+      "close-up view",
+      "dynamic angle",
+      "extreme perspective"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 1
+  },
+  "Camera Position": {
+    "prompts": [
+      "camera facing forward",
+      "camera tilted slightly upward",
+      "camera tilted slightly downward",
+      "camera positioned at ground level",
+      "camera positioned at height",
+      "camera positioned far away",
+      "dramatic camera angle",
+      "cinematic view"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  }
+}

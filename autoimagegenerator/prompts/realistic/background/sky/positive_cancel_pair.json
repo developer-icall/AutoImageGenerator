@@ -1,0 +1,75 @@
+{
+  "clear blue sky": [
+    "stormy weather",
+    "cloudy",
+    "overcast",
+    "rainy",
+    "foggy",
+    "indoor scene"
+  ],
+  "sunset sky": [
+    "midday",
+    "noon",
+    "midnight",
+    "dawn",
+    "indoor setting",
+    "underground"
+  ],
+  "starry night": [
+    "daylight",
+    "noon",
+    "bright day",
+    "indoor scene",
+    "underwater",
+    "bright sunlight"
+  ],
+  "clouds": [
+    "clear sky",
+    "underground",
+    "indoor scene",
+    "underwater",
+    "cave interior"
+  ],
+  "aurora": [
+    "daylight",
+    "tropical setting",
+    "desert noon",
+    "indoor scene",
+    "equatorial location"
+  ],
+  "stormy sky": [
+    "clear day",
+    "bright sunlight",
+    "indoor scene",
+    "underground",
+    "cloudless"
+  ],
+  "sunrise": [
+    "sunset",
+    "midnight",
+    "noon",
+    "indoor setting",
+    "underground"
+  ],
+  "full moon": [
+    "midday",
+    "bright sunlight",
+    "indoor scene",
+    "underground",
+    "new moon"
+  ],
+  "dramatic clouds": [
+    "clear sky",
+    "cloudless",
+    "indoor scene",
+    "underground",
+    "underwater"
+  ],
+  "lightning": [
+    "clear day",
+    "cloudless sky",
+    "indoor scene",
+    "underground",
+    "sunny day"
+  ]
+}

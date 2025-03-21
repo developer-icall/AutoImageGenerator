@@ -1,0 +1,57 @@
+{
+  "City Atmosphere": {
+    "prompts": [
+      "busy city",
+      "crowded streets",
+      "quiet neighborhood",
+      "night life",
+      "morning commute",
+      "festival atmosphere",
+      "market day",
+      "quiet sunday",
+      "business district atmosphere"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  },
+  "Urban Elements": {
+    "prompts": [
+      "street lamps",
+      "traffic lights",
+      "crosswalks",
+      "sidewalks",
+      "public benches",
+      "outdoor cafes",
+      "street vendors",
+      "public art",
+      "street murals",
+      "fountains",
+      "monuments",
+      "plazas",
+      "urban greenery",
+      "rooftop gardens",
+      "bike lanes",
+      "public transportation"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  },
+  "Urban Setting": {
+    "prompts": [
+      "international metropolis",
+      "financial district",
+      "historic center",
+      "cultural quarter",
+      "entertainment district",
+      "university area",
+      "diplomatic quarter",
+      "shopping district",
+      "port area",
+      "railway district",
+      "chinatown",
+      "little italy"
+    ],
+    "use_max_prompts": 1,
+    "use_min_prompts": 0
+  }
+}

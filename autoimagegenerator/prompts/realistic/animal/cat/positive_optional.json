@@ -46,14 +46,13 @@
       "moonlight",
       "sunlight",
       "dappled light",
-      "studio lighting",
       "high contrast lighting",
       "low key lighting",
       "high key lighting",
       "warm lighting",
       "cool lighting"
     ],
-    "use_max_prompts": 1,
+    "use_max_prompts": 0,
     "use_min_prompts": 0
   },
   "Composition": {
@@ -98,9 +97,6 @@
       "with flowers",
       "with plants",
       "with butterfly",
-      "with bird",
-      "with fish",
-      "with mouse",
       "with laser pointer dot",
       "with feather toy",
       "with string toy",

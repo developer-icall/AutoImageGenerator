@@ -1,7 +1,7 @@
 {
   "Base Positive Prompt": {
     "prompts": [
-      "(masterpiece, best quality, high quality, highres), (RPG icon:1.3), (game asset:1.2), (fantasy style:1.2), (centered composition:1.1)"
+      "(masterpiece, best quality), (RPG icon:1.3), (game asset:1.2), (fantasy style:1.2), (centered composition:1.1)"
     ],
     "use_max_prompts": 1,
     "use_min_prompts": 1
@@ -48,7 +48,6 @@
       "insect",
       "plant monster",
       "treant",
-      "mushroom creature",
       "fairy",
       "pixie",
       "gnome",

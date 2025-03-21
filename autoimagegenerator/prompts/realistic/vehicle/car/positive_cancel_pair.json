@@ -1,0 +1,25 @@
+{
+  "convertible": [
+    "in the rain",
+    "in the snow"
+  ],
+  "in a showroom": [
+    "in the rain",
+    "in the snow",
+    "on a race track",
+    "on a mountain road",
+    "on a highway",
+    "on a beach"
+  ],
+  "in a garage": [
+    "at sunset",
+    "natural lighting",
+    "golden hour lighting",
+    "blue hour lighting"
+  ],
+  "at night": [
+    "natural lighting",
+    "golden hour lighting",
+    "blue hour lighting"
+  ]
+}

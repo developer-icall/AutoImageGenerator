@@ -1,0 +1,73 @@
+{
+  "realistic background": [
+    "anime style",
+    "cartoon style",
+    "illustration style",
+    "manga style",
+    "chibi style",
+    "stylized art"
+  ],
+  "photorealistic": [
+    "anime",
+    "fantasy art",
+    "cartoon rendering",
+    "3d model",
+    "comic art style"
+  ],
+  "real world": [
+    "fantasy world",
+    "fictional setting",
+    "imaginary landscape",
+    "cartoon world",
+    "anime world"
+  ],
+  "natural lighting": [
+    "cel shading",
+    "anime lighting",
+    "cartoon lighting",
+    "fantasy glow",
+    "unrealistic light"
+  ],
+  "detailed texture": [
+    "flat color",
+    "cel shaded",
+    "anime shading",
+    "cartoon textures",
+    "simplified surfaces"
+  ],
+  "high definition": [
+    "anime resolution",
+    "cartoon quality",
+    "manga style",
+    "illustration resolution",
+    "low detail"
+  ],
+  "environmental realism": [
+    "fantasy environment",
+    "cartoon world",
+    "anime background",
+    "stylized setting",
+    "imaginary realm"
+  ],
+  "documentary style": [
+    "anime aesthetic",
+    "cartoon look",
+    "illustration appearance",
+    "manga feel",
+    "stylized art"
+  ],
+  "atmospheric perspective": [
+    "anime perspective",
+    "cartoon depth",
+    "illustration depth",
+    "flat background",
+    "simplified distance"
+  ],
+  "dynamic range": [
+    "cell shading",
+    "anime contrast",
+    "cartoon contrast",
+    "simplified lighting",
+    "flat lighting"
+  ]
+}
